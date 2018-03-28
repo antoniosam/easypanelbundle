@@ -1,0 +1,302 @@
+<?php
+
+
+namespace {{ bundle }}\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+
+/**
+ * {{ bundle }}\Entity\Contacto
+ *
+ * @ORM\Entity()
+ * @ORM\Table(name="contacto")
+ * @ORM\HasLifecycleCallbacks()
+ */
+class Contacto
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $nombre;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $asunto;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $correo;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $estado;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $recibido;
+
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     */
+    protected $mensaje;
+
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     */
+    protected $respuesta;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $respondido;
+
+    public function __construct()
+    {
+    }
+
+    public function __toString()
+    {
+        return $this->nombre;
+    }
+
+    /**
+    * Gets triggered only on insert
+    * @ORM\PrePersist
+    */
+    public function onPrePersist(){
+        //Cambiar por el campo creado si es que existe en la tabla
+        //$this->created = new \DateTime("now"); 
+    }
+
+    /**
+    * Gets triggered only on update
+    * @ORM\PreUpdate
+    */
+    public function onPreUpdate(){
+        //Cambiar por el campo modificado si es que existe en la tabla
+        //$this->updated = new \DateTime("now"); 
+    }
+
+    /**
+     * Set the value of id.
+     *
+     * @param integer $id
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of id.
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set the value of nombre.
+     *
+     * @param string $nombre
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setNombre($nombre)
+    {
+        $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nombre.
+     *
+     * @return string
+     */
+    public function getNombre()
+    {
+        return $this->nombre;
+    }
+
+    /**
+     * Set the value of asunto.
+     *
+     * @param string $asunto
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setAsunto($asunto)
+    {
+        $this->asunto = $asunto;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of asunto.
+     *
+     * @return string
+     */
+    public function getAsunto()
+    {
+        return $this->asunto;
+    }
+
+    /**
+     * Set the value of correo.
+     *
+     * @param string $correo
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setCorreo($correo)
+    {
+        $this->correo = $correo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of correo.
+     *
+     * @return string
+     */
+    public function getCorreo()
+    {
+        return $this->correo;
+    }
+
+    /**
+     * Set the value of estado.
+     *
+     * @param integer $estado
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setEstado($estado)
+    {
+        $this->estado = $estado;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of estado.
+     *
+     * @return integer
+     */
+    public function getEstado()
+    {
+        return $this->estado;
+    }
+
+    /**
+     * Set the value of recibido.
+     *
+     * @param \DateTime $recibido
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setRecibido($recibido)
+    {
+        $this->recibido = $recibido;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of recibido.
+     *
+     * @return \DateTime
+     */
+    public function getRecibido()
+    {
+        return $this->recibido;
+    }
+
+    /**
+     * Set the value of mensaje.
+     *
+     * @param string $mensaje
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setMensaje($mensaje)
+    {
+        $this->mensaje = $mensaje;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of mensaje.
+     *
+     * @return string
+     */
+    public function getMensaje()
+    {
+        return $this->mensaje;
+    }
+
+    /**
+     * Set the value of respuesta.
+     *
+     * @param string $respuesta
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setRespuesta($respuesta)
+    {
+        $this->respuesta = $respuesta;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of respuesta.
+     *
+     * @return string
+     */
+    public function getRespuesta()
+    {
+        return $this->respuesta;
+    }
+
+    /**
+     * Set the value of respondido.
+     *
+     * @param \DateTime $respondido
+     * @return  \{{ bundle }}\Entity\Contacto
+     */
+    public function setRespondido($respondido)
+    {
+        $this->respondido = $respondido;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of respondido.
+     *
+     * @return \DateTime
+     */
+    public function getRespondido()
+    {
+        return $this->respondido;
+    }
+
+    public function __sleep()
+    {
+        return array('id', 'nombre', 'asunto', 'correo', 'estado', 'recibido', 'mensaje', 'respuesta', 'respondido');
+    }
+}

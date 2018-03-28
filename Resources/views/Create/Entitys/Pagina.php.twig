@@ -1,0 +1,525 @@
+<?php
+
+
+namespace {{ bundle }}\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+
+/**
+ * {{ bundle }}\Entity\Pagina
+ *
+ * @ORM\Entity()
+ * @ORM\Table(name="paginas")
+ * @ORM\HasLifecycleCallbacks()
+ */
+class Pagina
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $titulo;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $slug;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $subtitulo;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $imagen;
+
+    /**
+     * @ORM\Column(type="string", length=250, nullable=true)
+     */
+    protected $descripcion;
+
+    /**
+     * @ORM\Column(type="string", length=1000, nullable=true)
+     */
+    protected $contenido;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $thumb;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $video;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $poster;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default":1})
+     */
+    protected $activo= true;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $seccion;
+
+    /**
+     * @ORM\Column(type="string", length=250, nullable=true)
+     */
+    protected $metakey;
+
+    /**
+     * @ORM\Column(type="string", length=250, nullable=true)
+     */
+    protected $metatags;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default":0})
+     */
+    protected $vistaseccion= false;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $creado;
+
+    /**
+     * @ORM\Column(type="string", length=45, nullable=true)
+     */
+    protected $actualizado;
+
+    public function __construct()
+    {
+    }
+
+    public function __toString()
+    {
+        return (string) $this->id;
+    }
+
+    /**
+    * Gets triggered only on insert
+    * @ORM\PrePersist
+    */
+    public function onPrePersist(){
+        $this->creado = new \DateTime("now"); 
+    }
+
+    /**
+    * Gets triggered only on update
+    * @ORM\PreUpdate
+    */
+    public function onPreUpdate(){
+        //Cambiar por el campo modificado si es que existe en la tabla
+        //$this->updated = new \DateTime("now"); 
+    }
+
+    /**
+     * Set the value of id.
+     *
+     * @param integer $id
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of id.
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set the value of titulo.
+     *
+     * @param string $titulo
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setTitulo($titulo)
+    {
+        $this->titulo = $titulo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of titulo.
+     *
+     * @return string
+     */
+    public function getTitulo()
+    {
+        return $this->titulo;
+    }
+
+    /**
+     * Set the value of slug.
+     *
+     * @param string $slug
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of slug.
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Set the value of subtitulo.
+     *
+     * @param string $subtitulo
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setSubtitulo($subtitulo)
+    {
+        $this->subtitulo = $subtitulo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of subtitulo.
+     *
+     * @return string
+     */
+    public function getSubtitulo()
+    {
+        return $this->subtitulo;
+    }
+
+    /**
+     * Set the value of imagen.
+     *
+     * @param string $imagen
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setImagen($imagen)
+    {
+        $this->imagen = $imagen;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of imagen.
+     *
+     * @return string
+     */
+    public function getImagen()
+    {
+        return $this->imagen;
+    }
+
+    /**
+     * Set the value of descripcion.
+     *
+     * @param string $descripcion
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setDescripcion($descripcion)
+    {
+        $this->descripcion = $descripcion;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of descripcion.
+     *
+     * @return string
+     */
+    public function getDescripcion()
+    {
+        return $this->descripcion;
+    }
+
+    /**
+     * Set the value of contenido.
+     *
+     * @param string $contenido
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setContenido($contenido)
+    {
+        $this->contenido = $contenido;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contenido.
+     *
+     * @return string
+     */
+    public function getContenido()
+    {
+        return $this->contenido;
+    }
+
+    /**
+     * Set the value of thumb.
+     *
+     * @param string $thumb
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setThumb($thumb)
+    {
+        $this->thumb = $thumb;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of thumb.
+     *
+     * @return string
+     */
+    public function getThumb()
+    {
+        return $this->thumb;
+    }
+
+    /**
+     * Set the value of video.
+     *
+     * @param string $video
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setVideo($video)
+    {
+        $this->video = $video;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of video.
+     *
+     * @return string
+     */
+    public function getVideo()
+    {
+        return $this->video;
+    }
+
+    /**
+     * Set the value of poster.
+     *
+     * @param string $poster
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setPoster($poster)
+    {
+        $this->poster = $poster;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of poster.
+     *
+     * @return string
+     */
+    public function getPoster()
+    {
+        return $this->poster;
+    }
+
+    /**
+     * Set the value of activo.
+     *
+     * @param boolean $activo
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setActivo($activo)
+    {
+        $this->activo = $activo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of activo.
+     *
+     * @return boolean
+     */
+    public function getActivo()
+    {
+        return $this->activo;
+    }
+
+    /**
+     * Set the value of seccion.
+     *
+     * @param integer $seccion
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setSeccion($seccion)
+    {
+        $this->seccion = $seccion;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of seccion.
+     *
+     * @return integer
+     */
+    public function getSeccion()
+    {
+        return $this->seccion;
+    }
+
+    /**
+     * Set the value of metakey.
+     *
+     * @param string $metakey
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setMetakey($metakey)
+    {
+        $this->metakey = $metakey;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of metakey.
+     *
+     * @return string
+     */
+    public function getMetakey()
+    {
+        return $this->metakey;
+    }
+
+    /**
+     * Set the value of metatags.
+     *
+     * @param string $metatags
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setMetatags($metatags)
+    {
+        $this->metatags = $metatags;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of metatags.
+     *
+     * @return string
+     */
+    public function getMetatags()
+    {
+        return $this->metatags;
+    }
+
+    /**
+     * Set the value of vistaseccion.
+     *
+     * @param boolean $vistaseccion
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setVistaseccion($vistaseccion)
+    {
+        $this->vistaseccion = $vistaseccion;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of vistaseccion.
+     *
+     * @return boolean
+     */
+    public function getVistaseccion()
+    {
+        return $this->vistaseccion;
+    }
+
+    /**
+     * Set the value of creado.
+     *
+     * @param \DateTime $creado
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setCreado($creado)
+    {
+        $this->creado = $creado;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of creado.
+     *
+     * @return \DateTime
+     */
+    public function getCreado()
+    {
+        return $this->creado;
+    }
+
+    /**
+     * Set the value of actualizado.
+     *
+     * @param string $actualizado
+     * @return  \{{ bundle }}\Entity\Paginas
+     */
+    public function setActualizado($actualizado)
+    {
+        $this->actualizado = $actualizado;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of actualizado.
+     *
+     * @return string
+     */
+    public function getActualizado()
+    {
+        return $this->actualizado;
+    }
+
+    public function __sleep()
+    {
+        return array('id', 'titulo', 'slug', 'subtitulo', 'imagen', 'descripcion', 'contenido', 'thumb', 'video', 'poster', 'activo', 'seccion', 'metakey', 'metatags', 'vistaseccion', 'creado', 'actualizado');
+    }
+}

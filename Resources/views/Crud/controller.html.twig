@@ -1,0 +1,159 @@
+<?php
+
+namespace AdminBundle\Controller;
+
+use AdminBundle\Entity\Clientes;
+use AdminBundle\Form\ClientesType;
+use Antoniost\SurveyBundle\Entity\Estudios;
+use Antoniost\SurveyUIGenerateBundle\Entity\SandboxEstudios;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * @Route("/{{ ruta }}" )
+ */
+class {{ entity }}Controller extends Controller
+{
+    /**
+     * @Route("/", name="admin_{{ ruta }}_index" )
+     */
+    public function indexAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+$clientes = $em->getRepository({{ entity }}::class)->findAll();
+
+$parameters = Panel::easyList("Clientes", $clientes,['clave', 'nombre', 'cuestionarios'], "admin_clientes");
+
+return $this->render('Panel/html.twig',$parameters);
+}
+
+/**
+* @Route("/new", name="admin_{{ ruta }}_new")
+*/
+public function nuevoAction(Request $request)
+{
+$form = $this->generateForm();
+if($redirect = $this->saveForm($request,$form)){
+return $this->redirect($redirect);
+};
+return $this->render('Panel/html.twig', Panel::easyForm('Nuevo Cliente',$form->createView(),'admin_clientes'));
+}
+
+/**
+* Finds and displays a Banners entity.
+*
+* @Route("/{id}/show", name="admin_{{ ruta }}_show", requirements={"page"="\d+"} )
+* @Method("GET")
+*/
+public function showAction(Clientes $cliente)
+{
+$panel = new Panel();
+$panel->addDirectory("Clientes",'admin_clientes_index');
+$panel->setLocation($cliente->getNombre());
+$show = PanelShow::easy("Cliente", $cliente,['clave', 'nombre', 'cuestionarios','mensajesuccess','mensajecancel','mensajeoverlimit'], "admin_clientes",$this->viewDeleteForm($cliente));
+$panel->addShow($show);
+
+
+return $this->render('Panel/html.twig', $panel->createView());
+}
+
+/**
+* Displays a form to edit an existing Banners entity.
+*
+* @Route("/{id}/edit", name="admin_{{ ruta }}_edit",requirements={"page"="\d+"})
+* @Method({"GET", "POST"})
+*/
+public function editAction(Request $request, Clientes $cliente)
+{
+$editForm = $this->generateForm( $cliente);
+if($redirect = $this->saveForm($request,$editForm,$cliente)){
+return $this->redirect($redirect);
+};
+
+$form = PanelForm::easy("Editar Cliente", $editForm->createView(),'',$this->viewDeleteForm($cliente));
+$form->addLinkBack('admin_clientes_show',array('id'=>$cliente->getId()),'Regresar');
+
+return $this->render('Panel/html.twig', Panel::createForm($form));
+}
+
+/**
+* Deletes a Banners entity.
+*
+* @Route("/{id}", name="admin_{{ ruta }}_delete")
+* @Method("DELETE")
+*/
+public function deleteAction(Request $request, Clientes $banner)
+{
+$form = $this->generateDeleteForm($banner);
+$form->handleRequest($request);
+if ($form->isSubmitted() && $form->isValid()) {
+$em = $this->getDoctrine()->getManager();
+$em->remove($banner);
+$em->flush();
+}
+return $this->redirectToRoute('admin_clientes_index');
+}
+
+/**
+* @param Clientes|null $cliente
+* @return FormInterface
+*/
+private function generateForm(Clientes $cliente = null){
+if($cliente ==null){
+$cliente = new Clientes();
+}
+return  $this->createForm(ClientesType::class, $cliente);
+}
+
+/**
+* @param Request $request
+* @param FormInterface $form
+* @param Clientes|null $cliente
+* @return bool|string
+*/
+private function saveForm(Request $request, FormInterface $form, Clientes $cliente = null){
+if($request->isMethod('POST')){
+$nuevo = false;
+if($cliente == null){
+$cliente = new Clientes();
+$nuevo = true;
+}
+$form->handleRequest($request);
+if ($form->isSubmitted() && $form->isValid()) {
+$em = $this->getDoctrine()->getManager();
+$em->persist($cliente);
+$em->flush();
+if( $nuevo ){
+return $this->generateUrl('admin_clientes_show', array('id'=>$cliente->getId()));
+}else{
+return $this->generateUrl('admin_clientes_index', []);
+}
+}
+}
+return false;
+
+}
+
+/**
+* @param Clientes $banner
+* @return \Symfony\Component\Form\FormInterface
+*/
+private function generateDeleteForm(Clientes $cliente)
+{
+return $this->createFormBuilder()
+->setAction($this->generateUrl('admin_{{ ruta }}_delete', array('id' => $cliente->getId())))
+->setMethod('DELETE')
+->getForm();
+}
+
+/**
+* @param Clientes $cliente
+* @return \Symfony\Component\Form\FormView
+*/
+private function viewDeleteForm(Clientes $cliente){
+return $this->generateDeleteForm($cliente)->createView();
+}
+}

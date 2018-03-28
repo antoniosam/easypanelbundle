@@ -1,0 +1,52 @@
+<?php
+
+namespace {{ bundle }}\Form;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+
+
+class {{ entity }}Type extends AbstractType
+
+{
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            {%- for columna in columnas -%}->add('{{ columna['fieldName'] }}'){%- endfor %};
+    }
+
+
+    /**
+    * {@inheritdoc}
+    */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => '{{ entitybundle }}'
+         ));
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function getBlockPrefix()
+    {
+        return '{{ entity }}Type';
+    }
+
+
+    /**
+    * {@inheritdoc}
+    */
+    public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+}

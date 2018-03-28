@@ -1,0 +1,172 @@
+<?php
+
+namespace {{ bundle }}\Controller;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Ast\EasyPanelBundle\Lib\Easy\EasyList;
+use Ast\EasyPanelBundle\Lib\Easy\EasyShow;
+use Ast\EasyPanelBundle\Lib\Easy\EasyForm;
+use Ast\EasyPanelBundle\Lib\Easy\Panel;
+
+use {{ entitybundle }};
+use {{ bundle }}\Form\{{ form }};
+
+
+/**
+ * @Route("/{{ entity|lower }}" )
+ */
+class {{ entity }}Controller extends Controller
+{
+    private function indexList(){
+        return array('{{ indexlist|join("', '")|raw }}');
+    }
+
+    /**
+     *List All {{ entity }} entity
+     *
+     * @Route("/", name="{{ ruta }}_index" )
+     * @Method("GET")
+     */
+    public function indexAction()
+    {
+        {{ '$em = $this->' }}getDoctrine()->getManager();
+        ${{ entity|lower }}s = $em->getRepository({{ entity }}::class)->findAll();
+
+        $vista = EasyList::easy("{{ seccion }}", ${{ entity|lower }}s, $this->indexList(), "admin_{{ ruta }}");
+
+        return $this->render('@EasyPanel/view.html.twig',Panel::createList($vista, '@{{ bundle }}/layout.html.twig'));
+    }
+
+    /**
+    * Create a new {{ entity }} entity.
+    *
+    * @Route("/new", name="{{ ruta }}_new")
+    * @Method("GET")
+    */
+    public function nuevoAction(Request $request)
+    {
+        $form = $this->generateForm();
+        if($redirect = $this->saveForm($request,$form)){
+            return $this->redirect($redirect);
+        };
+        $view = EasyForm::easy('Nuevo {{ seccion }}', $form->createView(), 'admin_{{ ruta }}');
+
+        return $this->render('@EasyPanel/view.html.twig', Panel::createForm($view, '@{{ bundle }}/layout.html.twig'));
+    }
+
+    private function showList(){
+        return array('{{ showlist|join("', '")|raw }}');
+    }
+    /**
+    * Finds and displays a {{ entity }} entity.
+    *
+    * @Route("/{id}/show", name="{{ ruta }}_show", requirements={"id"="\d+"} )
+    * @Method("GET")
+    */
+    public function showAction({{ entity }} ${{ entity|lower }})
+    {
+        $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), "{{ ruta }}", $this->viewDeleteForm(${{ entity|lower }}));
+        return $this->render('@EasyPanel/view.html.twig', Panel::createShow($view, '@{{ bundle }}/layout.html.twig'));
+    }
+
+    /**
+    * Displays a form to edit an existing {{ entity }} entity.
+    *
+    * @Route("/{id}/edit", name="{{ ruta }}_edit", requirements={"id"="\d+"})
+    * @Method({"GET", "POST"})
+    */
+    public function editAction(Request $request, {{ entity }} ${{ entity|lower }})
+    {
+        $editForm = $this->generateForm( ${{ entity|lower }});
+        if($redirect = $this->saveForm($request,$editForm,${{ entity|lower }})){
+            return $this->redirect($redirect);
+        };
+
+        $view = EasyForm::easy("Editar {{ entity }}", $editForm->createView(), '', $this->viewDeleteForm(${{ entity|lower }}));
+        $view->addLinkBack('{{ ruta }}_show',array('id'=>${{ entity|lower }}->getId()),'Regresar');
+
+        return $this->render('@EasyPanel/view.html.twig', Panel::createForm($view,'@{{ bundle }}/layout.html.twig'));
+    }
+
+    /**
+    * Deletes a {{ entity }} entity.
+    *
+    * @Route("/{id}", name="{{ ruta }}_delete", requirements={"id"="\d+"})
+    * @Method("DELETE")
+    */
+    public function deleteAction(Request $request, {{ entity }} ${{ entity|lower }})
+    {
+        $form = $this->generateDeleteForm(${{ entity|lower }});
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove(${{ entity|lower }});
+            $em->flush();
+        }
+        return $this->redirectToRoute('{{ ruta }}_index');
+    }
+
+    /**
+    * @param {{ entity }}|null ${{ entity|lower }}
+    * @return FormInterface
+    */
+    private function generateForm({{ entity }} ${{ entity|lower }} = null){
+        if(${{ entity|lower }} ==null){
+            ${{ entity|lower }} = new {{ entity }}();
+        }
+        return  $this->createForm({{ form }}::class, ${{ entity|lower }});
+    }
+
+    /**
+    * @param Request $request
+    * @param FormInterface $form
+    * @param {{ entity }}|null ${{ entity|lower }}
+    * @return bool|string
+    */
+    private function saveForm(Request $request, FormInterface $form, {{ entity }} ${{ entity|lower }} = null){
+        if($request->isMethod('POST')){
+            $nuevo = false;
+            if(${{ entity|lower }} == null){
+                ${{ entity|lower }} = new {{ entity }}();
+                $nuevo = true;
+            }
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist(${{ entity|lower }});
+                $em->flush();
+                if( $nuevo ){
+                    return $this->generateUrl('{{ ruta }}_show', array('id'=>${{ entity|lower }}->getId()));
+                }else{
+                    return $this->generateUrl('{{ ruta }}_index', []);
+                }
+            }
+        }
+        return false;
+
+    }
+
+    /**
+    * @param {{ entity }} ${{ entity|lower }}
+    * @return \Symfony\Component\Form\FormInterface
+    */
+    private function generateDeleteForm({{ entity }} ${{ entity|lower }})
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('{{ ruta }}_delete', array('id' => ${{ entity|lower }}->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
+    }
+
+    /**
+    * @param {{ entity }} ${{ entity|lower }}
+    * @return \Symfony\Component\Form\FormView
+    */
+    private function viewDeleteForm({{ entity }} ${{ entity|lower }}){
+        return $this->generateDeleteForm(${{ entity|lower }})->createView();
+    }
+}

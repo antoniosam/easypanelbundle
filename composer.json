@@ -1,0 +1,21 @@
+{
+  "name": "antoniosam/easypanelbundle",
+  "description": "PHP library .",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Antonio Samano",
+      "email": "antoniost.developer@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.5.9"
+  },
+  "autoload": {
+    "psr-4" : {
+      "Ast\\EasyPanelBundle\\" : ""
+    }
+  }
+}

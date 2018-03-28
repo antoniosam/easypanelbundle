@@ -1,0 +1,272 @@
+<?php
+
+namespace {{ bundle }}\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+
+/**
+ * {{ bundle }}\Entity\Foto
+ *
+ * @ORM\Entity()
+ * @ORM\Table(name="fotos")
+ * @ORM\HasLifecycleCallbacks()
+ */
+class Foto
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $nombre;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $slug;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    protected $foto;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default":1})
+     */
+    protected $activo= true;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default":1})
+     */
+    protected $vistagaleria= true;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $galeria;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $creado;
+
+    public function __construct()
+    {
+    }
+
+    public function __toString()
+    {
+        return $this->nombre;
+    }
+
+    /**
+    * Gets triggered only on insert
+    * @ORM\PrePersist
+    */
+    public function onPrePersist(){
+        $this->creado = new \DateTime("now"); 
+    }
+
+    /**
+    * Gets triggered only on update
+    * @ORM\PreUpdate
+    */
+    public function onPreUpdate(){
+        //Cambiar por el campo modificado si es que existe en la tabla
+        //$this->updated = new \DateTime("now"); 
+    }
+
+    /**
+     * Set the value of id.
+     *
+     * @param integer $id
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of id.
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set the value of nombre.
+     *
+     * @param string $nombre
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setNombre($nombre)
+    {
+        $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nombre.
+     *
+     * @return string
+     */
+    public function getNombre()
+    {
+        return $this->nombre;
+    }
+
+    /**
+     * Set the value of slug.
+     *
+     * @param string $slug
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of slug.
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Set the value of foto.
+     *
+     * @param string $foto
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setFoto($foto)
+    {
+        $this->foto = $foto;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of foto.
+     *
+     * @return string
+     */
+    public function getFoto()
+    {
+        return $this->foto;
+    }
+
+    /**
+     * Set the value of activo.
+     *
+     * @param boolean $activo
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setActivo($activo)
+    {
+        $this->activo = $activo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of activo.
+     *
+     * @return boolean
+     */
+    public function getActivo()
+    {
+        return $this->activo;
+    }
+
+    /**
+     * Set the value of vistagaleria.
+     *
+     * @param boolean $vistagaleria
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setVistagaleria($vistagaleria)
+    {
+        $this->vistagaleria = $vistagaleria;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of vistagaleria.
+     *
+     * @return boolean
+     */
+    public function getVistagaleria()
+    {
+        return $this->vistagaleria;
+    }
+
+    /**
+     * Set the value of galeria.
+     *
+     * @param integer $galeria
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setGaleria($galeria)
+    {
+        $this->galeria = $galeria;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of galeria.
+     *
+     * @return integer
+     */
+    public function getGaleria()
+    {
+        return $this->galeria;
+    }
+
+    /**
+     * Set the value of creado.
+     *
+     * @param \DateTime $creado
+     * @return  \{{ bundle }}\Entity\Fotos
+     */
+    public function setCreado($creado)
+    {
+        $this->creado = $creado;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of creado.
+     *
+     * @return \DateTime
+     */
+    public function getCreado()
+    {
+        return $this->creado;
+    }
+
+    public function __sleep()
+    {
+        return array('id', 'nombre', 'slug', 'foto', 'activo', 'vistagaleria', 'galeria', 'creado');
+    }
+}

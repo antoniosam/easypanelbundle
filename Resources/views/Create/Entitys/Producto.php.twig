@@ -1,0 +1,385 @@
+<?php
+
+
+namespace {{ bundle }}\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+
+/**
+ * {{ bundle }}\Entity\Producto
+ *
+ * @ORM\Entity()
+ * @ORM\Table(name="productos")
+ * @ORM\HasLifecycleCallbacks()
+ */
+class Producto
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    protected $folio;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $nombre;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    protected $slug;
+
+    /**
+     * @ORM\Column(type="string", length=250, nullable=true)
+     */
+    protected $descripcion;
+
+    /**
+     * @ORM\Column(type="string", length=1000, nullable=true)
+     */
+    protected $contenido;
+
+    /**
+     * @ORM\Column(type="float", precision=10, scale=2, nullable=true, options={"default":0})
+     */
+    protected $precio= 0;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default":0})
+     */
+    protected $vistacategoria= false;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $categoria;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default":1})
+     */
+    protected $activo= true;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $creado;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $actualizado;
+
+    public function __construct()
+    {
+    }
+
+    public function __toString()
+    {
+        return $this->nombre;
+    }
+
+    /**
+    * Gets triggered only on insert
+    * @ORM\PrePersist
+    */
+    public function onPrePersist(){
+        $this->creado = new \DateTime("now"); 
+    }
+
+    /**
+    * Gets triggered only on update
+    * @ORM\PreUpdate
+    */
+    public function onPreUpdate(){
+        //Cambiar por el campo modificado si es que existe en la tabla
+        //$this->updated = new \DateTime("now"); 
+    }
+
+    /**
+     * Set the value of id.
+     *
+     * @param integer $id
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of id.
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set the value of folio.
+     *
+     * @param string $folio
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setFolio($folio)
+    {
+        $this->folio = $folio;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of folio.
+     *
+     * @return string
+     */
+    public function getFolio()
+    {
+        return $this->folio;
+    }
+
+    /**
+     * Set the value of nombre.
+     *
+     * @param string $nombre
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setNombre($nombre)
+    {
+        $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nombre.
+     *
+     * @return string
+     */
+    public function getNombre()
+    {
+        return $this->nombre;
+    }
+
+    /**
+     * Set the value of slug.
+     *
+     * @param string $slug
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of slug.
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Set the value of descripcion.
+     *
+     * @param string $descripcion
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setDescripcion($descripcion)
+    {
+        $this->descripcion = $descripcion;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of descripcion.
+     *
+     * @return string
+     */
+    public function getDescripcion()
+    {
+        return $this->descripcion;
+    }
+
+    /**
+     * Set the value of contenido.
+     *
+     * @param string $contenido
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setContenido($contenido)
+    {
+        $this->contenido = $contenido;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contenido.
+     *
+     * @return string
+     */
+    public function getContenido()
+    {
+        return $this->contenido;
+    }
+
+    /**
+     * Set the value of precio.
+     *
+     * @param float $precio
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setPrecio($precio)
+    {
+        $this->precio = $precio;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of precio.
+     *
+     * @return float
+     */
+    public function getPrecio()
+    {
+        return $this->precio;
+    }
+
+    /**
+     * Set the value of vistacategoria.
+     *
+     * @param boolean $vistacategoria
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setVistacategoria($vistacategoria)
+    {
+        $this->vistacategoria = $vistacategoria;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of vistacategoria.
+     *
+     * @return boolean
+     */
+    public function getVistacategoria()
+    {
+        return $this->vistacategoria;
+    }
+
+    /**
+     * Set the value of categoria.
+     *
+     * @param integer $categoria
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setCategoria($categoria)
+    {
+        $this->categoria = $categoria;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of categoria.
+     *
+     * @return integer
+     */
+    public function getCategoria()
+    {
+        return $this->categoria;
+    }
+
+    /**
+     * Set the value of activo.
+     *
+     * @param boolean $activo
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setActivo($activo)
+    {
+        $this->activo = $activo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of activo.
+     *
+     * @return boolean
+     */
+    public function getActivo()
+    {
+        return $this->activo;
+    }
+
+    /**
+     * Set the value of creado.
+     *
+     * @param \DateTime $creado
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setCreado($creado)
+    {
+        $this->creado = $creado;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of creado.
+     *
+     * @return \DateTime
+     */
+    public function getCreado()
+    {
+        return $this->creado;
+    }
+
+    /**
+     * Set the value of actualizado.
+     *
+     * @param \DateTime $actualizado
+     * @return  \{{ bundle }}\Entity\Productos
+     */
+    public function setActualizado($actualizado)
+    {
+        $this->actualizado = $actualizado;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of actualizado.
+     *
+     * @return \DateTime
+     */
+    public function getActualizado()
+    {
+        return $this->actualizado;
+    }
+
+    public function __sleep()
+    {
+        return array('id', 'folio', 'nombre', 'slug', 'descripcion', 'contenido', 'precio', 'vistacategoria', 'categoria', 'activo', 'creado', 'actualizado');
+    }
+}

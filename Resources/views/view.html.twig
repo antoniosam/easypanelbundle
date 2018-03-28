@@ -1,0 +1,111 @@
+{% extends layout %}
+{% block location %}
+    {% for directory  in directories %}
+        <li class="breadcrumb-item ">
+            <a href="{{path(directory["route"],directory["parameters"]) }}" data-toggle="tooltip" title="{{ directory["texto"] }}">{{ directory["texto"] }}</a>
+        </li>
+    {% endfor %}
+    <li class="breadcrumb-item active">{{ location }}</li>
+{% endblock %}
+{% block body %}
+    {%  for card in cards %}
+        {% if  card['type'] == 'list'  %}
+            <!-- Card {{ card['data']['seccion'] }}-->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa fa-table"></i> {{ card['data']['seccion'] }}
+                    {% if card['data']['has_new'] %}
+                        <div class="pull-right">
+                            <a href="{{path(card['data']['new']["route"],card['data']['new']["parameters"]) }}" data-toggle="tooltip" title="{{ card['data']['new']["texto"] }}" class="btn  btn-sm {{ card['data']['new']["clase"] }}"><i class="fa {{ card['data']['new']["fa_icon"] }}"></i></a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr><th>{{ card['data']['headers']|join('</th><th>')|raw }}</th></tr>
+                            </thead>
+                            <tfoot>
+                            <tr><th>{{ card['data']['headers']|join('</th><th>')|raw }}</th></tr>
+                            </tfoot>
+                            <tbody>
+                            {% for row in card['data']['tabla'] %}
+                                <tr>
+                                    <td>{{ row['fila']|join('</td><td>')|raw }}</td>
+                                    {% if row['rutas']|length > 0 %}
+                                        <td>
+                                            {%  for ruta  in row['rutas'] %}
+                                                <a href="{{path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip" title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i class="fa {{ ruta["fa_icon"] }}"></i></a>
+                                            {% endfor %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!--<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>-->
+            </div>
+        {% elseif  card['type'] == 'show'  %}
+            <!-- Card {{ card['data']['seccion'] }} -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa fa-list-alt"></i> {{ card['data']['seccion'] }}
+                </div>
+                <div class="card-body">
+                    {% for fila in   card['data']['filas']   %}
+                        <div class="row">
+                            <p class="col-4">{{ fila['label'] }}</p>
+                            <p class="col-8">{{ fila['valor']|raw }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                    {%  for ruta  in card['data']['rutas'] %}
+                        <a href="{{path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip" title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i class="fa {{ ruta["fa_icon"] }}"></i></a>
+                    {% endfor %}
+                    {% if card['data']['has_delete'] %}
+                        {{ form_start(card['data']['delete'],{'attr':{'class':'pull-right'}}) }}
+                        {{ form_widget(card['data']['delete']) }}
+                        <button type="submit" class="btn btn-danger  m-t-10 " data-toggle="tooltip" title="Eliminar" onclick="return confirm('¿Estas seguro?');"><i class="fa fa-trash"></i> </button>
+                        {{ form_end(card['data']['delete']) }}
+                    {% endif %}
+                </div>
+            </div>
+        {% elseif  card['type'] == 'form'  %}
+            <!-- Card {{ card['data']['seccion'] }} -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa fa-check-square"></i> {{ card['data']['seccion'] }}
+                </div>
+                <div class="card-body">
+                    {% form_theme card['data']['form'] 'bootstrap_4_horizontal_layout.html.twig' %}
+                    {{ form_start(card['data']['form']) }}
+                    {{ form_widget(card['data']['form']) }}
+                    <div class="form-group m-b-0">
+                        <div class="col-sm-12">
+
+                            <button type="submit" class="btn btn-success  m-t-10 aire"  ><i class="fa fa-floppy-o"></i> Guardar</button>
+                        </div>
+                    </div>
+                    {{ form_end(card['data']['form']) }}
+                </div>
+                <div class="card-footer">
+                    {%  for ruta  in card['data']['rutas'] %}
+                        <a href="{{path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip" title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i class="fa {{ ruta["fa_icon"] }}"></i></a>
+                    {% endfor %}
+                    {% if card['data']['has_delete'] %}
+                        {{ form_start(card['data']['delete'],{'attr':{'class':'pull-right'}}) }}
+                        {{ form_widget(card['data']['delete']) }}
+                        <button type="submit" class="btn btn-danger  m-t-10 " data-toggle="tooltip" title="Eliminar" onclick="return confirm('¿Estas seguro?');"><i class="fa fa-trash"></i> </button>
+                        {{ form_end(card['data']['delete']) }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+
