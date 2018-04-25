@@ -14,13 +14,13 @@ class InfoEntityImport
     public static function folder(\Doctrine\ORM\EntityManager $em,$directory)
     {
         $listaposibles = ClassMapGenerator::createMap($directory);
+
         $listaclases = [];
         foreach ($listaposibles as $class => $clase):
             if (!$em->getMetadataFactory()->isTransient($class)) {
                $listaclases[] = $class;
             }
         endforeach;
-
         return $listaclases;
     }
     /**

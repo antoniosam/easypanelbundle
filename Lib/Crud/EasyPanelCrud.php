@@ -36,7 +36,7 @@ class EasyPanelCrud
         $this->templating = $templating;
         $this->kernel_project_dir = $kernel_project_dir ;
         $this->panelbundle = $panelbundle;
-        $this->entity = $entity;
+        $this->namespaceentity = $entity;
         $this->ruta = $ruta;
         $this->seccion = $seccion;
     }
@@ -45,6 +45,8 @@ class EasyPanelCrud
         $temp = str_replace("\\", "/", $entity);
         if(strpos($temp,"/")!==false){
             return $entity;
+        }elseif(strpos($temp,"\\")!==false){
+            return $entity;
         }else{
             return $panelbunle."\\Entity\\".$entity;
         }
@@ -52,13 +54,23 @@ class EasyPanelCrud
 
     public function create($type_crud=null,$ignore=null)
     {
-        $this->entitybundle = $this->createBundleEntity($this->entity,$this->panelbundle);
-        $ignorar = Util::getArray($ignore);
-        $this->campos = $this->fieldsEntity($this->entitybundle,$ignorar);
-        $controller = $this->createController($this->campos, $this->panelbundle, $this->entitybundle, $this->entity, $this->ruta, $this->seccion, $type_crud);
-        $form = $this->createForm($this->campos, $this->panelbundle, $this->entitybundle,$this->entity);
+        $filename = Util::fixFilename($this->kernel_project_dir.DIRECTORY_SEPARATOR.$this->namespaceentity).'.php';
 
-        return "Crud " . $controller . " " . $form." ".PHP_EOL;
+        if(file_exists($filename)){
+            $this->entity = Util::getFileNamespace($this->namespaceentity);
+            //$this->entitybundle = $this->createBundleEntity($this->entity,$this->panelbundle);
+            $ignorar = Util::getArray($ignore);
+            $this->campos = $this->fieldsEntity($this->namespaceentity,$ignorar);
+            $controller = $this->createController($this->campos, $this->panelbundle, $this->namespaceentity, $this->entity, $this->ruta, $this->seccion, $type_crud);
+            $form = $this->createForm($this->campos, $this->panelbundle, $this->namespaceentity,$this->entity);
+            $tempdir = Util::fixFilename($this->kernel_project_dir);
+            return 'Crud ' . str_replace($tempdir,'',$controller) . ' ' . str_replace($tempdir,'',$form).' '.PHP_EOL;
+        }else{
+            return 'Error  ' .$this->namespaceentity.PHP_EOL;
+        }
+
+
+
     }
 
     private function createController(

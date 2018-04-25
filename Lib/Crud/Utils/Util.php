@@ -35,6 +35,11 @@ class Util
         return str_replace('/', '\\', $temp);
     }
 
+    public static function fixFilename($namespace){
+        $temp = str_replace('\\', '/', $namespace);
+        return str_replace('//', '/', $temp);
+    }
+
     /**
      * @param $ignore
      * @return array
