@@ -7,7 +7,7 @@ namespace Ast\EasyPanelBundle\Command;
 
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateSato;
-use Ast\EasyPanelBundle\Lib\Crud\Lib\Util;
+use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
