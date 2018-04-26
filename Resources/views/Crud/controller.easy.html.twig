@@ -36,7 +36,7 @@ class {{ entity }}Controller extends Controller
         {{ '$em = $this->' }}getDoctrine()->getManager();
         ${{ entity|lower }}s = $em->getRepository({{ entity }}::class)->findAll();
 
-        $vista = EasyList::easy("{{ seccion }}", ${{ entity|lower }}s, $this->indexList(), "admin_{{ ruta }}");
+        $vista = EasyList::easy("{{ seccion }}", ${{ entity|lower }}s, $this->indexList(), "{{ ruta }}");
 
         return $this->render('@EasyPanel/view.html.twig',Panel::createList($vista, '@{{ bundle }}/layout.html.twig'));
     }
@@ -53,7 +53,7 @@ class {{ entity }}Controller extends Controller
         if($redirect = $this->saveForm($request,$form)){
             return $this->redirect($redirect);
         };
-        $view = EasyForm::easy('Nuevo {{ seccion }}', $form->createView(), 'admin_{{ ruta }}');
+        $view = EasyForm::easy('Nuevo {{ seccion }}', $form->createView(), '{{ ruta }}');
 
         return $this->render('@EasyPanel/view.html.twig', Panel::createForm($view, '@{{ bundle }}/layout.html.twig'));
     }

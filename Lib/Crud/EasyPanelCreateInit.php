@@ -9,7 +9,7 @@ namespace Ast\EasyPanelBundle\Lib\Crud;
 
 use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
 
-class EasyPanelCreateSato extends EasyPanelCreate
+class EasyPanelCreateInit extends EasyPanelCreate
 {
     function __construct(\Doctrine\ORM\EntityManager $entityManager, \Twig_Environment $templating, $kernel_project_dir, $proyecto, $panelbundle,  $prefix)
     {

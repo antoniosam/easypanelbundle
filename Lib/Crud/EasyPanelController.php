@@ -10,7 +10,7 @@ namespace Ast\EasyPanelBundle\Lib\Crud;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\InfoEntityImport;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
 
-class EasyPanelCrud
+class EasyPanelController
 {
     private $em;
     private $templating;

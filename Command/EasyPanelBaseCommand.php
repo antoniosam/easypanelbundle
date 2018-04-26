@@ -6,7 +6,7 @@
 namespace Ast\EasyPanelBundle\Command;
 
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
-use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateSato;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateInit;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,17 +15,17 @@ use Symfony\Component\Console\Input\InputOption;
 // Add the Container
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class EasyPanelSatoCommand extends  ContainerAwareCommand
+class EasyPanelBaseCommand extends  ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('easypanel:create:sato')
+            ->setName('easypanel:create:panel:base')
             ->setDescription('Crea un panel funcional con tablas ya preestablecidas.')
             ->addArgument('proyecto', InputArgument::REQUIRED, 'Nombre del proyecto')
             ->addArgument('panelbundle', InputArgument::REQUIRED, 'Bundle donde estara el panel')
             ->addArgument('prefix', InputArgument::REQUIRED, 'Prefijo para las rutas')
-            ->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min,normal)','easy')
+            ->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min)','easy')
             ->addOption('menu_collapse',null,InputOption::VALUE_REQUIRED,'Menu collapsado (1,0)','1')
 
 
@@ -72,7 +72,7 @@ class EasyPanelSatoCommand extends  ContainerAwareCommand
         $output->writeln('Tipo Menu: '.$menu);
         $output->writeln('');
 
-        $panel = new EasyPanelCreateSato($em,$twig,$dir,$proyecto,$panelbundle,$prefix);
+        $panel = new EasyPanelCreateInit($em,$twig,$dir,$proyecto,$panelbundle,$prefix);
         $resultado = $panel->create($menu,$type_crud);
         $output->writeln('Resultado:'.$resultado);
 

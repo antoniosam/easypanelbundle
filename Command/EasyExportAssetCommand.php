@@ -6,7 +6,7 @@
 namespace Ast\EasyPanelBundle\Command;
 
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
-use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateSato;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateInit;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use ZipArchive;
 
-class EasyPanelExportAssetCommand extends  ContainerAwareCommand
+class EasyExportAssetCommand extends  ContainerAwareCommand
 {
     protected function configure()
     {

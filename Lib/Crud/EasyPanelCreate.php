@@ -75,7 +75,7 @@ class EasyPanelCreate
                 foreach ($listaclases as $clase):
                     $entity = Util::getFileNamespace($clase);
                     $ruta = $this->prefix.'_'.strtolower($entity);
-                    $crud = new EasyPanelCrud($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$ruta,ucfirst($entity));
+                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$ruta,ucfirst($entity));
                     $creados[] = $crud->create($type_crud,$ignorar);
                     $listaentitys[] = $entity;
                 endforeach;
