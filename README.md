@@ -30,6 +30,13 @@ Tambien agregamos la direccion del repositorio
           "no-api": true
       }]
 ```
+Y al final agregamos el bundle en el AppKernel
+```
+ $bundles = [
+       ...
+      new Ast\EasyPanelBundle\EasyPanelBundle(),
+      ]
+```
 ## Prerequisitos
 
 Template layout.html.twig (app/Resources/views/layout.html.twig)
