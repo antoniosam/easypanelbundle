@@ -42,12 +42,13 @@ class {{ entity }}Controller extends Controller
     * Create a new {{ entity }} entity.
     *
     * @Route("/new", name="{{ ruta }}_new")
-    * @Method("GET")
+    * @Method({"GET", "POST"})
     */
     public function nuevoAction(Request $request)
     {
-        $form = $this->generateForm();
-        if($redirect = $this->saveForm($request,$form)){
+        ${{ entity|lower }} = new {{ entity }}();
+        $form = $this->generateForm(${{ entity|lower }});
+        if($redirect = $this->saveForm($request,$form,${{ entity|lower }},true)){
             return $this->redirect($redirect);
         };
         return $this->render('@EasyPanel/view.html.twig', Panel::easyForm('Nuevo {{ seccion }}',$form->createView(),'{{ ruta }}','@{{ bundle }}/layout.html.twig'));
@@ -104,10 +105,7 @@ class {{ entity }}Controller extends Controller
     * @param {{ entity }}|null ${{ entity|lower }}
     * @return FormInterface
     */
-    private function generateForm({{ entity }} ${{ entity|lower }} = null){
-        if(${{ entity|lower }} ==null){
-            ${{ entity|lower }} = new {{ entity }}();
-        }
+    private function generateForm({{ entity }} ${{ entity|lower }}){
         return  $this->createForm({{ form }}::class, ${{ entity|lower }});
     }
 
@@ -117,19 +115,14 @@ class {{ entity }}Controller extends Controller
     * @param {{ entity }}|null ${{ entity|lower }}
     * @return bool|string
     */
-    private function saveForm(Request $request, FormInterface $form, {{ entity }} ${{ entity|lower }} = null){
+    private function saveForm(Request $request, FormInterface $form, {{ entity }} ${{ entity|lower }}, $isnew = false){
         if($request->isMethod('POST')){
-            $nuevo = false;
-            if(${{ entity|lower }} == null){
-                ${{ entity|lower }} = new {{ entity }}();
-                $nuevo = true;
-            }
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $em = $this->getDoctrine()->getManager();
                 $em->persist(${{ entity|lower }});
                 $em->flush();
-                if( $nuevo ){
+                if( $isnew ){
                     return $this->generateUrl('{{ ruta }}_show', array('id'=>${{ entity|lower }}->getId()));
                 }else{
                     return $this->generateUrl('{{ ruta }}_index', []);
