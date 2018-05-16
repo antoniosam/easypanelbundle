@@ -85,6 +85,8 @@ $list->tableCleanLinks()
 $list->renderAsImage($columna)
 $list->renderAsBoolean($columna)
 $list->renderAsDate($columna)
+$list->renderAsTime($columna)
+$list->renderAsDateTime($columna)
 $list->renderAsRaw($columna)
 ```
 Clase EasyShow
@@ -105,6 +107,8 @@ $show->cleanLinks()
 $show->renderAsImage($columna)
 $show->renderAsBoolean($columna)
 $show->renderAsDate($columna)
+$list->renderAsTime($columna)
+$list->renderAsDateTime($columna)
 $show->renderAsRaw($columna)
 ```
 
