@@ -14,6 +14,8 @@ class EasyView
     const RENDER_IMAGE = "image";
     const RENDER_BOOLEAN = "bool";
     const RENDER_FECHA = "date";
+    const RENDER_TIME = "date";
+    const RENDER_FECHATIME = "datetime";
     const RENDER_RAW = "raw";
 
     /**
@@ -21,52 +23,66 @@ class EasyView
      * @param $valor
      * @return string
      */
-    protected function renderColumna($tipo,$valor){
+    protected function renderColumna($tipo, $valor)
+    {
 
-        if($tipo == self::RENDER_IMAGE){
-            return '<img src="'.$valor.'" alt="Image" "class"="img-responsive" />';
-        }elseif($tipo == self::RENDER_BOOLEAN){
-            return ($valor)? '<i class="fa fa-check"></i>':'<i class="fa fa-times"></i>';
-        }elseif($tipo == self::RENDER_FECHA){
+        if ($tipo == self::RENDER_IMAGE) {
+            return '<img src="' . $valor . '" alt="Image" "class"="img-responsive" />';
+        } elseif ($tipo == self::RENDER_BOOLEAN) {
+            return ($valor) ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
+        } elseif ($tipo == self::RENDER_FECHA) {
             return $valor->format("Y-m-d");
-        }elseif($tipo == self::RENDER_RAW){
+        } elseif ($tipo == self::RENDER_TIME) {
+            return $valor->format("H:i:s");
+        } elseif ($tipo == self::RENDER_FECHATIME) {
+            return $valor->format("Y-m-d H:i:s");
+        } elseif ($tipo == self::RENDER_RAW) {
             return $valor;
-        }else{
+        } else {
             return $valor;
         }
     }
 
-    protected function opcion($route,$parametros,$title,$clase= null,$fa_icon = null){
-        if(is_null($fa_icon)){
+    protected function opcion($route, $parametros, $title, $clase = null, $fa_icon = null)
+    {
+        if (is_null($fa_icon)) {
             $fa_icon = 'fa-square-o';
         }
-        if(is_null($clase)){
+        if (is_null($clase)) {
             $clase = '';
         }
-        return array("route"=>$route,"parameters"=>$parametros,"texto"=>$title, "fa_icon"=>$fa_icon, "clase"=>$clase);
+        return array(
+            "route" => $route,
+            "parameters" => $parametros,
+            "texto" => $title,
+            "fa_icon" => $fa_icon,
+            "clase" => $clase
+        );
     }
 
-    protected function defineHeaders($columnas,$cabeceras,$opciones = null){
-        if(count($cabeceras)==0){
+    protected function defineHeaders($columnas, $cabeceras, $opciones = null)
+    {
+        if (count($cabeceras) == 0) {
             $cabeceras = array();
             foreach ($columnas as $columna => $render) {
                 $cabeceras[] = ucwords($columna);
             }
         }
-        if($opciones!=null){
-            if(count($opciones)>0){
-                $cabeceras[]="";
+        if ($opciones != null) {
+            if (count($opciones) > 0) {
+                $cabeceras[] = "";
             }
         }
         return $cabeceras;
     }
 
-    protected function generateParameters($objeto, $opciones){
+    protected function generateParameters($objeto, $opciones)
+    {
         $limite = count($opciones);
-        for ($i = 0; $i<$limite ;$i++){
+        for ($i = 0; $i < $limite; $i++) {
             $param = [];
-            foreach ($opciones[$i]["parameters"] as $key=>$campo):
-                $getter = 'get'.$campo;
+            foreach ($opciones[$i]["parameters"] as $key => $campo):
+                $getter = 'get' . $campo;
                 $param[$key] = $objeto->$getter();
             endforeach;
             $opciones[$i]["parameters"] = $param;

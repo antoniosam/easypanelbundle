@@ -94,6 +94,20 @@ class EasyList extends EasyView
         }
     }
 
+    public function renderAsTime($columna)
+    {
+        if (isset($this->columnas[$columna])) {
+            $this->columnas[$columna] = self::RENDER_TIME;
+        }
+    }
+
+    public function renderAsDateTime($columna)
+    {
+        if (isset($this->columnas[$columna])) {
+            $this->columnas[$columna] = self::RENDER_FECHATIME;
+        }
+    }
+
     public function renderAsRaw($columna)
     {
         if (isset($this->columnas[$columna])) {
