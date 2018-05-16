@@ -14,7 +14,7 @@ class EasyView
     const RENDER_IMAGE = "image";
     const RENDER_BOOLEAN = "bool";
     const RENDER_FECHA = "date";
-    const RENDER_TIME = "date";
+    const RENDER_TIME = "time";
     const RENDER_FECHATIME = "datetime";
     const RENDER_RAW = "raw";
 
