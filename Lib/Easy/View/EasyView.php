@@ -23,11 +23,11 @@ class EasyView
      * @param $valor
      * @return string
      */
-    protected function renderColumna($tipo, $valor)
+    protected function renderColumna($tipo, $valor,$path='')
     {
 
         if ($tipo == self::RENDER_IMAGE) {
-            return '<img src="' . $valor . '" alt="Image" "class"="img-responsive" />';
+            return '<img src="' . str_replace('//','/',$path.'/'.$valor) . '" alt="Image" "class"="img-responsive easypanel-img" />';
         } elseif ($tipo == self::RENDER_BOOLEAN) {
             return ($valor) ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
         } elseif ($tipo == self::RENDER_FECHA) {
@@ -65,7 +65,12 @@ class EasyView
         if (count($cabeceras) == 0) {
             $cabeceras = array();
             foreach ($columnas as $columna => $render) {
-                $cabeceras[] = ucwords($columna);
+                if(strpos($columna,'.')!==false){
+                    list($titulo,$submetodo)= explode('.',$columna);
+                    $cabeceras[] = ucwords($titulo);
+                }else{
+                    $cabeceras[] = ucwords($columna);
+                }
             }
         }
         if ($opciones != null) {
@@ -73,6 +78,7 @@ class EasyView
                 $cabeceras[] = "";
             }
         }
+
         return $cabeceras;
     }
 

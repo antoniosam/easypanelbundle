@@ -18,6 +18,7 @@ class EasyShow extends EasyView
     private $consulta;
     private $has_delete = false;
     private $deleteform;
+    private $paths = [];
 
     function __construct($seccion,$objeto,$columnas)
     {
@@ -38,7 +39,7 @@ class EasyShow extends EasyView
     }
 
 
-    public function renderAsImage ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_IMAGE;} }
+    public function renderAsImage ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_IMAGE; $this->paths[$columna]=$path;} }
     public function renderAsBoolean($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_BOOLEAN;}}
     public function renderAsDate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_FECHA;} }
     public function renderAsTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TIME;} }
@@ -98,11 +99,29 @@ class EasyShow extends EasyView
         $return["seccion"]= $this->seccion;
         $this->cabeceras = $this->defineHeaders($this->columnas,$this->cabeceras);
         $fila = [];
+        $path ='';
         $key = 0;
         foreach ($this->columnas as $columna=>$tipo) {
-            $getter = 'get' . $columna;
-            $temp = $this->renderColumna($tipo,$this->consulta->$getter());
-            $fila[] = array('label'=>$this->cabeceras[$key],'valor'=> $temp);
+            if(count($this->paths)>0){
+                $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
+            }
+            if(strpos($columna,'.')!==false){
+                list($subobjeto,$submetodo)= explode('.',$columna);
+                $temp = 'get' . $subobjeto;
+                $sub = $this->consulta->$temp();
+                if($sub!=null){
+                    $temp = 'get' . $submetodo;
+                    $value = $this->renderColumna($tipo, $sub->$temp(),$path);
+                    $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $value);
+                }else{
+                    $value = '';
+                    $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $value);
+                }
+            }else{
+                $getter = 'get' . $columna;
+                $temp = $this->renderColumna($tipo, $this->consulta->$getter(),$path);
+                $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $temp);
+            }
             $key++;
         }
         $return["filas"] = $fila;

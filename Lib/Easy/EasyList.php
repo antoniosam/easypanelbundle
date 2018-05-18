@@ -22,6 +22,8 @@ class EasyList extends EasyView
     private $columnas;
     private $consulta;
 
+    private $paths = [];
+
     function __construct($seccion, $consulta, $columnas)
     {
         $this->seccion = $seccion;
@@ -73,10 +75,11 @@ class EasyList extends EasyView
         $this->opciones[] = [];
     }
 
-    public function renderAsImage($columna)
+    public function renderAsImage($columna, $path='')
     {
         if (isset($this->columnas[$columna])) {
             $this->columnas[$columna] = self::RENDER_IMAGE;
+            $this->paths[$columna]=$path;
         }
     }
 
@@ -125,11 +128,27 @@ class EasyList extends EasyView
 
         $return["headers"] = $this->defineHeaders($this->columnas, $this->cabeceras, $this->opciones);
         $filas = [];
+        $path ='';
         foreach ($this->consulta as $objet) {
             $fila = array();
             foreach ($this->columnas as $columna => $tipo) {
-                $temp = 'get' . $columna;
-                $fila[] = $this->renderColumna($tipo, $objet->$temp());
+                if(count($this->paths)>0){
+                    $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
+                }
+                if(strpos($columna,'.')!==false){
+                    list($subobjeto,$submetodo)= explode('.',$columna);
+                    $temp = 'get' . $subobjeto;
+                    $sub = $objet->$temp();
+                    if($sub!=null){
+                        $temp = 'get' . $submetodo;
+                        $fila[] = $this->renderColumna($tipo, $sub->$temp(),$path);
+                    }else{
+                        $fila[] = '';
+                    }
+                }else{
+                    $temp = 'get' . $columna;
+                    $fila[] = $this->renderColumna($tipo, $objet->$temp(),$path);
+                }
             }
             $filas[] = array('fila' => $fila, 'rutas' => $this->generateParameters($objet, $this->opciones));
         }

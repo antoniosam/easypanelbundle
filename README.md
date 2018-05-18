@@ -16,7 +16,7 @@ Agregar la libreria al composer json
 ```
 "require": {
       ...
-      "antoniosam/easypanelbundle": "1.0.*"
+      "antoniosam/easypanelbundle": "1.2.*"
     },
 ```
 Tambien agregamos la direccion del repositorio
@@ -52,7 +52,7 @@ Valores Basicos
 **$prefix** = Prefix del nombre de la ruta que se podrian generar ej: admin_clientes Generaria admin_clientes_show, admin_clientes_index dependiento del tipo de panel que se cree 
 **$layout** por default del prerequisito o si se quiere aplicar un layout direferente
 
-Clase EasyForm
+###Clase EasyForm
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -67,7 +67,7 @@ $form->addLink($route, $parametros, $titulo, $clase = 'btn-secondary', $fa_icon 
 $form->setDeleteForm($form_delete)
 $form->cleanLinks()
 ```
-Clase EasyList
+###Clase EasyList
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -82,14 +82,14 @@ $list->tableLinkEdit($route, $parametros, $nombre)
 $list->tableLinkShow($route, $parametros, $nombre)
 $list->tableLink($route, $parametros, $texto, $clase = 'btn-secondary', $fa_icon = null)
 $list->tableCleanLinks()
-$list->renderAsImage($columna)
+$list->renderAsImage($columna,$path)
 $list->renderAsBoolean($columna)
 $list->renderAsDate($columna)
 $list->renderAsTime($columna)
 $list->renderAsDateTime($columna)
 $list->renderAsRaw($columna)
 ```
-Clase EasyShow
+###Clase EasyShow
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -104,7 +104,7 @@ $show->addLinkEdit( $route, $parametros, $nombre)   ('btn-info', 'fa-edit')
 $show->addLinkBack( $route, $parametros,$nombre )   ('btn-secondary', 'fa-arrow-left')
 $show->addLink($route, $parametros, $texto,$clase = 'btn-secondary',$fa_icon = null)
 $show->cleanLinks()
-$show->renderAsImage($columna)
+$show->renderAsImage($columna,$path)
 $show->renderAsBoolean($columna)
 $show->renderAsDate($columna)
 $list->renderAsTime($columna)
@@ -112,7 +112,45 @@ $list->renderAsDateTime($columna)
 $show->renderAsRaw($columna)
 ```
 
-Clase Panel
+**Notas**
+
+***renderAsImage***
+  
+El metodo renderAsImage permite agregar una ruta para la correcta visualizacion de la imagen. 
+Si se ignora solo se antepone '/' para marcar la raiz del sitio
+```
+$manager = $this->get('assets.packages');
+$manager->getUrl('comprobantes'));
+       
+...
+$vista->renderAsImage('fotoperfil',$manager->getUrl('uploads/perfil'))
+...
+```
+Tomando en cuenta que el metodo **fotoperfil** devolviera un valor **fotousuario.jpg** el resultado html seria:
+```
+<img src="/uploads/perfil/fotousuario.jpg" alt="Image" "class"="img-responsive easypanel-img">
+```
+
+***Tablas relacionadas***
+
+Si se tiene una consulta relacionado lo que generaria tener un objeto de la relacion en lugar de un valor definido. Se puede elegir el metodo que desea visualizar el objeto relacionado
+```
+$columnas=['userid', 'username','usertask.name'];
+```
+Los metodos **userid** y **username** imprimirian el valor correspondiente para **usertask** el metodo internamente comprueba que la relacion no devuelda un valor**Null** y despues hace el llamado. Internamente la ejecucion seria la siguiente:
+```
+$relacion = $objeto->getUsertask()
+if($relacion!=null){
+    return $relacion->getName();
+}else{
+    return '';
+}
+```
+
+En la version 1.2.4 Solo se permite 1 nivel de relacion
+
+
+###Clase Panel
 
 Metodos estaticos 
 Estos metodos solo crean una sola vista del template con configuracion basica
