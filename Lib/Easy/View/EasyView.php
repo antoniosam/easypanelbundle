@@ -29,13 +29,13 @@ class EasyView
         if ($tipo == self::RENDER_IMAGE) {
             return '<img src="' . str_replace('//','/',$path.'/'.$valor) . '" alt="Image" "class"="img-responsive easypanel-img" />';
         } elseif ($tipo == self::RENDER_BOOLEAN) {
-            return ($valor) ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
+            return is_null($valor) ? '<i class="fa fa-minus"></i>':(($valor==true)?'<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
         } elseif ($tipo == self::RENDER_FECHA) {
-            return $valor->format("Y-m-d");
+            return is_null($valor)?'---':$valor->format("Y-m-d");
         } elseif ($tipo == self::RENDER_TIME) {
-            return $valor->format("H:i:s");
+            return is_null($valor)?'---':$valor->format("H:i:s");
         } elseif ($tipo == self::RENDER_FECHATIME) {
-            return $valor->format("Y-m-d H:i:s");
+            return is_null($valor)?'---':$valor->format("Y-m-d H:i:s");
         } elseif ($tipo == self::RENDER_RAW) {
             return $valor;
         } else {
