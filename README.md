@@ -16,7 +16,7 @@ Agregar la libreria al composer json
 ```
 "require": {
       ...
-      "antoniosam/easypanelbundle": "1.2.*"
+      "antoniosam/easypanelbundle": "1.3.*"
     },
 ```
 Tambien agregamos la direccion del repositorio
@@ -90,7 +90,7 @@ $list->renderAsDateTime($columna)
 $list->renderAsRaw($columna)
 
 ```
-**Version1.3.5**
+**Version1.3.0**
 
 Se agregan nuevos metodos para personzalizar la vista de tabla 
 
