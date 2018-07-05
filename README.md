@@ -88,6 +88,22 @@ $list->renderAsDate($columna)
 $list->renderAsTime($columna)
 $list->renderAsDateTime($columna)
 $list->renderAsRaw($columna)
+
+```
+**Version1.3.5**
+
+Se agregan nuevos metodos para personzalizar la vista de tabla 
+
+La opcion *enableSearch* agrega un formulario con el parametro **buscar** para busquedas sencillas(GET) 
+
+El metodo *createListPages* genera una paginacion sencilla con los valores predefinidos a un maximo de 7 elementos con la inclusion de la busqueda si es que esta presente
+Los metodos *addPage* *addPages* y *setPageInfo* se usan para una paginacion personalizada
+```
+$list->enableSearch($value,$textbutton = 'fa-search',$classbutton='btn',$classcontainer='')
+$list->addPages(array $array,$info=null)
+$list->setPageInfo($pageinfo)
+$list->addPage($route,$parameters,$pagina,$class='')
+$list->createListPages($totalpages,$currentpage,$search,$route,$classitem,$classactive,$first = "",$last = "")
 ```
 ###Clase EasyShow
 
