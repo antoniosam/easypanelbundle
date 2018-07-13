@@ -16,7 +16,7 @@ Agregar la libreria al composer json
 ```
 "require": {
       ...
-      "antoniosam/easypanelbundle": "1.3.*"
+      "antoniosam/easypanelbundle": "1.4.*"
     },
 ```
 Tambien agregamos la direccion del repositorio
