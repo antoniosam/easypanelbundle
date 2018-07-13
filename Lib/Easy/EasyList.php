@@ -21,6 +21,9 @@ class EasyList extends EasyView
     private $paginar = false;
     private $paginacion = array();
     private $paginainfo = ' ';
+    private $autopaginate = [];
+    private $ordenar = false;
+    private $orderby = [];
 
     private $rutas = array();
 
@@ -123,6 +126,11 @@ class EasyList extends EasyView
         }
     }
 
+    public function enableOrder($route,$parametros,$col=1,$direccion='ASC'){
+        $this->ordenar = true;
+        $this->orderby = array('route'=>$route,'parameters'=>$parametros,'columna' => $col,'direccion'=>$direccion);
+    }
+
     public function enableSearch($value,$textbutton = 'fa-search',$classbutton='btn',$classcontainer=''){
         $this->buscar = true;
 
@@ -152,40 +160,9 @@ class EasyList extends EasyView
         $first = "",
         $last = ""
     ) {
-        if ($totalpages > 0 ){
-            if ($totalpages <= 7) {
-                $inicio = 1;
-                $fin = $totalpages;
-            } else {
-                if ($currentpage - 3 < 0) {
-                    $inicio = 1;
-                    $fin = $currentpage + 3 + (3 - $currentpage);//3 a la derecha mas los links que no se puedieron mostrar en la izquierda
-                } elseif (($currentpage + 3) > $totalpages) {
-                    $inicio = $currentpage - 3 - (($currentpage + 3) - $totalpages);//3 a la izquierda mas los que no se puedieron mostrar el lado derecho
-                    $fin = $totalpages;
-                } else {
-                    $inicio = $currentpage - 3;
-                    $fin = $currentpage + 3;
-                }
-            }
+        $this->paginar = true;
+        $this->autopaginate = array('total'=>$totalpages,'current'=>$currentpage,'search'=>$search,'route'=>$route,'classitem'=>$classitem,'classactive'=>$classactive,'first'=>$first,'last'=>$last);
 
-            $lista = [];
-            if ($first != "") {
-                $lista[] = array($route, $this->parameterPages(1,$search), $first, $classitem);
-            }
-            for ($i = $inicio; $i <= $fin; $i++) {
-                if ($i == $currentpage) {
-                    $lista[] = array($route,$this->parameterPages($i,$search) , $i, $classitem . ' ' . $classactive);
-                } else {
-                    $lista[] = array($route, $this->parameterPages($i,$search), $i, $classitem);
-                }
-
-            }
-            if ($last != "") {
-                $lista[] = array($route, $this->parameterPages($totalpages,$search), $last, $classitem);
-            }
-            $this->addPages($lista,'Pagina ' . $currentpage . ' de ' . $totalpages);
-        }
     }
 
     /**
@@ -195,10 +172,16 @@ class EasyList extends EasyView
      */
     protected  function parameterPages($page, $search)
     {
+        $back = [];
         if ($search != '') {
-            return ['p' => $page, 'buscar' => $search];
+            $back['buscar'] = $search;
         }
-        return ['p' => $page];
+        if($this->ordenar){
+            $back['order']=$this->orderby['columna'];
+            $back['ordertype']=$this->orderby['direccion'];
+        }
+        $back['p'] = $page;
+        return $back;
 
     }
     public function addPages(array $array,$info=null){
@@ -266,12 +249,70 @@ class EasyList extends EasyView
         $return["new"] = $this->new;
         $return["has_search"] = $this->buscar;
         $return["search"] = $this->busqueda;
+        if($this->paginar && count($this->autopaginate)>0){
+            $this->generatePagination();
+        }
         $return["has_paginate"] = $this->paginar;
         $return["pages"] = $this->paginacion;
         $return['page_info'] = $this->paginainfo;
+        $return["has_order"] = $this->ordenar;
+        if($this->ordenar){
+            $param = $this->orderby['parameters'];
+            $columna = $this->orderby['columna']==null ? 1 : $this->orderby['columna'];
+            $direccion = $this->orderby['columna']==null ? 'ASC' : $this->orderby['direccion'];
+            if($this->buscar){
+                if(trim($this->busqueda['value'])!=''){
+                    $param['buscar']= $this->busqueda['value'];
+                }
+            }
+            $return["order"]=['route'=>$this->orderby['route'],'parameters'=>$param,'columna'=>$columna,'direccion'=>$direccion];
+        }
         return $return;
     }
+    private function generatePagination(){
+        $totalpages = $this->autopaginate['total'];
+        $currentpage = $this->autopaginate['current'];
+        $search = $this->autopaginate['search'];
+        $route = $this->autopaginate['route'];
+        $classitem = $this->autopaginate['classitem'];
+        $classactive = $this->autopaginate['classactive'];
+        $first = $this->autopaginate['first'];
+        $last = $this->autopaginate['last'];
+        if($totalpages > 0) {
+            if ($totalpages <= 7) {
+                $inicio = 1;
+                $fin = $totalpages;
+            } else {
+                if ($currentpage - 3 < 0) {
+                    $inicio = 1;
+                    $fin = $currentpage + 3 + (3 - $currentpage);//3 a la derecha mas los links que no se puedieron mostrar en la izquierda
+                } elseif (($currentpage + 3) > $totalpages) {
+                    $inicio = $currentpage - 3 - (($currentpage + 3) - $totalpages);//3 a la izquierda mas los que no se puedieron mostrar el lado derecho
+                    $fin = $totalpages;
+                } else {
+                    $inicio = $currentpage - 3;
+                    $fin = $currentpage + 3;
+                }
+            }
 
+            $lista = [];
+            if ($first != "") {
+                $lista[] = array($route, $this->parameterPages(1, $search), $first, $classitem);
+            }
+            for ($i = $inicio; $i <= $fin; $i++) {
+                if ($i == $currentpage) {
+                    $lista[] = array($route, $this->parameterPages($i, $search), $i, $classitem . ' ' . $classactive);
+                } else {
+                    $lista[] = array($route, $this->parameterPages($i, $search), $i, $classitem);
+                }
+
+            }
+            if ($last != "") {
+                $lista[] = array($route, $this->parameterPages($totalpages, $search), $last, $classitem);
+            }
+            $this->addPages($lista, 'Pagina ' . $currentpage . ' de ' . $totalpages);
+        }
+    }
     public function fixRenders()
     {
         $this->renderAsBoolean("activo");
