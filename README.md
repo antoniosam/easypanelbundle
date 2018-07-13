@@ -105,6 +105,15 @@ $list->setPageInfo($pageinfo)
 $list->addPage($route,$parameters,$pagina,$class='')
 $list->createListPages($totalpages,$currentpage,$search,$route,$classitem,$classactive,$first = "",$last = "")
 ```
+**Version1.4.0**
+
+Ordenamiento por columnas 
+
+La opcion *enableOrder* agrega links para ordenamiento en las cabeceras de las columnas. Por defecto se usan los iconos *fa-sort-asc*, *fa-sort-desc* y *fa-sort* 
+
+```
+$list->enableOrder($route,$parametersroute,$ordercolumn = 1,$ordertype = 'ASC');
+```
 ###Clase EasyShow
 
 Metodos estaticos solo crean una seccion con configuracion basica 

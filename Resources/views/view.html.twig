@@ -36,24 +36,49 @@
                         {% endif %}
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
-                            <tr><th>{{ card['data']['headers']|join('</th><th>')|raw }}</th></tr>
+                            {% if card['data']['has_order'] %}
+                                <tr>
+                                    {%  set colum=1 %}
+                                    {% for header in card['data']['headers'] %}
+                                        {% if colum == card['data']['order']['columna'] %}
+                                            {% if 'ASC'==card['data']['order']['direccion'] %}
+                                                {% set newparam = card['data']['order']["parameters"]|merge({ 'order': colum, 'ordertype': 'DESC' }) %}
+                                                <th><a href="{{path(card['data']['order']["route"],newparam) }}" >{{ header }}<i class="fa fa-sort-asc pull-right"></i></a></th>
+                                            {% else %}
+                                                {% set newparam = card['data']['order']["parameters"]|merge({ 'order': colum, 'ordertype': 'ASC' }) %}
+                                                <th><a href="{{path(card['data']['order']["route"],newparam) }}" >{{ header }}<i class="fa fa-sort-desc pull-right"></i></a></th>
+                                            {% endif %}
+                                        {% else %}
+                                            {% set newparam = card['data']['order']["parameters"]|merge({ 'order': colum, 'ordertype': 'ASC' }) %}
+                                            <th><a href="{{path(card['data']['order']["route"],newparam) }}" >{{ header }}<i class="fa fa-sort pull-right"></i></a></th>
+                                        {% endif %}
+                                        {%  set colum=colum+1 %}
+                                    {% endfor %}
+                                </tr>
+                            {% else %}
+                                <tr><th>{{ card['data']['headers']|join('</th><th>')|raw }}</th></tr>
+                            {% endif %}
                             </thead>
                             <tfoot>
                             <tr><th>{{ card['data']['headers']|join('</th><th>')|raw }}</th></tr>
                             </tfoot>
                             <tbody>
-                            {% for row in card['data']['tabla'] %}
-                                <tr>
-                                    <td>{{ row['fila']|join('</td><td>')|raw }}</td>
-                                    {% if row['rutas']|length > 0 %}
-                                        <td>
-                                            {%  for ruta  in row['rutas'] %}
-                                                <a href="{{path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip" title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i class="fa {{ ruta["fa_icon"] }}"></i></a>
-                                            {% endfor %}
-                                        </td>
-                                    {% endif %}
-                                </tr>
-                            {% endfor %}
+                            {% if card['data']['tabla']|length > 0 %}
+                                {% for row in card['data']['tabla'] %}
+                                    <tr>
+                                        <td>{{ row['fila']|join('</td><td>')|raw }}</td>
+                                        {% if row['rutas']|length > 0 %}
+                                            <td>
+                                                {%  for ruta  in row['rutas'] %}
+                                                    <a href="{{path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip" title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i class="fa {{ ruta["fa_icon"] }}"></i></a>
+                                                {% endfor %}
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="{{ card['data']['headers']|length }}" style="text-align: center; line-height: 50px;">Sin resultados</td></tr>
+                            {% endif %}
                             </tbody>
                         </table>
                         {% if card['data']['has_paginate'] %}

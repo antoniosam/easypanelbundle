@@ -152,39 +152,40 @@ class EasyList extends EasyView
         $first = "",
         $last = ""
     ) {
-
-        if ($totalpages <= 7) {
-            $inicio = 1;
-            $fin = $totalpages;
-        } else {
-            if ($currentpage - 3 < 0) {
+        if ($totalpages > 0 ){
+            if ($totalpages <= 7) {
                 $inicio = 1;
-                $fin = $currentpage + 3 + (3 - $currentpage);//3 a la derecha mas los links que no se puedieron mostrar en la izquierda
-            } elseif (($currentpage + 3) > $totalpages) {
-                $inicio = $currentpage - 3 - (($currentpage + 3) - $totalpages);//3 a la izquierda mas los que no se puedieron mostrar el lado derecho
                 $fin = $totalpages;
             } else {
-                $inicio = $currentpage - 3;
-                $fin = $currentpage + 3;
-            }
-        }
-
-        $lista = [];
-        if ($first != "") {
-            $lista[] = array($route, $this->parameterPages(1,$search), $first, $classitem);
-        }
-        for ($i = $inicio; $i <= $fin; $i++) {
-            if ($i == $currentpage) {
-                $lista[] = array($route,$this->parameterPages($i,$search) , $i, $classitem . ' ' . $classactive);
-            } else {
-                $lista[] = array($route, $this->parameterPages($i,$search), $i, $classitem);
+                if ($currentpage - 3 < 0) {
+                    $inicio = 1;
+                    $fin = $currentpage + 3 + (3 - $currentpage);//3 a la derecha mas los links que no se puedieron mostrar en la izquierda
+                } elseif (($currentpage + 3) > $totalpages) {
+                    $inicio = $currentpage - 3 - (($currentpage + 3) - $totalpages);//3 a la izquierda mas los que no se puedieron mostrar el lado derecho
+                    $fin = $totalpages;
+                } else {
+                    $inicio = $currentpage - 3;
+                    $fin = $currentpage + 3;
+                }
             }
 
+            $lista = [];
+            if ($first != "") {
+                $lista[] = array($route, $this->parameterPages(1,$search), $first, $classitem);
+            }
+            for ($i = $inicio; $i <= $fin; $i++) {
+                if ($i == $currentpage) {
+                    $lista[] = array($route,$this->parameterPages($i,$search) , $i, $classitem . ' ' . $classactive);
+                } else {
+                    $lista[] = array($route, $this->parameterPages($i,$search), $i, $classitem);
+                }
+
+            }
+            if ($last != "") {
+                $lista[] = array($route, $this->parameterPages($totalpages,$search), $last, $classitem);
+            }
+            $this->addPages($lista,'Pagina ' . $currentpage . ' de ' . $totalpages);
         }
-        if ($last != "") {
-            $lista[] = array($route, $this->parameterPages($totalpages,$search), $last, $classitem);
-        }
-        $this->addPages($lista,'Pagina ' . $currentpage . ' de ' . $totalpages);
     }
 
     /**
