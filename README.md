@@ -125,6 +125,18 @@ El metodo addPages ya no recibira la informacion de setPageInfo
 $list->setFirstColumnCount($initnumber)
 $list->addPages(array $array)
 ``` 
+**Version1.6.0**
+
+Se agrega los metodos addLinkEdit, addLinkBack, addLink y cleanLinks que permiten agregar opciones debajo de la lista (card-footer)
+
+```
+$list->addLinkEdit( $route, $parametros, $nombre)   ('btn-info', 'fa-edit')
+$list->addLinkBack( $route, $parametros,$nombre )   ('btn-secondary', 'fa-arrow-left')
+$list->addLink($route, $parametros, $texto,$clase = 'btn-secondary',$fa_icon = null)
+$list->cleanLinks()
+
+``` 
+
 
 ###Clase EasyShow
 

@@ -103,7 +103,11 @@
                         {% endif %}
                     </div>
                 </div>
-                <!--<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>-->
+                <div class="card-footer">
+                    {%  for ruta  in card['data']['rutas'] %}
+                        <a href="{{path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip" title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i class="fa {{ ruta["fa_icon"] }}"></i> {{ ruta["texto"] }}</a>
+                    {% endfor %}
+                </div>
             </div>
         {% elseif  card['type'] == 'show'  %}
             <!-- Card {{ card['data']['seccion'] }} -->

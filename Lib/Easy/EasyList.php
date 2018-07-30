@@ -16,6 +16,7 @@ class EasyList extends EasyView
     private $seccion = "";
     private $cabeceras = [];
     private $opciones = array();
+    private $tableopciones = array();
     private $buscar = false;
     private $busqueda ;
     private $paginar = false;
@@ -77,12 +78,12 @@ class EasyList extends EasyView
 
     public function tableLink($route, $parametros, $texto, $clase = 'btn-secondary', $fa_icon = null)
     {
-        $this->opciones[] = $this->opcion($route, $parametros, $texto, $clase, $fa_icon);
+        $this->tableopciones[] = $this->opcion($route, $parametros, $texto, $clase, $fa_icon);
     }
 
     public function tableCleanLinks()
     {
-        $this->opciones[] = [];
+        $this->tableopciones[] = [];
     }
 
     public function renderAsImage($columna, $path='')
@@ -143,11 +144,32 @@ class EasyList extends EasyView
         $this->busqueda = array('value'=>$value,'text_button'=>$textbutton,'class_button'=>$classbutton,'class_container'=>$classcontainer);
     }
 
-    public function setFirstColumnCount($initnumber=0){
+    public function setFirstColumnCount($initnumber){
         $this->firstColumnCount= true;
         $this->firstColumnCountInit = $initnumber;
 
     }
+
+    public function addLinkEdit( $route, $parametros, $nombre)
+    {
+        $this->opciones[]= $this->opcion( $route,$parametros,$nombre, 'btn-info', 'fa-edit');
+    }
+
+    public function addLinkBack( $route, $parametros,$nombre )
+    {
+        $this->opciones[] = $this->opcion( $route,$parametros,$nombre, 'btn-secondary', 'fa-arrow-left');
+    }
+
+    public function addLink($route, $parametros, $texto,$clase = 'btn-secondary',$fa_icon = null)
+    {
+        $this->opciones[] = $this->opcion( $route,$parametros,$texto, $clase, $fa_icon);
+    }
+
+    public function cleanLinks()
+    {
+        $this->opciones[] = [];
+    }
+
     /**
      * @param $totalresults
      * @param $pagina
@@ -224,7 +246,7 @@ class EasyList extends EasyView
         $return = array();
         $return["seccion"] = $this->seccion;
 
-        $return["headers"] = $this->defineHeaders($this->columnas, $this->cabeceras, $this->opciones);
+        $return["headers"] = $this->defineHeaders($this->columnas, $this->cabeceras, $this->tableopciones);
         $filas = [];
         $path ='';
         reset($this->columnas);
@@ -254,7 +276,7 @@ class EasyList extends EasyView
                     $fila[] = $this->renderColumna($tipo, $objet->$temp(),$path);
                 }
             }
-            $filas[] = array('fila' => $fila, 'rutas' => $this->generateParameters($objet, $this->opciones));
+            $filas[] = array('fila' => $fila, 'rutas' => $this->generateParameters($objet, $this->tableopciones));
         }
         $return["tabla"] = $filas;
         $return["has_new"] = $this->nueva;
@@ -279,6 +301,7 @@ class EasyList extends EasyView
             }
             $return["order"]=['route'=>$this->orderby['route'],'parameters'=>$param,'columna'=>$columna,'direccion'=>$direccion];
         }
+        $return["rutas"] = $this->opciones;
         return $return;
     }
     private function generatePagination(){
