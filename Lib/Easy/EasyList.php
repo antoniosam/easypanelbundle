@@ -24,6 +24,8 @@ class EasyList extends EasyView
     private $autopaginate = [];
     private $ordenar = false;
     private $orderby = [];
+    private $firstColumnCount=false;
+    private $firstColumnCountInit=0;
 
     private $rutas = array();
 
@@ -140,6 +142,12 @@ class EasyList extends EasyView
         }
         $this->busqueda = array('value'=>$value,'text_button'=>$textbutton,'class_button'=>$classbutton,'class_container'=>$classcontainer);
     }
+
+    public function setFirstColumnCount($initnumber=0){
+        $this->firstColumnCount= true;
+        $this->firstColumnCountInit = $initnumber;
+
+    }
     /**
      * @param $totalresults
      * @param $pagina
@@ -184,7 +192,7 @@ class EasyList extends EasyView
         return $back;
 
     }
-    public function addPages(array $array,$info=null){
+    public function addPages(array $array){
         foreach ($array as $item){
             if(count($item)==3){
                 $this->addPage($item[0],$item[1],$item[2]);
@@ -192,9 +200,7 @@ class EasyList extends EasyView
                 $this->addPage($item[0],$item[1],$item[2],$item[3]);
             }
         }
-        if(!is_null($info)){
-            $this->setPageInfo($info);
-        }
+
     }
 
     public function setPageInfo($pageinfo){
@@ -221,13 +227,19 @@ class EasyList extends EasyView
         $return["headers"] = $this->defineHeaders($this->columnas, $this->cabeceras, $this->opciones);
         $filas = [];
         $path ='';
+        reset($this->columnas);
+        $firstcolum = key($this->columnas);
+        //echo $firstcolum;
         foreach ($this->consulta as $objet) {
             $fila = array();
             foreach ($this->columnas as $columna => $tipo) {
                 if(count($this->paths)>0){
                     $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
                 }
-                if(strpos($columna,'.')!==false){
+                if($this->firstColumnCount && $firstcolum == $columna){
+                    $fila[] = $this->firstColumnCountInit;
+                    $this->firstColumnCountInit++;
+                }elseif(strpos($columna,'.')!==false){
                     list($subobjeto,$submetodo)= explode('.',$columna);
                     $temp = 'get' . $subobjeto;
                     $sub = $objet->$temp();
@@ -310,7 +322,13 @@ class EasyList extends EasyView
             if ($last != "") {
                 $lista[] = array($route, $this->parameterPages($totalpages, $search), $last, $classitem);
             }
-            $this->addPages($lista, 'Pagina ' . $currentpage . ' de ' . $totalpages);
+
+            $this->addPages($lista);
+
+            if($this->paginainfo==' ' || $this->paginainfo==''){
+                $this->setPageInfo('Pagina ' . $currentpage . ' de ' . $totalpages);
+            }
+
         }
     }
     public function fixRenders()

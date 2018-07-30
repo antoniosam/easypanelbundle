@@ -16,7 +16,7 @@ Agregar la libreria al composer json
 ```
 "require": {
       ...
-      "antoniosam/easypanelbundle": "1.4.*"
+      "antoniosam/easypanelbundle": "1.5.*"
     },
 ```
 Tambien agregamos la direccion del repositorio
@@ -114,6 +114,18 @@ La opcion *enableOrder* agrega links para ordenamiento en las cabeceras de las c
 ```
 $list->enableOrder($route,$parametersroute,$ordercolumn = 1,$ordertype = 'ASC');
 ```
+
+**Version1.5.0**
+
+Se agrega el metodo setFirstColumnCount que cambia el valor de la primera columna y lo reemplaza por el numero de fila que se renderea, se puede establecer un valor de inicio
+
+El metodo addPages ya no recibira la informacion de setPageInfo
+
+```
+$list->setFirstColumnCount($initnumber)
+$list->addPages(array $array)
+``` 
+
 ###Clase EasyShow
 
 Metodos estaticos solo crean una seccion con configuracion basica 
