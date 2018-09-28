@@ -12,25 +12,13 @@ Las consultas para mostrar informacion no se incorporan dentro del bundle, depen
 
 ### Installing
 
-Agregar la libreria al composer json
-```
-"require": {
-      ...
-      "antoniosam/easypanelbundle": "1.6.*"
-    },
-```
-Tambien agregamos la direccion del repositorio
+Agregar la libreria mediante composer 
 
 ```
-"repositories": [
-      ...
-      {
-          "type": "vcs",
-          "url": "https://github.com/antoniosam/easypanelbundle",
-          "no-api": true
-      }]
+composer require antoniosam/easypanelbundle
 ```
-Y al final agregamos el bundle en el AppKernel
+
+Y agregamos el bundle en el AppKernel
 ```
  $bundles = [
        ...
@@ -135,7 +123,13 @@ $list->addLinkBack( $route, $parametros,$nombre )   ('btn-secondary', 'fa-arrow-
 $list->addLink($route, $parametros, $texto,$clase = 'btn-secondary',$fa_icon = null)
 $list->cleanLinks()
 
-``` 
+```
+ **Version1.6.1**
+ 
+ **createListPages** Acepta params para generar la ruta
+ ```
+ $list->createListPages($totalpages,$currentpage,$search,$route,$params,$classitem,$classactive,$first = "",$last = "")
+ ```
 
 
 ###Clase EasyShow
