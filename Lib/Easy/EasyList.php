@@ -185,13 +185,14 @@ class EasyList extends EasyView
         $currentpage,
         $search,
         $route,
+        $params,
         $classitem,
         $classactive,
         $first = "",
         $last = ""
     ) {
         $this->paginar = true;
-        $this->autopaginate = array('total'=>$totalpages,'current'=>$currentpage,'search'=>$search,'route'=>$route,'classitem'=>$classitem,'classactive'=>$classactive,'first'=>$first,'last'=>$last);
+        $this->autopaginate = array('total'=>$totalpages,'current'=>$currentpage,'search'=>$search,'route'=>$route,'params'=>$params,'classitem'=>$classitem,'classactive'=>$classactive,'first'=>$first,'last'=>$last);
 
     }
 
@@ -200,9 +201,12 @@ class EasyList extends EasyView
      * @param $search
      * @return array
      */
-    protected  function parameterPages($page, $search)
+    protected  function parameterPages($page, $search,$params)
     {
         $back = [];
+        if(count($params)>0){
+            $back = array_merge($back,$params);
+        }
         if ($search != '') {
             $back['buscar'] = $search;
         }
@@ -309,6 +313,7 @@ class EasyList extends EasyView
         $currentpage = $this->autopaginate['current'];
         $search = $this->autopaginate['search'];
         $route = $this->autopaginate['route'];
+        $params = $this->autopaginate['params'];
         $classitem = $this->autopaginate['classitem'];
         $classactive = $this->autopaginate['classactive'];
         $first = $this->autopaginate['first'];
@@ -332,18 +337,18 @@ class EasyList extends EasyView
 
             $lista = [];
             if ($first != "") {
-                $lista[] = array($route, $this->parameterPages(1, $search), $first, $classitem);
+                $lista[] = array($route, $this->parameterPages(1, $search,$params), $first, $classitem);
             }
             for ($i = $inicio; $i <= $fin; $i++) {
                 if ($i == $currentpage) {
-                    $lista[] = array($route, $this->parameterPages($i, $search), $i, $classitem . ' ' . $classactive);
+                    $lista[] = array($route, $this->parameterPages($i, $search,$params), $i, $classitem . ' ' . $classactive);
                 } else {
-                    $lista[] = array($route, $this->parameterPages($i, $search), $i, $classitem);
+                    $lista[] = array($route, $this->parameterPages($i, $search,$params), $i, $classitem);
                 }
 
             }
             if ($last != "") {
-                $lista[] = array($route, $this->parameterPages($totalpages, $search), $last, $classitem);
+                $lista[] = array($route, $this->parameterPages($totalpages, $search,$params), $last, $classitem);
             }
 
             $this->addPages($lista);
