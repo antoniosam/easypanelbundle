@@ -19,12 +19,14 @@ class EasyPanelService
     private $twig;
     private $panellayout;
     private $panelvista;
+    private $panelmenu;
 
-    function __construct(Twig_Environment $twig,  $layout, $vista)
+    function __construct(Twig_Environment $twig,  $layout, $vista,$menu)
     {
         $this->twig = $twig;
         $this->panellayout = ($layout == null)?'@EasyPanel/layout.html.twig':$layout;
         $this->panelvista = ($vista == null)?'@EasyPanel/view.html.twig':$vista;
+        $this->panelmenu = ($menu == null)?'@EasyPanel/menu.html.twig':$menu;
     }
 
     function render($vista, Response $response = null)
@@ -49,6 +51,7 @@ class EasyPanelService
         }
 
         $parameters['layout'] = $this->panellayout;
+        $parameters['menu'] = $this->panelmenu;
 
         $content = $this->twig->render($this->panelvista, $parameters);
         if (null === $response) {
