@@ -68,4 +68,17 @@ class InstallAssetsCommand extends  ContainerAwareCommand
         // outputs a message without adding a "\n" at the end of the line
         $output->writeln(['','Comando Terminado, :)']);
     }
+
+    private function timecommand($tiempo_inicio){
+        $tiempo_fin = microtime(true);
+        $seconds = round($tiempo_fin - $tiempo_inicio, 0);
+        $hours = floor($seconds / 3600);
+        $mins = floor($seconds / 60 % 60);
+        $secs = floor($seconds % 60);
+        if($secs == 0){
+            $secs = round($tiempo_fin - $tiempo_inicio, 3);
+        }
+
+        return ($hours>0? $hours.'h ':'').($mins>0? $mins.'m ':''). $secs.'s';
+    }
 }

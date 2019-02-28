@@ -40,11 +40,16 @@ class EasyPanelMenu
         $this->panelbundle = $panelbundle;
         $this->entitybundle = $entitybundle;
         $this->prefix = $prefix;
-        $this->panelbundledir = $this->kernel_project_dir . $this->panelbundle . '/';
+
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $this->panelbundledir = $this->kernel_project_dir.'../templates/'.$this->panelbundle;
+        }else{
+            $this->panelbundledir = $this->kernel_project_dir . $this->panelbundle . '/Resources/views';
+        }
         Util::createDir($this->panelbundledir);
     }
 
-    public function create($menu)
+    public function create()
     {
         if(is_array($this->entitybundle)){
             $entitys = $this->entitybundle;
@@ -72,12 +77,13 @@ class EasyPanelMenu
 
         $parametros=[];
         $parametros['proyecto'] = $this->proyecto;
-        $parametros['simple']= ($menu == EasyPanelCreate::MENU_COLLAPSE);
+        $parametros['simple']= EasyPanelCreate::MENU_EXPAND;
         $parametros['rutas'] = $lista;
         $parametros['prefix'] = $this->prefix;
 
         $html = $this->templating->render('@EasyPanel/Create/menu.html.twig', $parametros);
-        $nombre = Util::guardar($this->panelbundledir.'Resources/views','menu.html.twig',$html);
+
+        file_put_contents($this->panelbundledir.'/menu.html.twig',$html);
 
         return 'Menu Creado con '.count($lista).' rutas';
     }

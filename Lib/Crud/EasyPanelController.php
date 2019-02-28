@@ -10,6 +10,7 @@ namespace Ast\EasyPanelBundle\Lib\Crud;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\InfoEntityImport;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
 
+
 class EasyPanelController
 {
     private $em;
@@ -18,10 +19,19 @@ class EasyPanelController
     private $panelbundle;
     private $entitybundle;
     private $entity;
+    private $prefix;
     private $ruta;
     private $seccion;
     private $campos;
     private $columnas;
+    private $rutacontroller;
+    private $rutaform;
+    private $rutatemplates;
+
+    private $namespacedircontroller ;
+    private $namespacedirform ;
+    private $formnamespace;
+
 
     public function __construct(
         \Doctrine\ORM\EntityManager $entityManager,
@@ -29,6 +39,7 @@ class EasyPanelController
         $kernel_project_dir,
         $panelbundle,
         $entity,
+        $prefix,
         $ruta,
         $seccion
     ) {
@@ -38,7 +49,20 @@ class EasyPanelController
         $this->panelbundle = $panelbundle;
         $this->namespaceentity = $entity;
         $this->ruta = $ruta;
+        $this->prefix = $prefix;
         $this->seccion = $seccion;
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $this->rutacontroller = $this->kernel_project_dir.'Controller/'.$this->panelbundle;
+            $this->rutaform = $this->kernel_project_dir.'Form/'.$this->panelbundle;
+            $this->rutatemplates = $this->kernel_project_dir.'../templates/'.$this->panelbundle;
+        }else{
+            $this->rutacontroller =  $this->kernel_project_dir . $this->panelbundle . '/Controller/';
+            $this->rutaform = $this->kernel_project_dir.$this->panelbundle .'/Form/';
+            $this->rutatemplates = $this->kernel_project_dir.$this->panelbundle .'/Resources/views/';
+        }
+        Util::createDir($this->rutacontroller);
+        Util::createDir($this->rutaform);
+        Util::createDir($this->rutatemplates);
     }
 
     protected function createBundleEntity($entity,$panelbunle){
@@ -54,15 +78,29 @@ class EasyPanelController
 
     public function create($type_crud=null,$ignore=null)
     {
-        $filename = Util::fixFilename($this->kernel_project_dir.DIRECTORY_SEPARATOR.$this->namespaceentity).'.php';
+        //Obtener la ruta completa de la clase que se creara
+        $a = new \ReflectionClass($this->namespaceentity);
+        $filename = $a->getFileName();
+
 
         if(file_exists($filename)){
+            //Recuperamos el nombre de la clase
             $this->entity = Util::getFileNamespace($this->namespaceentity);
-            //$this->entitybundle = $this->createBundleEntity($this->entity,$this->panelbundle);
-            $ignorar = Util::getArray($ignore);
-            $this->campos = $this->fieldsEntity($this->namespaceentity,$ignorar);
+            //lista de campos excluyendos los campos a ignorar
+            $this->campos = $this->fieldsEntity($this->namespaceentity,Util::getArray($ignore));
+            if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+                $this->namespacedircontroller = 'App\\Controller\\'.$this->panelbundle;
+                $this->namespacedirform = 'App\\Form\\'.$this->panelbundle;
+                $this->formnamespace = 'App\\Form\\'.$this->panelbundle.'\\'.$this->entity.'Type';
+            }else{
+                $this->namespacedircontroller = $this->panelbundle.'\\Controller';
+                $this->namespacedirform = $this->panelbundle.'\\Form';
+                $this->formnamespace = $this->panelbundle.'\\Form\\'.$this->entity.'Type';
+            }
+
             $controller = $this->createController($this->campos, $this->panelbundle, $this->namespaceentity, $this->entity, $this->ruta, $this->seccion, $type_crud);
             $form = $this->createForm($this->campos, $this->panelbundle, $this->namespaceentity,$this->entity);
+
             $tempdir = Util::fixFilename($this->kernel_project_dir);
             return 'Crud ' . str_replace($tempdir,'',$controller) . ' ' . str_replace($tempdir,'',$form).' '.PHP_EOL;
         }else{
@@ -89,6 +127,7 @@ class EasyPanelController
 
         $showlist =  $this->getColumnas($this->ignoreFields($campos,$showexclude));
 
+
         $parametros = array(
             'seccion' => $seccion,
             'ruta' => $ruta,
@@ -96,24 +135,26 @@ class EasyPanelController
             'entitybundle' => $entitybundle,
             'form' => $entity . 'Type',
             'bundle' => $panelbundle,
-            "indexlist" => $indexlist,
-            "showlist" => $showlist
+            'indexlist' => $indexlist,
+            'showlist' => $showlist,
+            'namespace' => $this->namespacedircontroller,
+            'formnamespace' => $this->formnamespace,
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:''
         );
 
-        if ($type_crud == EasyPanelCreateAuto::TYPE_EASY) {
+        /*if ($type_crud == EasyPanelCreateAuto::TYPE_EASY) {
             $html = $this->templating->render('@EasyPanel/Crud/controller.easy.html.twig', $parametros);
         } elseif ($type_crud == EasyPanelCreateAuto::TYPE_EASY_MIN)  {
             $html = $this->templating->render('@EasyPanel/Crud/controller.easy.min.html.twig', $parametros);
         }elseif ($type_crud == EasyPanelCreateAuto::TYPE_NORMAL){
             $html = $this->templating->render('@EasyPanel/Crud/controller.html.twig', $parametros);
         }else{
-            $html = $this->templating->render('@EasyPanel/Crud/controller.easy.html.twig', $parametros);
-        }
 
-        $ruta = $this->createDir($panelbundle,'Controller');
+        }*/
+        $html = $this->templating->render('@EasyPanel/Crud/controller.easy.html.twig', $parametros);
         $name = $entity . "Controller.php";
 
-        file_put_contents($ruta . $name, $html);
+        file_put_contents($this->rutacontroller .'/'. $name, $html);
 
         return $name;
     }
@@ -129,26 +170,21 @@ class EasyPanelController
             'bundle' => $bundle,
             'entity' => $entity,
             'entitybundle' => $entitybundle,
-            'columnas' => $formlist
+            'columnas' => $formlist,
+            'namespace' => $this->namespacedirform,
         );
 
         $html = $this->templating->render('@EasyPanel/Crud/form.html.twig', $parametros);
 
-        $ruta = $this->createDir($bundle,'Form');
+
         $name = $entity . "Type.php";
 
-        file_put_contents($ruta . $name, $html);
+        file_put_contents($this->rutaform .'/'. $name, $html);
 
         return $name;
     }
 
-    private function createDir($bundle,$carpeta){
-        $filename = $this->kernel_project_dir . $bundle . '/'.$carpeta.'/';
-        if (!file_exists($filename)) {
-            mkdir($filename, 0777, true);
-        }
-        return $filename;
-    }
+
 
     private function fieldsEntity($entitybundle, array  $excluir = [])
     {

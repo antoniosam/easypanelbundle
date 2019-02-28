@@ -6,7 +6,8 @@
 
 namespace Ast\EasyPanelBundle\Lib\Crud\Utils;
 
-use Symfony\Component\ClassLoader\ClassMapGenerator;
+
+use Ast\EasyPanelBundle\Lib\Crud\Utils\ClassMapGenerator;
 
 class InfoEntityImport
 {

@@ -1,23 +1,26 @@
 <?php
 
-namespace {{ bundle }}\Controller;
+namespace {{ namespace }};
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Ast\EasyPanelBundle\Lib\Easy\EasyList;
 use Ast\EasyPanelBundle\Lib\Easy\EasyShow;
 use Ast\EasyPanelBundle\Lib\Easy\EasyForm;
 use Ast\EasyPanelBundle\Lib\Easy\Panel;
+use Ast\EasyPanelBundle\Services\EasyPanelService;
+use Ast\EasyDoctrinePagination\EasyPagination;
 
 use {{ entitybundle }};
-use {{ bundle }}\Form\{{ form }};
+use {{ formnamespace }};
 
 
 /**
- * @Route("/{{ entity|lower }}" )
+ * @Route("{{ prefix_controller_route }}/{{ entity|lower }}" )
  */
 class {{ entity }}Controller extends Controller
 {
@@ -31,7 +34,7 @@ class {{ entity }}Controller extends Controller
 
     private function indexColumnOrder($col){
         $campos = ['{{ indexlist|join("', '")|raw }}'];
-        return (isset($campos[$col])? $campos[$col] : '';
+        return isset($campos[$col])? $campos[$col] : '';
     }
 
     /**
@@ -40,7 +43,7 @@ class {{ entity }}Controller extends Controller
      * @Route("/", name="{{ ruta }}_index" )
      * @Method("GET")
      */
-    public function indexAction(Request $request, EasyPanelService, $easypanel)
+    public function indexAction(Request $request, EasyPanelService $easypanel)
     {
         {{ '$em = $this->' }}getDoctrine()->getManager();
         $buscar = $request->get('buscar', '');
@@ -53,7 +56,7 @@ class {{ entity }}Controller extends Controller
         //Agregar validacion extras
         //$paginar->where('activo','=',true);
         if(!empty($buscar)){
-        $paginar->search($buscar,$this->indexColumnsSearch()]);
+            $paginar->search($buscar,$this->indexColumnsSearch());
         }
         $paginar->order($this->indexColumnOrder($col),$orden);
 
@@ -73,7 +76,7 @@ class {{ entity }}Controller extends Controller
     * @Route("/new", name="{{ ruta }}_new")
     * @Method({"GET", "POST"})
     */
-    public function nuevoAction(Request $request, EasyPanelService, $easypanel)
+    public function nuevoAction(Request $request, EasyPanelService $easypanel)
     {
         ${{ entity|lower }} = new {{ entity }}();
         $form = $this->createForm({{ form }}::class, ${{ entity|lower }});
@@ -95,10 +98,10 @@ class {{ entity }}Controller extends Controller
     * @Route("/{id}/show", name="{{ ruta }}_show", requirements={"id"="\d+"} )
     * @Method("GET")
     */
-    public function showAction({{ entity }} ${{ entity|lower }}, EasyPanelService, $easypanel)
+    public function showAction({{ entity }} ${{ entity|lower }}, EasyPanelService $easypanel)
     {
         $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ ruta }}');
-        $show->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
+        $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
 
         return $easypanel->render($view);
     }
@@ -109,7 +112,7 @@ class {{ entity }}Controller extends Controller
     * @Route("/{id}/edit", name="{{ ruta }}_edit", requirements={"id"="\d+"})
     * @Method({"GET", "POST"})
     */
-    public function editAction(Request $request, {{ entity }} ${{ entity|lower }}, EasyPanelService, $easypanel)
+    public function editAction(Request $request, {{ entity }} ${{ entity|lower }}, EasyPanelService $easypanel)
     {
         $editForm = $this->createForm({{ form }}::class, ${{ entity|lower }});
         if($redirect = $this->saveForm($request,$editForm,${{ entity|lower }})){

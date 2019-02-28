@@ -49,22 +49,39 @@ class EasyPanelCreate
         $this->exclude = $exclude;
 
     }
-    protected function findBundle(){
-        $this->panelbundledir = $this->kernel_project_dir . $this->panelbundle . '/';
-        Util::createDir($this->panelbundledir);
-        if (!file_exists($this->panelbundledir.$this->panelbundle.'.php')) {
-            $html ='<?php'.PHP_EOL.PHP_EOL.'namespace '.$this->panelbundle.';'.PHP_EOL.PHP_EOL.'use Symfony\Component\HttpKernel\Bundle\Bundle;'.PHP_EOL.PHP_EOL.'class '.$this->panelbundle.' extends Bundle'.PHP_EOL.'{'.PHP_EOL.'}'.PHP_EOL;
-            file_put_contents($this->panelbundledir.$this->panelbundle.'.php',$html);
-            return false;
+
+
+    public function create($ignorar=null)
+    {
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $listaclases = InfoEntityImport::folder($this->em,$this->kernel_project_dir.$this->entitybundle);
+            $listaclases = $this->excluirEntidades($listaclases);
+            $creados = [];
+            $instrucciones = 'Controladores Creados'.PHP_EOL;
+            if(count($listaclases)>0){
+                $listaentitys = [];
+                foreach ($listaclases as $clase):
+
+                    $entity = Util::getFileNamespace($clase);
+                    $ruta = $this->prefix.'_'.strtolower($entity);
+                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity));
+                    $tmp = $crud->create($ignorar);
+                    $creados[] = $tmp;
+                    $instrucciones .= $tmp.PHP_EOL;
+                    $listaentitys[] = $entity;
+                endforeach;
+                $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix))->create();
+                $instrucciones .= PHP_EOL.PHP_EOL.$menu;
+            }
+
         }else{
-            return true;
+            $instrucciones = $this->createSf3($ignorar);
         }
 
+        return $instrucciones;
     }
 
-
-    public function create($menu,$type_crud=null,$ignorar=null)
-    {
+    protected function createSf3($ignorar){
         if($this->findBundle()){
             $this->initBundle();
             $listaclases = InfoEntityImport::folder($this->em,$this->kernel_project_dir.$this->entitybundle);
@@ -76,12 +93,12 @@ class EasyPanelCreate
                     $entity = Util::getFileNamespace($clase);
                     $ruta = $this->prefix.'_'.strtolower($entity);
                     $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$ruta,ucfirst($entity));
-                    $creados[] = $crud->create($type_crud,$ignorar);
+                    $creados[] = $crud->create($ignorar);
                     $listaentitys[] = $entity;
                 endforeach;
-                $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix))->create($menu);
+                $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix))->create();
             }
-            $instrucciones = PHP_EOL."Creado " . implode($creados)." ".$menu.PHP_EOL;
+            $instrucciones = PHP_EOL."Creado " . implode($creados)." ".PHP_EOL;
             $instrucciones .="Para concluir debes agregar bundle a la configuracion".PHP_EOL;
             $instrucciones .="En el archivo routing.yml debes agregar la nueva ruta".PHP_EOL;
             $instrucciones .=$this->prefix."_route:".PHP_EOL;
@@ -117,6 +134,18 @@ class EasyPanelCreate
         Util::guardar($this->panelbundledir."Resources/views/Default","index.html.twig",$html);
         $html = $this->templating->render('@EasyPanel/Create/default.dashboard.html.twig', $parametros);
         Util::guardar($this->panelbundledir."Resources/views/Default","dashboard.html.twig",$html);
+    }
+    protected function findBundle(){
+        $this->panelbundledir = $this->kernel_project_dir . $this->panelbundle . '/';
+        Util::createDir($this->panelbundledir);
+        if (!file_exists($this->panelbundledir.$this->panelbundle.'.php')) {
+            $html ='<?php'.PHP_EOL.PHP_EOL.'namespace '.$this->panelbundle.';'.PHP_EOL.PHP_EOL.'use Symfony\Component\HttpKernel\Bundle\Bundle;'.PHP_EOL.PHP_EOL.'class '.$this->panelbundle.' extends Bundle'.PHP_EOL.'{'.PHP_EOL.'}'.PHP_EOL;
+            file_put_contents($this->panelbundledir.$this->panelbundle.'.php',$html);
+            return false;
+        }else{
+            return true;
+        }
+
     }
 
     protected function excluirEntidades($listaclases){

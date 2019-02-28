@@ -36,6 +36,7 @@ class CreateModuleCommand extends  ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $tiempo_inicio = microtime(true);
         // outputs multiple lines to the console (adding "\n" at the end of each line)
 
         $em = $this->getContainer()->get('doctrine')->getManager();
@@ -57,7 +58,7 @@ class CreateModuleCommand extends  ContainerAwareCommand
         $ignore = $input->getOption('ignore');
 
         $output->writeln([
-            'Create EasyPanel Type Sato  ',// A line
+            'Create EasyPanel  ',// A line
             '========================================',// Another line
             '',// Empty line
         ]);
@@ -77,6 +78,19 @@ class CreateModuleCommand extends  ContainerAwareCommand
 
 
         // outputs a message without adding a "\n" at the end of the line
-        $output->writeln(['','Comando Terminado, :)']);
+        $output->writeln(['','Comando Terminado, '.$this->timecommand($tiempo_inicio).' :)']);
+    }
+
+    private function timecommand($tiempo_inicio){
+        $tiempo_fin = microtime(true);
+        $seconds = round($tiempo_fin - $tiempo_inicio, 0);
+        $hours = floor($seconds / 3600);
+        $mins = floor($seconds / 60 % 60);
+        $secs = floor($seconds % 60);
+        if($secs == 0){
+            $secs = round($tiempo_fin - $tiempo_inicio, 3);
+        }
+
+        return ($hours>0? $hours.'h ':'').($mins>0? $mins.'m ':''). $secs.'s';
     }
 }
