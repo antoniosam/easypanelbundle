@@ -148,16 +148,14 @@ class EasyShow extends EasyView
      * @param $prefix
      * @return EasyShow
      */
-    public static function easy($seccion , $consulta,$columnas,$prefix = null,$deleteform=null){
+    public static function easy($seccion , $consulta,$columnas,$prefix = null){
         $show = new EasyShow("Ver ".$seccion,$consulta,$columnas);
         $show->fixRenders();
         if(!empty($prefix)){
             $show->addLinkBack($prefix.'_index',[],"Regresar ");
             $show->addLinkEdit($prefix.'_edit',array("id"=>"id"),"Editar ".$seccion);
         }
-        if($deleteform!=null){
-            $show->setDeleteForm($deleteform);
-        }
+
         return $show;
     }
 

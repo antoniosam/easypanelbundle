@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="easypanel.command.createmenu" class="Ast\EasyPanelBundle\Command\CreateMenuCommand">
+            <tag name="console.command" command="easypanel:create:menu" />
+        </service>
+        <service id="easypanel.command.createmodule" class="Ast\EasyPanelBundle\Command\CreateModuleCommand">
+            <tag name="console.command" command="easypanel:create:module" />
+        </service>
+        <service id="easypanel.command.createpanel" class="Ast\EasyPanelBundle\Command\CreatePanelCommand">
+            <tag name="console.command" command="easypanel:create:panel" />
+        </service>
+        <service id="easypanel.command.installassets" class="Ast\EasyPanelBundle\Command\InstallAssetsCommand">
+            <tag name="console.command" command="easypanel:install:assets" />
+        </service>
+
+    </services>
+</container>

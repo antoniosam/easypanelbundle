@@ -17,12 +17,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use ZipArchive;
 
-class EasyExportAssetCommand extends  ContainerAwareCommand
+class InstallAssetsCommand extends  ContainerAwareCommand
 {
+    protected static $defaultName = 'easypanel:install:assets';
+
     protected function configure()
     {
         $this
-            ->setName('easypanel:export:assets')
+            ->setName(static::$defaultName)
             ->setDescription('Exporta los asset a la carpeta admin.')
             ->addOption('dir',null,InputOption::VALUE_REQUIRED,'Especifica el directorio Web','web')
         ;

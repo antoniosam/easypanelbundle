@@ -21,8 +21,17 @@ use {{ bundle }}\Form\{{ form }};
  */
 class {{ entity }}Controller extends Controller
 {
-    private function indexList(){
-        return array('{{ indexlist|join("', '")|raw }}');
+    private function indexColumnsTable(){
+        return ['{{ indexlist|join("', '")|raw }}'];
+    }
+
+    private function indexColumnsSearch(){
+        return ['{{ indexlist|join("', '")|raw }}'];
+    }
+
+    private function indexColumnOrder($col){
+        $campos = ['{{ indexlist|join("', '")|raw }}'];
+        return (isset($campos[$col])? $campos[$col] : '';
     }
 
     /**
@@ -31,14 +40,31 @@ class {{ entity }}Controller extends Controller
      * @Route("/", name="{{ ruta }}_index" )
      * @Method("GET")
      */
-    public function indexAction()
+    public function indexAction(Request $request, EasyPanelService, $easypanel)
     {
         {{ '$em = $this->' }}getDoctrine()->getManager();
-        ${{ entity|lower }}s = $em->getRepository({{ entity }}::class)->findAll();
+        $buscar = $request->get('buscar', '');
+        $pagina = $request->get('pagina', 1);
+        $col = $request->get('columna', 0);
+        $orden = $request->get('orden', 'ASC');
 
-        $vista = EasyList::easy("{{ seccion }}", ${{ entity|lower }}s, $this->indexList(), "{{ ruta }}");
+        $paginar = new EasyPagination($em,{{ entity }}::class);
+        $paginar->setPage($pagina);
+        //Agregar validacion extras
+        //$paginar->where('activo','=',true);
+        if(!empty($buscar)){
+        $paginar->search($buscar,$this->indexColumnsSearch()]);
+        }
+        $paginar->order($this->indexColumnOrder($col),$orden);
 
-        return $this->render('@EasyPanel/view.html.twig',Panel::createList($vista, '@{{ bundle }}/layout.html.twig'));
+        $paginar->execute();
+        $result = $paginar->getResult();
+
+        $view = EasyList::easy('{{ seccion }}', $result['data'], $this->indexColumnsTable() , '{{ ruta }}');
+        $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ ruta }}_index' , []);
+        $view->enableOrder('{{ ruta }}_index' , [] , $col , $orden);
+
+        return $easypanel->render($view);
     }
 
     /**
@@ -47,16 +73,17 @@ class {{ entity }}Controller extends Controller
     * @Route("/new", name="{{ ruta }}_new")
     * @Method({"GET", "POST"})
     */
-    public function nuevoAction(Request $request)
+    public function nuevoAction(Request $request, EasyPanelService, $easypanel)
     {
         ${{ entity|lower }} = new {{ entity }}();
-        $form = $this->generateForm( ${{ entity|lower }});
+        $form = $this->createForm({{ form }}::class, ${{ entity|lower }});
         if($redirect = $this->saveForm($request,$form, ${{ entity|lower }},true)){
             return $this->redirect($redirect);
         };
+
         $view = EasyForm::easy('Nuevo {{ seccion }}', $form->createView(), '{{ ruta }}');
 
-        return $this->render('@EasyPanel/view.html.twig', Panel::createForm($view, '@{{ bundle }}/layout.html.twig'));
+        return $easypanel->render($view);
     }
 
     private function showList(){
@@ -68,10 +95,12 @@ class {{ entity }}Controller extends Controller
     * @Route("/{id}/show", name="{{ ruta }}_show", requirements={"id"="\d+"} )
     * @Method("GET")
     */
-    public function showAction({{ entity }} ${{ entity|lower }})
+    public function showAction({{ entity }} ${{ entity|lower }}, EasyPanelService, $easypanel)
     {
-        $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), "{{ ruta }}", $this->viewDeleteForm(${{ entity|lower }}));
-        return $this->render('@EasyPanel/view.html.twig', Panel::createShow($view, '@{{ bundle }}/layout.html.twig'));
+        $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ ruta }}');
+        $show->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
+
+        return $easypanel->render($view);
     }
 
     /**
@@ -80,17 +109,18 @@ class {{ entity }}Controller extends Controller
     * @Route("/{id}/edit", name="{{ ruta }}_edit", requirements={"id"="\d+"})
     * @Method({"GET", "POST"})
     */
-    public function editAction(Request $request, {{ entity }} ${{ entity|lower }})
+    public function editAction(Request $request, {{ entity }} ${{ entity|lower }}, EasyPanelService, $easypanel)
     {
-        $editForm = $this->generateForm( ${{ entity|lower }});
+        $editForm = $this->createForm({{ form }}::class, ${{ entity|lower }});
         if($redirect = $this->saveForm($request,$editForm,${{ entity|lower }})){
             return $this->redirect($redirect);
         };
 
-        $view = EasyForm::easy("Editar {{ entity }}", $editForm->createView(), '', $this->viewDeleteForm(${{ entity|lower }}));
+        $view = EasyForm::easy('Editar {{ entity }}', $editForm->createView());
         $view->addLinkBack('{{ ruta }}_show',array('id'=>${{ entity|lower }}->getId()),'Regresar');
+        $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
 
-        return $this->render('@EasyPanel/view.html.twig', Panel::createForm($view,'@{{ bundle }}/layout.html.twig'));
+        return $easypanel->render($view);
     }
 
     /**
@@ -107,16 +137,9 @@ class {{ entity }}Controller extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->remove(${{ entity|lower }});
             $em->flush();
+            $this->addFlash('success','{{ entity }} eliminado correctamente');
         }
         return $this->redirectToRoute('{{ ruta }}_index');
-    }
-
-    /**
-    * @param {{ entity }}|null ${{ entity|lower }}
-    * @return FormInterface
-    */
-    private function generateForm({{ entity }} ${{ entity|lower }}){
-        return  $this->createForm({{ form }}::class, ${{ entity|lower }});
     }
 
     /**
@@ -133,11 +156,16 @@ class {{ entity }}Controller extends Controller
                 $em->persist(${{ entity|lower }});
                 $em->flush();
                 if( $isnew ){
+                    $this->addFlash('success','{{ entity }} registrado correctamente');
                     return $this->generateUrl('{{ ruta }}_show', array('id'=>${{ entity|lower }}->getId()));
                 }else{
+                    $this->addFlash('success','{{ entity }} actualizado correctamente');
                     return $this->generateUrl('{{ ruta }}_index', []);
                 }
+            }else{
+                $this->addFlash('success','{{ entity }} actualizado correctamente');
             }
+
         }
         return false;
 
@@ -155,11 +183,4 @@ class {{ entity }}Controller extends Controller
             ->getForm();
     }
 
-    /**
-    * @param {{ entity }} ${{ entity|lower }}
-    * @return \Symfony\Component\Form\FormView
-    */
-    private function viewDeleteForm({{ entity }} ${{ entity|lower }}){
-        return $this->generateDeleteForm(${{ entity|lower }})->createView();
-    }
 }

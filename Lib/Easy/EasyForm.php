@@ -80,14 +80,11 @@ class EasyForm extends EasyView
      * @param null $deleteform
      * @return EasyForm
      */
-    public static function easy($seccion, $form, $prefix = null,$deleteform = null)
+    public static function easy($seccion, $form, $prefix = null)
     {
         $form = new EasyForm("Formulario de " . $seccion, $form);
         if(!empty($prefix)){
             $form->addLinkBack($prefix . '_index', [], "Regresar " );
-        }
-        if($deleteform!=null){
-            $form->setDeleteForm($deleteform);
         }
         return $form;
     }

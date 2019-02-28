@@ -7,6 +7,7 @@ namespace Ast\EasyPanelBundle\Command;
 
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateInit;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelController;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,23 +16,21 @@ use Symfony\Component\Console\Input\InputOption;
 // Add the Container
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class EasyPanelImportCommand extends  ContainerAwareCommand
+class CreateModuleCommand extends  ContainerAwareCommand
 {
+    protected static $defaultName = 'easypanel:create:module';
+
     protected function configure()
     {
         $this
-            ->setName('easypanel:create:panel:import')
-            ->setDescription('Crea un panel funcional con las entidades de otro bundle.')
-            ->addArgument('proyecto', InputArgument::REQUIRED, 'Nombre del proyecto')
+            ->setName(static::$defaultName)
+            ->setDescription('Crea un controlador y un form basandose en un entidad ')
+            ->addArgument('seccion', InputArgument::REQUIRED, 'Seccion del Modulo')
             ->addArgument('panelbundle', InputArgument::REQUIRED, 'Bundle donde estara el panel')
-            ->addArgument('entitybundle', InputArgument::REQUIRED, 'Bundle donde estan las entidades')
+            ->addArgument('entity', InputArgument::REQUIRED, 'Namespace de la Entidad que se usara')
             ->addArgument('prefix', InputArgument::REQUIRED, 'Prefijo para las rutas')
             ->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min)','easy')
-            ->addOption('menu_collapse',null,InputOption::VALUE_REQUIRED,'Menu collapsado (1,0)','1')
             ->addOption('ignore',null,InputOption::VALUE_REQUIRED,'Campos que se ignorarn al crear los archivos','')
-            ->addOption('exclude',null,InputOption::VALUE_REQUIRED,'Entidades que se ignorarn para la creacion del panel','')
-
-
         ;
     }
 
@@ -42,9 +41,9 @@ class EasyPanelImportCommand extends  ContainerAwareCommand
         $em = $this->getContainer()->get('doctrine')->getManager();
         $twig = $this->getContainer()->get('twig');
         $dir = $this->getContainer()->getParameter("kernel.root_dir").'/../src/';
-        $proyecto = $input->getArgument('proyecto');
+        $seccion = $input->getArgument('seccion');
         $panelbundle = $input->getArgument('panelbundle');
-        $entitybundle = $input->getArgument('entitybundle');
+        $entity = $input->getArgument('entity');
         $prefix = $input->getArgument('prefix');
         if($input->getOption('type_crud') == 'easy'){
             $type_crud = EasyPanelCreate::TYPE_EASY;
@@ -55,15 +54,7 @@ class EasyPanelImportCommand extends  ContainerAwareCommand
         }else{
             $type_crud = EasyPanelCreate::TYPE_EASY;
         }
-        if($input->getOption('menu_collapse')=='1'){
-            $menu= EasyPanelCreate::MENU_COLLAPSE;
-        }elseif($input->getOption('menu_collapse')=='0'){
-            $menu= EasyPanelCreate::MENU_EXPAND;
-        }else{
-            $menu= EasyPanelCreate::MENU_COLLAPSE;
-        }
         $ignore = $input->getOption('ignore');
-        $exclude = $input->getOption('exclude');
 
         $output->writeln([
             'Create EasyPanel Type Sato  ',// A line
@@ -72,18 +63,16 @@ class EasyPanelImportCommand extends  ContainerAwareCommand
         ]);
 
         // outputs a message followed by a "\n"
-        $output->writeln('Proyecto: '.$proyecto);
+        $output->writeln('Seccion: '.$seccion);
         $output->writeln('PanelBundle: '.$panelbundle);
-        $output->writeln('EntityBundle: '.$entitybundle);
+        $output->writeln('Namespace Entity: '.$entity);
         $output->writeln('Prefix: '.$prefix);
         $output->writeln('Tipo Crud: '.$type_crud);
-        $output->writeln('Tipo Menu: '.$menu);
-        $output->writeln('Exluir Entidades: '.$exclude);
-        $output->writeln('Ignorar Campos: '.$ignore);
+        $output->writeln('Ignorar: '.$ignore);
         $output->writeln('');
 
-        $panel = new EasyPanelCreate($em,$twig,$dir,$proyecto,$panelbundle,$entitybundle,$prefix,$exclude);
-        $resultado = $panel->create($menu,$type_crud,$ignore);
+        $panel = new EasyPanelController($em,$twig,$dir,$panelbundle,$entity,$prefix,$seccion);
+        $resultado = $panel->create($type_crud,$ignore);
         $output->writeln('Resultado:'.$resultado);
 
 

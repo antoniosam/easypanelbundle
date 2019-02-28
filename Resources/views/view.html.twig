@@ -30,6 +30,9 @@
                                             <label>Buscar:<input name="buscar" class="form-control form-control-sm" placeholder="" aria-controls="dataTable" type="search"></label>
                                             <button type="submit" class="btn btn-small"><i class="fa fa-search"></i><span class="sr-only">Buscar</span></button>
                                         </form>
+                                        <form method="get" action="{{ path(card['data']['search']['route_reset'],card['data']['search']['params_reset']) }}" name="frmsearch" class="pullright">
+                                            <button type="submit" class="btn btn-small"><i class="fa fa-cross"></i><span class="sr-only">Cancelar</span></button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -42,14 +45,14 @@
                                     {% for header in card['data']['headers'] %}
                                         {% if colum == card['data']['order']['columna'] %}
                                             {% if 'ASC'==card['data']['order']['direccion'] %}
-                                                {% set newparam = card['data']['order']["parameters"]|merge({ 'order': colum, 'ordertype': 'DESC' }) %}
+                                                {% set newparam = card['data']['order']["parameters"]|merge({ 'columna': colum, 'orden': 'DESC' }) %}
                                                 <th><a href="{{path(card['data']['order']["route"],newparam) }}" >{{ header }}<i class="fa fa-sort-asc pull-right"></i></a></th>
                                             {% else %}
-                                                {% set newparam = card['data']['order']["parameters"]|merge({ 'order': colum, 'ordertype': 'ASC' }) %}
+                                                {% set newparam = card['data']['order']["parameters"]|merge({ 'columna': colum, 'orden': 'ASC' }) %}
                                                 <th><a href="{{path(card['data']['order']["route"],newparam) }}" >{{ header }}<i class="fa fa-sort-desc pull-right"></i></a></th>
                                             {% endif %}
                                         {% else %}
-                                            {% set newparam = card['data']['order']["parameters"]|merge({ 'order': colum, 'ordertype': 'ASC' }) %}
+                                            {% set newparam = card['data']['order']["parameters"]|merge({ 'columna': colum, 'orden': 'ASC' }) %}
                                             <th><a href="{{path(card['data']['order']["route"],newparam) }}" >{{ header }}<i class="fa fa-sort pull-right"></i></a></th>
                                         {% endif %}
                                         {%  set colum=colum+1 %}

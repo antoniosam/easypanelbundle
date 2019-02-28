@@ -105,9 +105,9 @@ class Panel
      * @param $prefix
      * @return array
      */
-    public static function easyList($seccion, array $consulta, array $columnas, $prefix,$layout=null)
+    public static function easyList($seccion, array $consulta, array $columnas, $prefix)
     {
-        $panel = new Panel($layout);
+        $panel = new Panel();
         $panel->addList(EasyList::easy($seccion, $consulta, $columnas, $prefix));
         $panel->setLocation($seccion);
         return $panel->createView();
@@ -121,9 +121,9 @@ class Panel
      * @param null $deleteform
      * @return array
      */
-    public static function easyShow($seccion, $consulta, array $columnas, $prefix,$deleteform = null,$layout=null)
+    public static function easyShow($seccion, $consulta, array $columnas, $prefix,$deleteform = null)
     {
-        $panel = new Panel($layout);
+        $panel = new Panel();
         $panel->addShow(EasyShow::easy($seccion, $consulta, $columnas, $prefix,$deleteform));
         $panel->setLocation($seccion);
         return $panel->createView();
@@ -136,9 +136,9 @@ class Panel
      * @param null $deleteform
      * @return array
      */
-    public static function easyForm($seccion, $form, $prefix,$deleteform = null,$layout=null)
+    public static function easyForm($seccion, $form, $prefix,$deleteform = null)
     {
-        $panel = new Panel($layout);
+        $panel = new Panel();
         $panel->addForm(EasyForm::easy($seccion, $form, $prefix,$deleteform));
         $panel->setLocation($seccion);
         return $panel->createView();

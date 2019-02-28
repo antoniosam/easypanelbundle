@@ -7,7 +7,7 @@ namespace Ast\EasyPanelBundle\Command;
 
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateInit;
-use Ast\EasyPanelBundle\Lib\Crud\EasyPanelController;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelMenu;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,22 +16,20 @@ use Symfony\Component\Console\Input\InputOption;
 // Add the Container
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class EasyModuleCommand extends  ContainerAwareCommand
+class CreateMenuCommand extends  ContainerAwareCommand
 {
+    protected static $defaultName = 'easypanel:create:menu';
+
     protected function configure()
     {
         $this
-            ->setName('easypanel:create:module')
-            ->setDescription('Crea un controlador y un form basandose en un entidad ')
-            ->addArgument('seccion', InputArgument::REQUIRED, 'Seccion del Modulo')
+            ->setName(static::$defaultName)
+            ->setDescription('Crea un twig de menu usando entidades.')
+            ->addArgument('proyecto', InputArgument::REQUIRED, 'Nombre del proyecto')
             ->addArgument('panelbundle', InputArgument::REQUIRED, 'Bundle donde estara el panel')
-            ->addArgument('entity', InputArgument::REQUIRED, 'Namespace de la Entidad que se usara')
+            ->addArgument('entitybundle', InputArgument::REQUIRED, 'Bundle donde estan las entidades')
             ->addArgument('prefix', InputArgument::REQUIRED, 'Prefijo para las rutas')
-            ->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min)','easy')
-            ->addOption('ignore',null,InputOption::VALUE_REQUIRED,'Campos que se ignorarn al crear los archivos','')
-
-
-
+            ->addOption('menu_collapse',null,InputOption::VALUE_REQUIRED,'Menu collapsado (1,0)','1')
         ;
     }
 
@@ -42,38 +40,34 @@ class EasyModuleCommand extends  ContainerAwareCommand
         $em = $this->getContainer()->get('doctrine')->getManager();
         $twig = $this->getContainer()->get('twig');
         $dir = $this->getContainer()->getParameter("kernel.root_dir").'/../src/';
-        $seccion = $input->getArgument('seccion');
+        $proyecto = $input->getArgument('proyecto');
         $panelbundle = $input->getArgument('panelbundle');
-        $entity = $input->getArgument('entity');
+        $entitybundle = $input->getArgument('entitybundle');
         $prefix = $input->getArgument('prefix');
-        if($input->getOption('type_crud') == 'easy'){
-            $type_crud = EasyPanelCreate::TYPE_EASY;
-        }elseif($input->getOption('type_crud') == 'min'){
-            $type_crud = EasyPanelCreate::TYPE_EASY_MIN;
-        }elseif($input->getOption('type_crud') == 'normal'){
-            $type_crud = EasyPanelCreate::TYPE_NORMAL;
-        }else{
-            $type_crud = EasyPanelCreate::TYPE_EASY;
-        }
-        $ignore = $input->getOption('ignore');
 
+        if($input->getOption('menu_collapse')=='1'){
+            $menu= EasyPanelCreate::MENU_COLLAPSE;
+        }elseif($input->getOption('menu_collapse')=='0'){
+            $menu= EasyPanelCreate::MENU_EXPAND;
+        }else{
+            $menu= EasyPanelCreate::MENU_COLLAPSE;
+        }
         $output->writeln([
-            'Create EasyPanel Type Sato  ',// A line
+            'Create EasyPanel Menu  ',// A line
             '========================================',// Another line
             '',// Empty line
         ]);
 
         // outputs a message followed by a "\n"
-        $output->writeln('Seccion: '.$seccion);
+        $output->writeln('Proyecto: '.$proyecto);
         $output->writeln('PanelBundle: '.$panelbundle);
-        $output->writeln('Namespace Entity: '.$entity);
+        $output->writeln('EntityBundle: '.$entitybundle);
         $output->writeln('Prefix: '.$prefix);
-        $output->writeln('Tipo Crud: '.$type_crud);
-        $output->writeln('Ignorar: '.$ignore);
+        $output->writeln('Tipo Menu: '.$menu);
         $output->writeln('');
 
-        $panel = new EasyPanelController($em,$twig,$dir,$panelbundle,$entity,$prefix,$seccion);
-        $resultado = $panel->create($type_crud,$ignore);
+        $panel = new EasyPanelMenu($em,$twig,$dir,$proyecto,$panelbundle,$entitybundle,$prefix);
+        $resultado = $panel->create($menu);
         $output->writeln('Resultado:'.$resultado);
 
 

@@ -1,1 +1,4 @@
-#services:
+services:
+    codigos:
+        class: Ast\EasyPanelBundle\Services\EasyPanelService
+        arguments: ['@twig',"%easy_panel.layoutpanel%","%easy_panel.viewpanel%"]

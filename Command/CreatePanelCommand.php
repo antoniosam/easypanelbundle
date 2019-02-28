@@ -6,6 +6,7 @@
 namespace Ast\EasyPanelBundle\Command;
 
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateAuto;
 use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateInit;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,20 +16,22 @@ use Symfony\Component\Console\Input\InputOption;
 // Add the Container
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class EasyPanelBaseCommand extends  ContainerAwareCommand
+class CreatePanelCommand extends  ContainerAwareCommand
 {
+    protected static $defaultName = 'easypanel:create:panel';
+
     protected function configure()
     {
         $this
-            ->setName('easypanel:create:panel:base')
-            ->setDescription('Crea un panel funcional con tablas ya preestablecidas.')
+            ->setName(static::$defaultName)
+            ->setDescription('Crea un panel con las entidades que estan dentro del propio bundle.')
             ->addArgument('proyecto', InputArgument::REQUIRED, 'Nombre del proyecto')
             ->addArgument('panelbundle', InputArgument::REQUIRED, 'Bundle donde estara el panel')
             ->addArgument('prefix', InputArgument::REQUIRED, 'Prefijo para las rutas')
-            ->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min)','easy')
+            ->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min,normal)','easy')
             ->addOption('menu_collapse',null,InputOption::VALUE_REQUIRED,'Menu collapsado (1,0)','1')
-
-
+            ->addOption('ignore',null,InputOption::VALUE_REQUIRED,'Campos que se ignorarn al crear los archivos','')
+            ->addOption('exclude',null,InputOption::VALUE_REQUIRED,'Entidades que se ignorarn para la creacion del panel','')
         ;
     }
 
@@ -58,8 +61,10 @@ class EasyPanelBaseCommand extends  ContainerAwareCommand
         }else{
             $menu= EasyPanelCreate::MENU_COLLAPSE;
         }
+        $ignore = $input->getOption('ignore');
+        $exclude = $input->getOption('exclude');
         $output->writeln([
-            'Create EasyPanel Type Sato  ',// A line
+            'Create EasyPanel Auto  ',// A line
             '========================================',// Another line
             '',// Empty line
         ]);
@@ -70,12 +75,13 @@ class EasyPanelBaseCommand extends  ContainerAwareCommand
         $output->writeln('Prefix: '.$prefix);
         $output->writeln('Tipo Crud: '.$type_crud);
         $output->writeln('Tipo Menu: '.$menu);
+        $output->writeln('Exluir Entidades: '.$exclude);
+        $output->writeln('Ignorar Campos: '.$ignore);
         $output->writeln('');
 
-        $panel = new EasyPanelCreateInit($em,$twig,$dir,$proyecto,$panelbundle,$prefix);
-        $resultado = $panel->create($menu,$type_crud);
+        $panel = new EasyPanelCreateAuto($em,$twig,$dir,$proyecto,$panelbundle,$prefix,$exclude);
+        $resultado = $panel->create($menu,$type_crud,$ignore);
         $output->writeln('Resultado:'.$resultado);
-
 
         // outputs a message without adding a "\n" at the end of the line
         $output->writeln(['','Comando Terminado, :)']);

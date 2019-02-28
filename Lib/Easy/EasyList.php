@@ -131,17 +131,17 @@ class EasyList extends EasyView
 
     public function enableOrder($route,$parametros,$col=1,$direccion='ASC'){
         $this->ordenar = true;
-        $this->orderby = array('route'=>$route,'parameters'=>$parametros,'columna' => $col,'direccion'=>$direccion);
+        $this->orderby = array('route'=>$route,'parameters'=>$parametros,'columna' => $col,'orden'=>$direccion);
     }
 
-    public function enableSearch($value,$textbutton = 'fa-search',$classbutton='btn',$classcontainer=''){
+    public function enableSearch($route_reset,$params_reset,$value, $textbutton = 'fa-search',$classbutton='btn',$classcontainer=''){
         $this->buscar = true;
 
         $hasicon = strpos($textbutton,'fa-');
         if($hasicon === 0){
             $textbutton = '<i class="fa '.$textbutton.'"></i><span class="sr-only">Buscar</span>';
         }
-        $this->busqueda = array('value'=>$value,'text_button'=>$textbutton,'class_button'=>$classbutton,'class_container'=>$classcontainer);
+        $this->busqueda = array('route_reset'=>$route_reset,'params_reset'=>$params_reset,'value'=>$value,'text_button'=>$textbutton,'class_button'=>$classbutton,'class_container'=>$classcontainer);
     }
 
     public function setFirstColumnCount($initnumber){
@@ -186,10 +186,10 @@ class EasyList extends EasyView
         $search,
         $route,
         $params,
-        $classitem,
-        $classactive,
-        $first = "",
-        $last = ""
+        $classitem = 'paginate_button',
+        $classactive = 'current',
+        $first = "fa-angle-double-left",
+        $last = "fa-angle-double-right"
     ) {
         $this->paginar = true;
         $this->autopaginate = array('total'=>$totalpages,'current'=>$currentpage,'search'=>$search,'route'=>$route,'params'=>$params,'classitem'=>$classitem,'classactive'=>$classactive,'first'=>$first,'last'=>$last);
@@ -211,8 +211,8 @@ class EasyList extends EasyView
             $back['buscar'] = $search;
         }
         if($this->ordenar){
-            $back['order']=$this->orderby['columna'];
-            $back['ordertype']=$this->orderby['direccion'];
+            $back['columna']=$this->orderby['columna'];
+            $back['orden']=$this->orderby['orden'];
         }
         $back['p'] = $page;
         return $back;
