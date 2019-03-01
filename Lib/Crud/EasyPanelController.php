@@ -183,7 +183,47 @@ class EasyPanelController
 
         return $name;
     }
+    public function createDefaultController(){
+        $this->createDefault($this->campos, $this->panelbundle, $this->namespaceentity, $this->entity, $this->ruta, $this->seccion, '');
+    }
+    private function createDefault($campos,
+        $panelbundle,
+        $entitybundle,
+        $entity,
+        $ruta,
+        $seccion,
+        $type_crud){
 
+
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $this->namespacedircontroller = 'App\\Controller\\'.$this->panelbundle;
+            $this->namespacedirform = 'App\\Form\\'.$this->panelbundle;
+            $this->formnamespace = 'App\\Form\\'.$this->panelbundle.'\\'.$this->entity.'Type';
+        }else{
+            $this->namespacedircontroller = $this->panelbundle.'\\Controller';
+            $this->namespacedirform = $this->panelbundle.'\\Form';
+            $this->formnamespace = $this->panelbundle.'\\Form\\'.$this->entity.'Type';
+        }
+        $parametros = array(
+            'seccion' => $seccion,
+            'ruta' => $ruta,
+            'entity' => $entity,
+            'entitybundle' => $entitybundle,
+            'form' => $entity . 'Type',
+            'bundle' => $panelbundle,
+            'indexlist' => '',
+            'showlist' => '',
+            'namespace' => $this->namespacedircontroller,
+            'formnamespace' => $this->formnamespace,
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:''
+        );
+
+
+        $html = $this->templating->render('@EasyPanel/Crud/controller.default.html.twig', $parametros);
+        $name = $entity . "Controller.php";
+
+        file_put_contents($this->rutacontroller .'/'. $name, $html);
+    }
 
 
     private function fieldsEntity($entitybundle, array  $excluir = [])

@@ -1,45 +1,18 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-    <a class="navbar-brand" href="{{ "{{ path('"}}{{ prefix }}{{ "_home') }}" }}">{{ proyecto }}</a>
-    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand" href="/">Menu Admin</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
-                <a class="nav-link" href="{{ "{{ path('"}}{{ prefix }}{{ "_dashboard') }}" }}">
+                <a class="nav-link" href="/">
                     <i class="fa fa-fw fa-dashboard"></i>
                     <span class="nav-link-text">Dashboard</span>
                 </a>
             </li>
-            {% if simple %}
-                {% for ruta in rutas %}
-            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="{{ ruta[0]|capitalize }}">
-                <a class="nav-link" href="{{ "{{ path('"}}{{ ruta[1] }}{{ "_index') }}"}}">
-                    <i class="fa fa-fw {{ ruta[2] }}"></i>
-                    <span class="nav-link-text">{{ ruta[0]|capitalize }}</span>
-                </a>
-            </li>
-            {% endfor %}
-            {% else %}
-                {% for ruta in rutas %}
-                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="{{ ruta[0]|capitalize }}">
-                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapse{{ ruta[1] }}" data-parent="#exampleAccordion">
-                        <i class="fa fa-fw {{ ruta[2] }}"></i>
-                        <span class="nav-link-text">{{ ruta[0]|capitalize }}</span>
-                    </a>
-                    <ul class="sidenav-second-level collapse" id="collapse{{ ruta[1] }}">
-                        <li>
-                            <a href="{{ "{{ path('"}}{{ ruta[1] }}{{ "_index') }}"}}"><i class="fa fa-fw fa-code"></i> Ver {{ ruta[0]|capitalize }}</a>
-                        </li>
-                        <li>
-                            <a href="{{ "{{ path('"}}{{ ruta[1] }}{{ "_new') }}"}}"><i class="fa fa-fw fa-picture-o"></i> Nuevo {{ ruta[0]|capitalize }}</a>
-                        </li>
-                    </ul>
-                </li>
-                {% endfor %}
-            {% endif %}
-
-
         </ul>
         <ul class="navbar-nav sidenav-toggler">
             <li class="nav-item">
@@ -49,7 +22,7 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item dropdown">
+            {#<li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-fw fa-envelope"></i>
                     <span class="d-lg-none">Messages
@@ -131,16 +104,16 @@
                     <div class="input-group">
                         <input class="form-control" type="text" placeholder="Search for...">
                         <span class="input-group-append">
-                <button class="btn btn-primary" type="button">
-                  <i class="fa fa-search"></i>
-                </button>
-              </span>
+                            <button class="btn btn-primary" type="button">
+                              <i class="fa fa-search"></i>
+                            </button>
+                        </span>
                     </div>
                 </form>
-            </li>
+            </li>#}
             <li class="nav-item">
-                <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
-                    <i class="fa fa-fw fa-sign-out"></i>Logout</a>
+                <a class="nav-link" href="{% if rutalogout is defined %} {{ path(rutalogout) }}{% else %}#{% endif %}"">
+                <i class="fa fa-fw fa-sign-out"></i>Salir</a>
             </li>
         </ul>
     </div>

@@ -54,6 +54,11 @@ class EasyPanelCreate
     public function create($ignorar=null)
     {
         if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $entity = 'Default';
+            $ruta = $this->prefix.'_'.strtolower($entity);
+            $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$entity,$this->prefix,$ruta,ucfirst(''));
+            $crud->createDefaultController();
+
             $listaclases = InfoEntityImport::folder($this->em,$this->kernel_project_dir.$this->entitybundle);
             $listaclases = $this->excluirEntidades($listaclases);
             $creados = [];
@@ -70,7 +75,7 @@ class EasyPanelCreate
                     $instrucciones .= $tmp.PHP_EOL;
                     $listaentitys[] = $entity;
                 endforeach;
-                $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix))->create();
+                $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix,'material'))->create();
                 $instrucciones .= PHP_EOL.PHP_EOL.$menu;
             }
 
@@ -83,7 +88,7 @@ class EasyPanelCreate
 
     protected function createSf3($ignorar){
         if($this->findBundle()){
-            $this->initBundle();
+            $this->initDefaultController();
             $listaclases = InfoEntityImport::folder($this->em,$this->kernel_project_dir.$this->entitybundle);
             $listaclases = $this->excluirEntidades($listaclases);
             $creados = [];
@@ -92,11 +97,11 @@ class EasyPanelCreate
                 foreach ($listaclases as $clase):
                     $entity = Util::getFileNamespace($clase);
                     $ruta = $this->prefix.'_'.strtolower($entity);
-                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$ruta,ucfirst($entity));
+                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity));
                     $creados[] = $crud->create($ignorar);
                     $listaentitys[] = $entity;
                 endforeach;
-                $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix))->create();
+                $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix,'material'))->create();
             }
             $instrucciones = PHP_EOL."Creado " . implode($creados)." ".PHP_EOL;
             $instrucciones .="Para concluir debes agregar bundle a la configuracion".PHP_EOL;
@@ -120,14 +125,14 @@ class EasyPanelCreate
         }
         return $instrucciones;
     }
-    protected function initBundle(){
+    protected function initDefaultController(){
         $parametros = array(
             'proyecto' => $this->proyecto,
             'bundle' => $this->panelbundle,
             'ruta_prefix' => $this->prefix,
         );
-        $html = $this->templating->render('@EasyPanel/Create/layout.html.twig', $parametros);
-        Util::guardar($this->panelbundledir."Resources/views","layout.html.twig",$html);
+        //$html = $this->templating->render('@EasyPanel/Create/layout.html.twig', $parametros);
+        //Util::guardar($this->panelbundledir."Resources/views","layout.html.twig",$html);
         $html = $this->templating->render('@EasyPanel/Create/defaultController.php.twig', $parametros);
         Util::guardar($this->panelbundledir."Controller","DefaultController.php",$html);
         $html = $this->templating->render('@EasyPanel/Create/default.index.html.twig', $parametros);

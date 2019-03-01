@@ -25,48 +25,61 @@ class InstallAssetsCommand extends  ContainerAwareCommand
     {
         $this
             ->setName(static::$defaultName)
-            ->setDescription('Exporta los asset a la carpeta admin.')
-            ->addOption('dir',null,InputOption::VALUE_REQUIRED,'Especifica el directorio Web','web')
+            ->setDescription('Exporta Assets predefinidos para el layout')
+            ->addOption('tipo',null,InputOption::VALUE_REQUIRED,'Tipo de assets (material, sb-admin)','material')
+            ->addOption('dir', null,InputOption::VALUE_REQUIRED, 'Directorio de salida','admin')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $tiempo_inicio = microtime(true);
         // outputs multiple lines to the console (adding "\n" at the end of each line)
         $dir = $input->getOption('dir');
-        $init = $this->getContainer()->getParameter("kernel.root_dir").'/../'.$dir;
-        $path = Util::createDir($init."/");
-        $filezip = $path.'/admin.zip';
+        $tipo = $input->getOption('tipo');
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $destino = $this->getContainer()->getParameter("kernel.root_dir").'/../public/'.$dir.'/assets';
+        }else{
+            $destino = $this->getContainer()->getParameter("kernel.root_dir").'/../web/'.$dir.'/assets';
+        }
+
 
         $output->writeln([
-            'Create Assets to EasyPanel',// A line
+            'Export Assets to EasyPanel',// A line
             '========================================',// Another line
             '',// Empty line
         ]);
 
         // outputs a message followed by a "\n"
-        $output->writeln('Directorio: '.$dir);
-        $output->writeln('Salida: '.$path);
+
+        $zipname = ($tipo=='material')?'zip-material.zip':'zip-sb_admin.zip';
+        $assetinternal = $tipo;
+
+
+        $path = Util::createDir($destino.'/'.$assetinternal);
+        $filezip = $path.'/'.$zipname;
+
+        $output->writeln('Tipo Assets: '.$tipo);
+        $output->writeln('Destino: '.$path);
         $output->writeln('');
-        if(copy (  __DIR__.'/admin.zip' ,  $filezip )){
+
+        if(copy (  __DIR__.'/'.$zipname ,  $filezip )){
             $zip = new ZipArchive();
             $res = $zip->open($filezip);
             if ($res === TRUE) {
-                $zip->extractTo($path.'/admin/');
+                $zip->extractTo($path);
                 $zip->close();
                 unlink($filezip);
-                $output->writeln('Assets export '.$dir.'/admin');
+                $output->writeln('Assets export ');
             }else{
-                $output->writeln('Copy to  '.$dir.'/admin.zip unzip file ');
+                $output->writeln('Zip copiado en '.$filezip.' extraer manualmente');
             }
         }else{
-            $output->writeln('Sorry please use "https://startbootstrap.com/template-overviews/sb-admin"');
+            $output->writeln('No se puede copiar el archivo zip');
         }
 
-
-
         // outputs a message without adding a "\n" at the end of the line
-        $output->writeln(['','Comando Terminado, :)']);
+        $output->writeln(['','Comando Terminado, '.$this->timecommand($tiempo_inicio).' :)']);
     }
 
     private function timecommand($tiempo_inicio){

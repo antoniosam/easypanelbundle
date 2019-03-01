@@ -20,13 +20,17 @@ class EasyPanelService
     private $panellayout;
     private $panelvista;
     private $panelmenu;
+    private $panelnompreproyecto;
+    private $panelrutalogout;
 
-    function __construct(Twig_Environment $twig,  $layout, $vista,$menu)
+    function __construct(Twig_Environment $twig,  $layout, $vista, $menu, $nombreproyecto, $rutalogout)
     {
         $this->twig = $twig;
-        $this->panellayout = ($layout == null)?'@EasyPanel/layout.html.twig':$layout;
-        $this->panelvista = ($vista == null)?'@EasyPanel/view.html.twig':$vista;
-        $this->panelmenu = ($menu == null)?'@EasyPanel/menu.html.twig':$menu;
+        $this->panellayout = ($layout == null)?'@EasyPanel/layoutmaterial.html.twig':$layout;
+        $this->panelvista = ($vista == null)?'@EasyPanel/viewmaterial.html.twig':$vista;
+        $this->panelmenu = ($menu == null)?'@EasyPanel/Default/menumaterial.html.twig':$menu;
+        $this->panelnompreproyecto = ($nombreproyecto == null)?'':$nombreproyecto;
+        $this->panelrutalogout = ($rutalogout == null)?'':$rutalogout;
     }
 
     function render($vista, Response $response = null)
@@ -52,6 +56,8 @@ class EasyPanelService
 
         $parameters['layout'] = $this->panellayout;
         $parameters['menu'] = $this->panelmenu;
+        $parameters['nombreproyecto'] = $this->panelnompreproyecto;
+        $parameters['rutalogout'] = $this->panelrutalogout;
 
         $content = $this->twig->render($this->panelvista, $parameters);
         if (null === $response) {

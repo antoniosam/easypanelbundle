@@ -64,9 +64,9 @@ class {{ entity }}Controller extends Controller
         $result = $paginar->getResult();
 
         $view = EasyList::easy('{{ seccion }}', $result['data'], $this->indexColumnsTable() , '{{ ruta }}');
-        $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ ruta }}_index' , []);
+        $view->enableSearch('{{ ruta }}_index',[],$buscar);
         $view->enableOrder('{{ ruta }}_index' , [] , $col , $orden);
-
+        $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ ruta }}_index' , []);
         return $easypanel->render($view);
     }
 

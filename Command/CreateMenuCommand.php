@@ -31,6 +31,7 @@ class CreateMenuCommand extends  ContainerAwareCommand
             ->addArgument('directorio_bundle', InputArgument::REQUIRED, 'Carpeta o Bundle donde se creara el panel')
             ->addArgument('directorio_entitys', InputArgument::REQUIRED, 'Carpeta donde se ubican las entidades')
             ->addArgument('prefix', InputArgument::REQUIRED, 'Prefijo para las rutas')
+            ->addOption('tema',null,InputOption::VALUE_REQUIRED,'Tipo de assets (material, sb-admin)','material')
             //->addOption('menu_collapse',null,InputOption::VALUE_REQUIRED,'Menu collapsado (1,0)','1')
         ;
     }
@@ -51,6 +52,7 @@ class CreateMenuCommand extends  ContainerAwareCommand
         $carpetaobundle = $input->getArgument('directorio_bundle');
         $directorio_entitys = $input->getArgument('directorio_entitys');
         $prefix = $input->getArgument('prefix');
+        $tema = $input->getOption('tema');
         if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
             $carpetaobundle = ucfirst($carpetaobundle);
         }
@@ -79,7 +81,7 @@ class CreateMenuCommand extends  ContainerAwareCommand
                 $entity = Util::getFileNamespace($clase);
                 $listaentitys[] = $entity;
             endforeach;
-            $panel = new EasyPanelMenu($em,$twig,$dir,$proyecto,$carpetaobundle,$listaentitys,$prefix);
+            $panel = new EasyPanelMenu($em,$twig,$dir,$proyecto,$carpetaobundle,$listaentitys,$prefix,$tema);
             $resultado = $panel->create();
             $output->writeln('Resultado:'.$resultado);
         }else{

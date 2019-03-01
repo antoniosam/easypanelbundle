@@ -1,0 +1,231 @@
+{% extends layout %}
+{% block location %} {{ location }} {% endblock %}
+{% block body %}
+    {% for card in cards %}
+        {% if  card['type'] == 'list' %}
+            <!-- Card {{ card['data']['seccion'] }}-->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header card-header-info">
+                            <h4 class="card-title ">{{ card['data']['seccion'] }}
+                                {% if card['data']['has_new'] %}
+                                    <div class="pull-right">
+                                        <a href="{{ path(card['data']['new']["route"],card['data']['new']["parameters"]) }}"
+                                           data-toggle="tooltip" title="{{ card['data']['new']["texto"] }}"
+                                           class="btn btn-round {{ card['data']['new']["clase"] }}"><i
+                                                    class="fa {{ card['data']['new']["fa_icon"] }}"></i></a>
+                                    </div>
+                                {% endif %}
+                            </h4>
+                            <!--<p class="card-category"> Here is a subtitle for this table</p>-->
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                {% if card['data']['has_search'] %}
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-6 offset-md-6">
+                                            <div id="dataTable_filter" class="dataTables_filter">
+                                                <form method="get" action="" name="frmsearch">
+                                                    <label>Buscar:</label>
+                                                    <input name="buscar"
+                                                         class="form-control form-control-sm"
+                                                         placeholder="" aria-controls="dataTable"
+                                                         type="search"
+                                                         value="{{ card['data']['search']['value'] }}"
+                                                        />
+                                                    <button type="submit" class="btn btn-round btn-just-icon btn-white "><i
+                                                                class="fa fa-search"></i><span
+                                                                class="sr-only">Buscar</span></button>
+                                                </form>
+                                                <form method="get"
+                                                      action="{{ path(card['data']['search']['route_reset'],card['data']['search']['params_reset']) }}"
+                                                      name="frmsearch" class="pullright">
+                                                    <button type="submit" class="btn btn-just-icon btn-white"><i
+                                                                class="fa fa-times"></i><span
+                                                                class="sr-only">Cancelar</span></button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <table class="table" id="dataTable" width="100%" cellspacing="0">
+                                    <thead class="text-info">
+                                    {% if card['data']['has_order'] %}
+                                        <tr>
+                                            {% set colum=1 %}
+                                            {% for header in card['data']['headers'] %}
+                                                {% if colum == card['data']['order']['columna'] %}
+                                                    {% if 'ASC'==card['data']['order']['direccion'] %}
+                                                        {% set newparam = card['data']['order']["parameters"]|merge({ 'columna': colum, 'orden': 'DESC' }) %}
+                                                        <th>
+                                                            <a href="{{ path(card['data']['order']["route"],newparam) }}">{{ header }}
+                                                                <i class="fa fa-sort-asc pull-right"></i></a></th>
+                                                    {% else %}
+                                                        {% set newparam = card['data']['order']["parameters"]|merge({ 'columna': colum, 'orden': 'ASC' }) %}
+                                                        <th>
+                                                            <a href="{{ path(card['data']['order']["route"],newparam) }}">{{ header }}
+                                                                <i class="fa fa-sort-desc pull-right"></i></a></th>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% set newparam = card['data']['order']["parameters"]|merge({ 'columna': colum, 'orden': 'ASC' }) %}
+                                                    <th>
+                                                        <a href="{{ path(card['data']['order']["route"],newparam) }}">{{ header }}
+                                                            <i class="fa fa-sort pull-right"></i></a></th>
+                                                {% endif %}
+                                                {% set colum=colum+1 %}
+                                            {% endfor %}
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <th>{{ card['data']['headers']|join('</th><th>')|raw }}</th>
+                                        </tr>
+                                    {% endif %}
+                                    </thead>
+                                    {#<tfoot>
+                                    <tr><th>{{ card['data']['headers']|join('</th><th>')|raw }}</th></tr>
+                                    </tfoot>#}
+                                    <tbody>
+                                    {% if card['data']['tabla']|length > 0 %}
+                                        {% for row in card['data']['tabla'] %}
+                                            <tr>
+                                                <td>{{ row['fila']|join('</td><td>')|raw }}</td>
+                                                {% if row['rutas']|length > 0 %}
+                                                    <td>
+                                                        {% for ruta  in row['rutas'] %}
+                                                            <a href="{{ path(ruta["route"],ruta["parameters"]) }}"
+                                                               data-toggle="tooltip" title="{{ ruta["texto"] }}"
+                                                               class="btn  btn-round btn-just-icon {{ ruta["clase"] }}"><i
+                                                                        class="fa {{ ruta["fa_icon"] }}"></i></a>
+                                                        {% endfor %}
+                                                    </td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="{{ card['data']['headers']|length }}"
+                                                style="text-align: center; line-height: 50px;">Sin resultados
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                                {% if card['data']['has_paginate'] %}
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-5">
+                                            <div class="dataTables_info" id="dataTable_info" role="status"
+                                                 aria-live="polite">{{ card['data']['page_info'] }}</div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-7 ">
+                                            <div class="dataTables_paginate paging_simple_numbers"
+                                                 id="dataTable_paginate">
+                                                <ul class="pagination">
+                                                    {% set idx = 0 %}
+                                                    {% for page  in card['data']['pages'] %}
+                                                        <li class="paginate_button page-item {{ page['class'] }} "
+                                                            id="dataTable_previous">
+                                                            <a href="{{ path(page["route"],page["parameters"]) }}"
+                                                               aria-controls="dataTable" data-dt-idx="{{ idx }}"
+                                                               tabindex="0"
+                                                               class="page-link">{{ page["texto"]|raw }}</a>
+                                                        </li>
+                                                        {% set idx = idx+1 %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            {% for ruta  in card['data']['rutas'] %}
+                                <a href="{{ path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip"
+                                   title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i
+                                            class="fa {{ ruta["fa_icon"] }}"></i> {{ ruta["texto"] }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div><!--end col-md-12 -->
+            </div><!--end row -->
+        {% elseif  card['type'] == 'show' %}
+            <!-- Card {{ card['data']['seccion'] }} -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header card-header-info">
+                            <h4 class="card-title "><i class="fa fa-list-alt"></i> {{ card['data']['seccion'] }}</h4>
+                        </div>
+                        <div class="card-body">
+                            {% for fila in   card['data']['filas'] %}
+                                <div class="row">
+                                    <p class="col-4">{{ fila['label'] }}</p>
+                                    <p class="col-8">{{ fila['valor']|raw }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="card-footer">
+                            {% for ruta  in card['data']['rutas'] %}
+                                <a href="{{ path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip"
+                                   title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i
+                                            class="fa {{ ruta["fa_icon"] }}"></i></a>
+                            {% endfor %}
+                            {% if card['data']['has_delete'] %}
+                                {{ form_start(card['data']['delete'],{'attr':{'class':'pull-right'}}) }}
+                                {{ form_widget(card['data']['delete']) }}
+                                <button type="submit" class="btn btn-danger  m-t-10 " data-toggle="tooltip"
+                                        title="Eliminar" onclick="return confirm('¿Estas seguro?');"><i
+                                            class="fa fa-trash"></i></button>
+                                {{ form_end(card['data']['delete']) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% elseif  card['type'] == 'form' %}
+            <!-- Card {{ card['data']['seccion'] }} -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header card-header-info">
+                            <h4 class="card-title "><i class="fa fa-check-square"></i> {{ card['data']['seccion'] }}
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% form_theme card['data']['form'] 'bootstrap_4_horizontal_layout.html.twig' %}
+                            {{ form_start(card['data']['form']) }}
+                            {{ form_widget(card['data']['form']) }}
+                            <div class="form-group m-b-0">
+                                <div class="col-sm-12">
+
+                                    <button type="submit" class="btn btn-success  m-t-10 aire"><i
+                                                class="fa fa-floppy-o"></i> Guardar
+                                    </button>
+                                </div>
+                            </div>
+                            {{ form_end(card['data']['form']) }}
+                        </div>
+                        <div class="card-footer">
+                            {% for ruta  in card['data']['rutas'] %}
+                                <a href="{{ path(ruta["route"],ruta["parameters"]) }}" data-toggle="tooltip"
+                                   title="{{ ruta["texto"] }}" class="btn  {{ ruta["clase"] }}"><i
+                                            class="fa {{ ruta["fa_icon"] }}"></i></a>
+                            {% endfor %}
+                            {% if card['data']['has_delete'] %}
+                                {{ form_start(card['data']['delete'],{'attr':{'class':'pull-right'}}) }}
+                                {{ form_widget(card['data']['delete']) }}
+                                <button type="submit" class="btn btn-danger  m-t-10 " data-toggle="tooltip"
+                                        title="Eliminar" onclick="return confirm('¿Estas seguro?');"><i
+                                            class="fa fa-trash"></i></button>
+                                {{ form_end(card['data']['delete']) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+

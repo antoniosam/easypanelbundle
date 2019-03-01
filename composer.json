@@ -11,7 +11,8 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.5.9"
+    "php": ">=5.5.9",
+    "antoniosam/easydoctrinepagination": "^1.0"
   },
   "autoload": {
     "psr-4" : {

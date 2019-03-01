@@ -22,6 +22,7 @@ class EasyPanelMenu
     protected $panelbundle;
     protected $entitybundle;
     protected $prefix;
+    protected $tema;
 
     public function __construct(
         \Doctrine\ORM\EntityManager $entityManager,
@@ -30,7 +31,8 @@ class EasyPanelMenu
         $proyecto,
         $panelbundle,
         $entitybundle,
-        $prefix
+        $prefix,
+        $tema
     )
     {
         $this->em = $entityManager;
@@ -40,7 +42,7 @@ class EasyPanelMenu
         $this->panelbundle = $panelbundle;
         $this->entitybundle = $entitybundle;
         $this->prefix = $prefix;
-
+        $this->tema = $tema;
         if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
             $this->panelbundledir = $this->kernel_project_dir.'../templates/'.$this->panelbundle;
         }else{
@@ -81,7 +83,12 @@ class EasyPanelMenu
         $parametros['rutas'] = $lista;
         $parametros['prefix'] = $this->prefix;
 
-        $html = $this->templating->render('@EasyPanel/Create/menu.html.twig', $parametros);
+        if($this->tema == 'material'){
+            $html = $this->templating->render('@EasyPanel/Crud/menumaterial.html.twig', $parametros);
+        }else{
+            $html = $this->templating->render('@EasyPanel/Crud/menu.html.twig', $parametros);
+        }
+
 
         file_put_contents($this->panelbundledir.'/menu.html.twig',$html);
 

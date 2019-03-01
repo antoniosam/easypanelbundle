@@ -1,0 +1,43 @@
+<?php
+
+namespace {{ namespace }};
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+{%  if prefix_controller_route is not '' %}
+/**
+ * @Route("{{ prefix_controller_route }}" )
+ */
+ {% endif %}
+class DefaultController extends Controller
+{
+
+    /**
+     * @Route("/", name="{{ ruta }}_home")
+     */
+    public function indexAction()
+    {
+        $vista = $this->getParameter('easy_panel.viewpanel');
+        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig')
+            $twig = '@EasyPanel/Default/index.material.html.twig';
+        }else if ($vista == '@EasyPanel/view.html.twig'){
+            $twig = '@EasyPanel/Default/index.html.twig';
+        }
+        return $this->render($twig);
+    }
+
+    /**
+     * @Route("/dashboard", name="{{ ruta }}_dashboard")
+     */
+    public function dashboardAction()
+    {
+        $vista = $this->getParameter('easy_panel.viewpanel');
+        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig')
+            $twig = '@EasyPanel/Default/dashboard.material.html.twig';
+        }else if ($vista == '@EasyPanel/view.html.twig'){
+            $twig = '@EasyPanel/Default/dashboard.html.twig';
+        }
+        return $this->render($twig);
+    }
+
+}
