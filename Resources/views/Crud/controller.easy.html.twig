@@ -33,7 +33,7 @@ class {{ entity }}Controller extends Controller
     }
 
     private function indexColumnOrder($col){
-        $campos = ['{{ indexlist|join("', '")|raw }}'];
+        $campos = [1 => '{{ indexlist|join("', '")|raw }}'];
         return isset($campos[$col])? $campos[$col] : '';
     }
 
@@ -53,20 +53,21 @@ class {{ entity }}Controller extends Controller
 
         $paginar = new EasyPagination($em,{{ entity }}::class);
         $paginar->setPage($pagina);
-        //Agregar validacion extras
-        //$paginar->where('activo','=',true);
+        //$paginar->where('activo','=',true);// opcional
         if(!empty($buscar)){
             $paginar->search($buscar,$this->indexColumnsSearch());
         }
-        $paginar->order($this->indexColumnOrder($col),$orden);
+        if($col > 0) {
+            $paginar->order($this->indexColumnOrder($col), $orden);
+        }
 
         $paginar->execute();
         $result = $paginar->getResult();
 
         $view = EasyList::easy('{{ seccion }}', $result['data'], $this->indexColumnsTable() , '{{ ruta }}');
-        $view->enableSearch('{{ ruta }}_index',[],$buscar);
-        $view->enableOrder('{{ ruta }}_index' , [] , $col , $orden);
         $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ ruta }}_index' , []);
+        $view->enableOrder('{{ ruta }}_index' , [] , $col , $orden);
+
         return $easypanel->render($view);
     }
 

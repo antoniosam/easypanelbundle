@@ -8,42 +8,46 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header card-header-info">
-                            <h4 class="card-title ">{{ card['data']['seccion'] }}
+                            <h4 class="card-title ">{{ card['data']['seccion'] }}</h4>
                                 {% if card['data']['has_new'] %}
-                                    <div class="pull-right">
+                                    <div class="new-top-table">
                                         <a href="{{ path(card['data']['new']["route"],card['data']['new']["parameters"]) }}"
                                            data-toggle="tooltip" title="{{ card['data']['new']["texto"] }}"
                                            class="btn btn-round {{ card['data']['new']["clase"] }}"><i
                                                     class="fa {{ card['data']['new']["fa_icon"] }}"></i></a>
                                     </div>
                                 {% endif %}
-                            </h4>
+
                             <!--<p class="card-category"> Here is a subtitle for this table</p>-->
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 {% if card['data']['has_search'] %}
-                                    <div class="row">
-                                        <div class="col-sm-12 col-md-6 offset-md-6">
-                                            <div id="dataTable_filter" class="dataTables_filter">
-                                                <form method="get" action="" name="frmsearch">
-                                                    <label>Buscar:</label>
-                                                    <input name="buscar"
-                                                         class="form-control form-control-sm"
-                                                         placeholder="" aria-controls="dataTable"
-                                                         type="search"
-                                                         value="{{ card['data']['search']['value'] }}"
+                                    <div class="row nomargin">
+                                        <div class="col-sm-12 col-md-4 offset-md-8">
+                                            <div class="dataTables_filter" style="position: relative;">
+                                                <form method="get" action="" name="frmsearch" class="row frm-search-table">
+                                                    <div class="form-group bmd-form-group col-10 {%  if card['data']['search']['value'] is not empty %}is-focused{% endif %}"  style="padding-right: 0px;">
+                                                        <label class="bmd-label-floating">Buscar</label>
+                                                        <input name="buscar"
+                                                               class="form-control input-search"
+                                                               placeholder="" aria-controls="dataTable"
+                                                               type="text"
+                                                               required
+                                                               value="{{ card['data']['search']['value'] }}"
                                                         />
-                                                    <button type="submit" class="btn btn-round btn-just-icon btn-white "><i
-                                                                class="fa fa-search"></i><span
-                                                                class="sr-only">Buscar</span></button>
-                                                </form>
-                                                <form method="get"
-                                                      action="{{ path(card['data']['search']['route_reset'],card['data']['search']['params_reset']) }}"
-                                                      name="frmsearch" class="pullright">
-                                                    <button type="submit" class="btn btn-just-icon btn-white"><i
+                                                    </div>
+                                                    <div class="col-2 " style="padding-left: 0px;">
+                                                        <button type="submit"
+                                                                class="btn btn-round btn-just-icon btn-white col-2"><i
+                                                                    class="fa fa-search"></i><span
+                                                                    class="sr-only">Buscar</span></button>
+                                                    </div>
+                                                    <a href="{{ path(card['data']['search']['route_reset'],card['data']['search']['params_reset']) }}"
+                                                       class="btn close-search" style="{%  if card['data']['search']['value'] is  empty %}display:none;{% endif %}"
+                                                    ><i
                                                                 class="fa fa-times"></i><span
-                                                                class="sr-only">Cancelar</span></button>
+                                                                class="sr-only">Cancelar</span></a>
                                                 </form>
                                             </div>
                                         </div>
@@ -56,7 +60,7 @@
                                             {% set colum=1 %}
                                             {% for header in card['data']['headers'] %}
                                                 {% if colum == card['data']['order']['columna'] %}
-                                                    {% if 'ASC'==card['data']['order']['direccion'] %}
+                                                    {% if 'ASC'==card['data']['order']['orden'] %}
                                                         {% set newparam = card['data']['order']["parameters"]|merge({ 'columna': colum, 'orden': 'DESC' }) %}
                                                         <th>
                                                             <a href="{{ path(card['data']['order']["route"],newparam) }}">{{ header }}
@@ -75,10 +79,12 @@
                                                 {% endif %}
                                                 {% set colum=colum+1 %}
                                             {% endfor %}
+                                            {% if card['data']['has_tabla_rutas'] %}<th class="col-actions"></th>{% endif %}
                                         </tr>
                                     {% else %}
                                         <tr>
                                             <th>{{ card['data']['headers']|join('</th><th>')|raw }}</th>
+                                            {% if card['data']['has_tabla_rutas'] %}<th class="col-actions"></th>{% endif %}
                                         </tr>
                                     {% endif %}
                                     </thead>
@@ -104,7 +110,12 @@
                                         {% endfor %}
                                     {% else %}
                                         <tr>
-                                            <td colspan="{{ card['data']['headers']|length }}"
+                                            {% if card['data']['has_tabla_rutas'] %}
+                                            {% set colspan = card['data']['headers']|length +1  %}
+                                            {% else %}
+                                                {% set colspan = card['data']['headers']|length   %}
+                                            {% endif %}
+                                            <td colspan="{{ colspan }}"
                                                 style="text-align: center; line-height: 50px;">Sin resultados
                                             </td>
                                         </tr>
@@ -112,7 +123,7 @@
                                     </tbody>
                                 </table>
                                 {% if card['data']['has_paginate'] %}
-                                    <div class="row">
+                                    <div class="row nomargin">
                                         <div class="col-sm-12 col-md-5">
                                             <div class="dataTables_info" id="dataTable_info" role="status"
                                                  aria-live="polite">{{ card['data']['page_info'] }}</div>

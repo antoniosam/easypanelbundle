@@ -55,6 +55,8 @@ class CreatePanelCommand extends  ContainerAwareCommand
         $prefix = $input->getArgument('prefix');
         if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
             $carpetaobundle = ucfirst($carpetaobundle);
+        }else{
+            Util::createDir($dir.$carpetaobundle);
         }
 
         //$type_crud = EasyPanelCreate::TYPE_EASY;
@@ -79,7 +81,7 @@ class CreatePanelCommand extends  ContainerAwareCommand
         $output->writeln('Ignorar Campos: '.$ignore);
         $output->writeln('');
 
-        Util::createDir($dir.$carpetaobundle);
+
 
         $panel = new EasyPanelCreate($em,$twig,$dir,$proyecto,$carpetaobundle,$directorio_entitys,$prefix,$exclude);
         $resultado = $panel->create($ignore);

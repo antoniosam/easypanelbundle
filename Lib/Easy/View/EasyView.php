@@ -60,7 +60,7 @@ class EasyView
         );
     }
 
-    protected function defineHeaders($columnas, $cabeceras, $opciones = null)
+    protected function defineHeaders($columnas, $cabeceras)
     {
         if (count($cabeceras) == 0) {
             $cabeceras = array();
@@ -73,11 +73,7 @@ class EasyView
                 }
             }
         }
-        if ($opciones != null) {
-            if (count($opciones) > 0) {
-                $cabeceras[] = "";
-            }
-        }
+
 
         return $cabeceras;
     }

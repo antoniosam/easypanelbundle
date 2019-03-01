@@ -4,7 +4,7 @@ namespace {{ namespace }};
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-{%  if prefix_controller_route is not '' %}
+{%  if prefix_controller_route is not empty %}
 /**
  * @Route("{{ prefix_controller_route }}" )
  */
@@ -18,7 +18,7 @@ class DefaultController extends Controller
     public function indexAction()
     {
         $vista = $this->getParameter('easy_panel.viewpanel');
-        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig')
+        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig'){
             $twig = '@EasyPanel/Default/index.material.html.twig';
         }else if ($vista == '@EasyPanel/view.html.twig'){
             $twig = '@EasyPanel/Default/index.html.twig';
@@ -32,7 +32,7 @@ class DefaultController extends Controller
     public function dashboardAction()
     {
         $vista = $this->getParameter('easy_panel.viewpanel');
-        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig')
+        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig'){
             $twig = '@EasyPanel/Default/dashboard.material.html.twig';
         }else if ($vista == '@EasyPanel/view.html.twig'){
             $twig = '@EasyPanel/Default/dashboard.html.twig';

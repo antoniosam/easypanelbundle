@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
     <!-- CSS Files -->
     <link href="{{ asset('admin/assets/material') }}/css/material-dashboard.css?v=2.1.1" rel="stylesheet" />
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link href="{{ asset('admin/assets/material') }}/demo/demo.css" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/material') }}/summernote/summernote.css" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/material') }}/summernote/summernote-bs4.css" rel="stylesheet" />
     {% block css %}{% endblock %}
     <style>
         .btn.aire{
@@ -168,13 +168,13 @@
 </div>
 <!--   Core JS Files   -->
 <script src="{{asset('admin/assets/material') }}/js/core/jquery.min.js"></script>
-<script src="{{asset('admin/assets/material') }}js/core/popper.min.js"></script>
-<script src="{{asset('admin/assets/material') }}js/core/bootstrap-material-design.min.js"></script>
-<script src="{{asset('admin/assets/material') }}js/plugins/perfect-scrollbar.jquery.min.js"></script>
+<script src="{{asset('admin/assets/material') }}/js/core/popper.min.js"></script>
+<script src="{{asset('admin/assets/material') }}/js/core/bootstrap-material-design.min.js"></script>
+<script src="{{asset('admin/assets/material') }}/js/plugins/perfect-scrollbar.jquery.min.js"></script>
 <!-- Plugin for the momentJs  -->
-<script src="{{asset('admin/assets/material') }}js/plugins/moment.min.js"></script>
+<script src="{{asset('admin/assets/material') }}/js/plugins/moment.min.js"></script>
 <!--  Plugin for Sweet Alert -->
-<script src="{{asset('admin/assets/material') }}js/plugins/sweetalert2.js"></script>
+<script src="{{asset('admin/assets/material') }}/js/plugins/sweetalert2.js"></script>
 <!-- Forms Validations Plugin -->
 <script src="{{asset('admin/assets/material') }}/js/plugins/jquery.validate.min.js"></script>
 <!-- Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
@@ -204,10 +204,54 @@
 <!--  Notifications Plugin    -->
 <script src="{{asset('admin/assets/material') }}/js/plugins/bootstrap-notify.js"></script>
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-<script src=".{{asset('admin/assets/material') }}/js/material-dashboard.js?v=2.1.1" type="text/javascript"></script>
-<!-- Material Dashboard DEMO methods, don't include it in your project! -->
-<script src="{{asset('admin/assets/material') }}/assets/demo/demo.js"></script>
+<script src="{{asset('admin/assets/material') }}/js/material-dashboard.js?v=2.1.1" type="text/javascript"></script>
+<script src="{{asset('admin/assets/material') }}/js/material-dashboard.js?v=2.1.1" type="text/javascript"></script>
 
+<script src="{{asset('admin/assets/material') }}/summernote/summernote.min.js" type="text/javascript"></script>
+<script type="text/javascript">var BASE_WEB = '{{asset('admin/') }}';</script>
+<script src="{{asset('admin/assets/material') }}/summernote/plugins/picture-upload/summernote-ext-picture-upload.js" type="text/javascript"></script>
+<script>
+
+$(document).ready(function() {
+    $(".frm-search-table .input-search").on("keyup",function(){
+        var close = $(this).parent().parent().find('.close-search');
+        if($.trim($(this).val())!=''){
+            if(!$(close).is(':visible')){
+                $(close).fadeIn();
+            }
+        }else{
+            $(close).fadeOut();
+        }
+    });
+    $('.initsummernote').each(function(obj,callback){
+        var textarea = $(this);
+        var id = textarea.attr('id');
+        textarea.hide();
+        var div = $('<div>');
+        div.attr('id',id+'summernote');
+        div.insertAfter(textarea);
+        $('#'+id+'summernote').summernote({
+            toolbar:[
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['codeview', 'help']],
+                // This is a Custom Button in a new Toolbar Area
+                ['custom', ['picture-upload']]
+            ],
+            height: 300,
+            tabsize: 2
+        });
+    });
+
+});
+
+
+</script>
 {% block js %}{% endblock %}
 </body>
 

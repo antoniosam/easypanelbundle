@@ -6,10 +6,16 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 
 class {{ entity }}Type extends AbstractType
@@ -22,7 +28,44 @@ class {{ entity }}Type extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            {%- for columna in columnas -%}->add('{{ columna['fieldName'] }}'){%- endfor %};
+{%- for columna in columnas -%}
+{% if columna['type'] == "string" %}
+{%  if columna['length'] < 254 %}
+{% if columna['fieldName'] in ["imagen","poster","foto","video","pdf","archivo"] %}
+->add('{{ columna['fieldName'] }}',FileType::class,['label'=>'{{ columna['fieldName']|capitalize }}','attr'=>['maxlength'=>{{ columna['length'] }}]])
+{% else %}
+->add('{{ columna['fieldName'] }}',TextType::class,['label'=>'{{ columna['fieldName']|capitalize }}','attr'=>['maxlength'=>{{ columna['length'] }}]])
+{% endif %}
+{% else %}
+->add('{{ columna['fieldName'] }}',TextareaType::class,['label'=>'{{ columna['fieldName']|capitalize }}','attr'=>['class'=>'initsummernote','maxlength'=>{{ columna['length'] }}]])
+{% endif %}
+{% elseif columna['type'] == "integer" %}
+->add('{{ columna['fieldName'] }}',IntegerType::class,['label'=>'{{ columna['fieldName']|capitalize }}'])
+{% elseif columna['type'] == "boolean" %}
+->add('{{ columna['fieldName'] }}',CheckboxType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false])
+{% elseif columna['type'] == "datetime" %}
+->add('{{ columna['fieldName'] }}',DateTimeType::class,['label'=>'{{ columna['fieldName']|capitalize }}','widget' => 'single_text' ,  'html5' => true ,  "attr"=>array()])
+{% elseif columna['type'] == "time" %}
+->add('{{ columna['fieldName'] }}',TimeType::class,['label'=>'{{ columna['fieldName']|capitalize }}','widget' => 'single_text' ,  'html5' => true ,  "attr"=>array()])
+{% elseif columna['type'] == "date" %}
+->add('{{ columna['fieldName'] }}',DateType::class,['label'=>'{{ columna['fieldName']|capitalize }}','widget' => 'single_text' ,  'html5' => true ,  "attr"=>array("placeholder"=>"YYYY-MM-DD")])
+{% else %}
+->add('{{ columna['fieldName'] }}')
+{% endif %}
+
+{{ '/*'}}
+ {% for key, value in columna %}
+    {% if value is iterable %}
+        {% for key, valu in value %}
+            __{{ key }}-{{ valu }}
+        {% endfor %}
+    {% else %}
+        {{ key }}-{{ value }}
+    {% endif %}
+{% endfor %}
+{{ '*/'}}
+{% endfor %};
+
     }
 
 
@@ -41,7 +84,7 @@ class {{ entity }}Type extends AbstractType
     */
     public function getBlockPrefix()
     {
-        return '{{ entity }}Type';
+        return '{{ entity|lower }}';
     }
 
 

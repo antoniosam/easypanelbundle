@@ -210,7 +210,7 @@ class EasyList extends EasyView
         if ($search != '') {
             $back['buscar'] = $search;
         }
-        if($this->ordenar){
+        if($this->ordenar && $this->orderby['columna'] > 0){
             $back['columna']=$this->orderby['columna'];
             $back['orden']=$this->orderby['orden'];
         }
@@ -250,7 +250,7 @@ class EasyList extends EasyView
         $return = array();
         $return["seccion"] = $this->seccion;
 
-        $return["headers"] = $this->defineHeaders($this->columnas, $this->cabeceras, $this->tableopciones);
+        $return["headers"] = $this->defineHeaders($this->columnas, $this->cabeceras);
         $filas = [];
         $path ='';
         reset($this->columnas);
@@ -283,6 +283,7 @@ class EasyList extends EasyView
             $filas[] = array('fila' => $fila, 'rutas' => $this->generateParameters($objet, $this->tableopciones));
         }
         $return["tabla"] = $filas;
+        $return["has_tabla_rutas"] = count($this->tableopciones);
         $return["has_new"] = $this->nueva;
         $return["new"] = $this->new;
         $return["has_search"] = $this->buscar;
@@ -297,13 +298,13 @@ class EasyList extends EasyView
         if($this->ordenar){
             $param = $this->orderby['parameters'];
             $columna = $this->orderby['columna']==null ? 1 : $this->orderby['columna'];
-            $direccion = $this->orderby['columna']==null ? 'ASC' : $this->orderby['direccion'];
+            $direccion = $this->orderby['columna']==null ? 'ASC' : $this->orderby['orden'];
             if($this->buscar){
                 if(trim($this->busqueda['value'])!=''){
                     $param['buscar']= $this->busqueda['value'];
                 }
             }
-            $return["order"]=['route'=>$this->orderby['route'],'parameters'=>$param,'columna'=>$columna,'direccion'=>$direccion];
+            $return["order"]=['route'=>$this->orderby['route'],'parameters'=>$param,'columna'=>$columna,'orden'=>$direccion];
         }
         $return["rutas"] = $this->opciones;
         return $return;
@@ -323,7 +324,7 @@ class EasyList extends EasyView
                 $inicio = 1;
                 $fin = $totalpages;
             } else {
-                if ($currentpage - 3 < 0) {
+                if ($currentpage - 3 < 1) {
                     $inicio = 1;
                     $fin = $currentpage + 3 + (3 - $currentpage);//3 a la derecha mas los links que no se puedieron mostrar en la izquierda
                 } elseif (($currentpage + 3) > $totalpages) {

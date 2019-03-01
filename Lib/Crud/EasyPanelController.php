@@ -120,7 +120,7 @@ class EasyPanelController
         $seccion,
         $type_crud
     ) {
-        $indexexclude = ['creado', 'actualizado', 'contenido', 'descripcion', 'slug', 'folio'];
+        $indexexclude = ['creado', 'actualizado', 'contenido', 'descripcion', 'slug', 'folio','pass', 'salt','master','rol'];
         $showexclude = ['creado', 'actualizado', 'slug'];
 
         $indexlist = $this->getColumnas($this->ignoreFields($campos,$indexexclude));
@@ -162,7 +162,7 @@ class EasyPanelController
     private function createForm($columnas, $bundle, $entitybundle, $entity)
     {
 
-        $formexclude = ['creado', 'actualizado', 'slug'];
+        $formexclude = ['id','creado','actualizado', 'slug'];
 
         $formlist =  $this->ignoreFields($columnas,$formexclude);
 
@@ -220,7 +220,7 @@ class EasyPanelController
 
 
         $html = $this->templating->render('@EasyPanel/Crud/controller.default.html.twig', $parametros);
-        $name = $entity . "Controller.php";
+        $name = "DefaultController.php";
 
         file_put_contents($this->rutacontroller .'/'. $name, $html);
     }
