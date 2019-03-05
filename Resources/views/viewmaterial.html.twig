@@ -160,6 +160,7 @@
                     </div>
                 </div><!--end col-md-12 -->
             </div><!--end row -->
+            {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
         {% elseif  card['type'] == 'show' %}
             <!-- Card {{ card['data']['seccion'] }} -->
             <div class="row">
@@ -194,6 +195,7 @@
                     </div>
                 </div>
             </div>
+            {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
         {% elseif  card['type'] == 'form' %}
             <!-- Card {{ card['data']['seccion'] }} -->
             <div class="row">
@@ -204,7 +206,7 @@
                             </h4>
                         </div>
                         <div class="card-body">
-                            {% form_theme card['data']['form'] 'bootstrap_4_horizontal_layout.html.twig' %}
+                            {% form_theme card['data']['form'] '@EasyPanel/CustomBoostrapHorizontal/Material_Bootstrap_4.html.twig' %}
                             {{ form_start(card['data']['form']) }}
                             {{ form_widget(card['data']['form']) }}
                             <div class="form-group m-b-0">
@@ -235,8 +237,10 @@
                     </div>
                 </div>
             </div>
+            {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
         {% endif %}
     {% endfor %}
+    {% if has_includelayout %}{% include includelayout %}{% endif %}
 {% endblock %}
 
 

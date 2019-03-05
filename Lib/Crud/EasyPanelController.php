@@ -31,6 +31,7 @@ class EasyPanelController
     private $namespacedircontroller ;
     private $namespacedirform ;
     private $formnamespace;
+    private $pathpublicuploads;
 
 
     public function __construct(
@@ -92,11 +93,14 @@ class EasyPanelController
                 $this->namespacedircontroller = 'App\\Controller\\'.$this->panelbundle;
                 $this->namespacedirform = 'App\\Form\\'.$this->panelbundle;
                 $this->formnamespace = 'App\\Form\\'.$this->panelbundle.'\\'.$this->entity.'Type';
+                $this->pathpublicuploads = '/../web/uploads';
             }else{
                 $this->namespacedircontroller = $this->panelbundle.'\\Controller';
                 $this->namespacedirform = $this->panelbundle.'\\Form';
                 $this->formnamespace = $this->panelbundle.'\\Form\\'.$this->entity.'Type';
+                $this->pathpublicuploads = '/../public/uploads';
             }
+
 
             $controller = $this->createController($this->campos, $this->panelbundle, $this->namespaceentity, $this->entity, $this->ruta, $this->seccion, $type_crud);
             $form = $this->createForm($this->campos, $this->panelbundle, $this->namespaceentity,$this->entity);
@@ -135,22 +139,15 @@ class EasyPanelController
             'entitybundle' => $entitybundle,
             'form' => $entity . 'Type',
             'bundle' => $panelbundle,
+            'campos' => $this->getColumnas($campos),
             'indexlist' => $indexlist,
             'showlist' => $showlist,
             'namespace' => $this->namespacedircontroller,
             'formnamespace' => $this->formnamespace,
-            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:''
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:'',
+            'pathpublicuploads' => $this->pathpublicuploads
         );
 
-        /*if ($type_crud == EasyPanelCreateAuto::TYPE_EASY) {
-            $html = $this->templating->render('@EasyPanel/Crud/controller.easy.html.twig', $parametros);
-        } elseif ($type_crud == EasyPanelCreateAuto::TYPE_EASY_MIN)  {
-            $html = $this->templating->render('@EasyPanel/Crud/controller.easy.min.html.twig', $parametros);
-        }elseif ($type_crud == EasyPanelCreateAuto::TYPE_NORMAL){
-            $html = $this->templating->render('@EasyPanel/Crud/controller.html.twig', $parametros);
-        }else{
-
-        }*/
         $html = $this->templating->render('@EasyPanel/Crud/controller.easy.html.twig', $parametros);
         $name = $entity . "Controller.php";
 

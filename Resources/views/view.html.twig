@@ -112,6 +112,7 @@
                     {% endfor %}
                 </div>
             </div>
+            {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
         {% elseif  card['type'] == 'show'  %}
             <!-- Card {{ card['data']['seccion'] }} -->
             <div class="card mb-3">
@@ -138,6 +139,7 @@
                     {% endif %}
                 </div>
             </div>
+            {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
         {% elseif  card['type'] == 'form'  %}
             <!-- Card {{ card['data']['seccion'] }} -->
             <div class="card mb-3">
@@ -168,8 +170,10 @@
                     {% endif %}
                 </div>
             </div>
+            {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
         {% endif %}
     {% endfor %}
+    {% if has_includelayout %}{% include includelayout %}{% endif %}
 {% endblock %}
 
 

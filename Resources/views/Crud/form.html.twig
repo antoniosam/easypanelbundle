@@ -31,39 +31,35 @@ class {{ entity }}Type extends AbstractType
 {%- for columna in columnas -%}
 {% if columna['type'] == "string" %}
 {%  if columna['length'] < 254 %}
-{% if columna['fieldName'] in ["imagen","poster","foto","video","pdf","archivo"] %}
-->add('{{ columna['fieldName'] }}',FileType::class,['label'=>'{{ columna['fieldName']|capitalize }}','attr'=>['maxlength'=>{{ columna['length'] }}]])
+{% if columna['fieldName'] in ["imagen","poster","foto","video","pdf","archivo",'metaimage','imagenpreview','metaimagelarge'] %}
+        ->add('{{ columna['fieldName'] }}',FileType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['maxlength'=>{{ columna['length'] }}]])
 {% else %}
-->add('{{ columna['fieldName'] }}',TextType::class,['label'=>'{{ columna['fieldName']|capitalize }}','attr'=>['maxlength'=>{{ columna['length'] }}]])
+        ->add('{{ columna['fieldName'] }}',TextType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['maxlength'=>{{ columna['length'] }}]])
 {% endif %}
 {% else %}
-->add('{{ columna['fieldName'] }}',TextareaType::class,['label'=>'{{ columna['fieldName']|capitalize }}','attr'=>['class'=>'initsummernote','maxlength'=>{{ columna['length'] }}]])
+{%  if columna['length'] > 999  %}
+{% if columna['fieldName'] in ['metadesc','metakey'] %}
+        ->add('{{ columna['fieldName'] }}',TextareaType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['class'=>'','maxlength'=>{{ columna['length'] }}]])
+{% else %}
+        ->add('{{ columna['fieldName'] }}',TextareaType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['class'=>'initsummernote','maxlength'=>{{ columna['length'] }}]])
+{% endif %}
+{% else %}
+        ->add('{{ columna['fieldName'] }}',TextareaType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['class'=>'','maxlength'=>{{ columna['length'] }}]])
+{% endif %}
 {% endif %}
 {% elseif columna['type'] == "integer" %}
-->add('{{ columna['fieldName'] }}',IntegerType::class,['label'=>'{{ columna['fieldName']|capitalize }}'])
+        ->add('{{ columna['fieldName'] }}',IntegerType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false])
 {% elseif columna['type'] == "boolean" %}
-->add('{{ columna['fieldName'] }}',CheckboxType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false])
+        ->add('{{ columna['fieldName'] }}',CheckboxType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false])
 {% elseif columna['type'] == "datetime" %}
-->add('{{ columna['fieldName'] }}',DateTimeType::class,['label'=>'{{ columna['fieldName']|capitalize }}','widget' => 'single_text' ,  'html5' => true ,  "attr"=>array()])
+        ->add('{{ columna['fieldName'] }}',DateTimeType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'widget' => 'single_text' ,  'html5' => true ,  "attr"=>array()])
 {% elseif columna['type'] == "time" %}
-->add('{{ columna['fieldName'] }}',TimeType::class,['label'=>'{{ columna['fieldName']|capitalize }}','widget' => 'single_text' ,  'html5' => true ,  "attr"=>array()])
+        ->add('{{ columna['fieldName'] }}',TimeType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'widget' => 'single_text' ,  'html5' => true ,  "attr"=>array()])
 {% elseif columna['type'] == "date" %}
-->add('{{ columna['fieldName'] }}',DateType::class,['label'=>'{{ columna['fieldName']|capitalize }}','widget' => 'single_text' ,  'html5' => true ,  "attr"=>array("placeholder"=>"YYYY-MM-DD")])
+        ->add('{{ columna['fieldName'] }}',DateType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'widget' => 'single_text' ,  'html5' => true ,  "attr"=>array("placeholder"=>"YYYY-MM-DD")])
 {% else %}
-->add('{{ columna['fieldName'] }}')
+        ->add('{{ columna['fieldName'] }}')
 {% endif %}
-
-{{ '/*'}}
- {% for key, value in columna %}
-    {% if value is iterable %}
-        {% for key, valu in value %}
-            __{{ key }}-{{ valu }}
-        {% endfor %}
-    {% else %}
-        {{ key }}-{{ value }}
-    {% endif %}
-{% endfor %}
-{{ '*/'}}
 {% endfor %};
 
     }

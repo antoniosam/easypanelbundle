@@ -18,6 +18,9 @@ class EasyForm extends EasyView
 
     private $form;
 
+    private $hasincludelayout = false;
+    private $includelayout;
+
     function __construct($seccion, $form)
     {
         $this->seccion = $seccion;
@@ -60,6 +63,15 @@ class EasyForm extends EasyView
     }
 
     /**
+     * @param mixed $includelayout
+     */
+    public function setIncludeLayout($includelayout)
+    {
+        $this->includelayout = $includelayout;
+        $this->hasincludelayout = true;
+    }
+
+    /**
      * @return array
      */
     public function generar()
@@ -70,6 +82,9 @@ class EasyForm extends EasyView
         $return["rutas"] = $this->opciones;
         $return["has_delete"] = $this->has_delete;
         $return["delete"] = $this->deleteform;
+        $return["has_includelayout"] = $this->hasincludelayout;
+        $return["includelayout"] = $this->includelayout;
+
         return $return;
     }
 

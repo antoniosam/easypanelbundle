@@ -20,6 +20,9 @@ class EasyShow extends EasyView
     private $deleteform;
     private $paths = [];
 
+    private $hasincludelayout = false;
+    private $includelayout;
+
     function __construct($seccion,$objeto,$columnas)
     {
         $this->seccion = $seccion;
@@ -91,6 +94,15 @@ class EasyShow extends EasyView
     }
 
     /**
+     * @param mixed $includelayout
+     */
+    public function setIncludeLayout($includelayout)
+    {
+        $this->hasincludelayout = true;
+        $this->includelayout = $includelayout;
+    }
+
+    /**
      * @return array
      */
     public function generar()
@@ -128,7 +140,8 @@ class EasyShow extends EasyView
         $return["rutas"] = $this->generateParameters($this->consulta,$this->opciones);
         $return["has_delete"] = $this->has_delete;
         $return["delete"] = $this->deleteform;
-
+        $return["has_includelayout"] = $this->hasincludelayout;
+        $return["includelayout"] = $this->includelayout;
 
         return $return;
     }

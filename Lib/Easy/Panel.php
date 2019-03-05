@@ -17,6 +17,9 @@ class Panel
 
     private $layout;
 
+    private $hasincludelayout = false;
+    private $includelayout;
+
     function __construct($layout=null)
     {
         $this->layout = (is_null($layout))?'layout.html.twig':$layout;
@@ -62,7 +65,16 @@ class Panel
 
     public function createView()
     {
-        return array('cards' => $this->matrix ,'location'=>$this->location ,"directories"=>$this->directories,"layout"=>$this->layout);
+        return array('cards' => $this->matrix ,'location'=>$this->location ,"directories"=>$this->directories,"layout"=>$this->layout,'has_includelayout' => $this->hasincludelayout,'includelayout' => $this->includelayout);
+    }
+
+    /**
+     * @param mixed $includelayout
+     */
+    public function setIncludeLayout($includelayout)
+    {
+        $this->hasincludelayout = true;
+        $this->includelayout = $includelayout;
     }
 
     /**

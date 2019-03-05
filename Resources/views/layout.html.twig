@@ -71,6 +71,21 @@
 <!-- Create scripts for this page-->
 <script src="{{asset('admin/assets/sb-admin') }}/js/sb-admin-datatables.min.js"></script>
 <script src="{{asset('admin/assets/sb-admin') }}/js/sb-admin-charts.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('form').each(function (){
+            var form =  $(this);
+            form.on('submit',function(e){
+                var button = $(this).find('button[type=submit]');
+                var  icon = button.find('i.fa');
+                icon.removeClass('fa-floppy-o');
+                icon.addClass('fa-refresh fa-spin');
+                button.attr('disabled','disabled');
+                button.add('disabled');
+            });
+        });
+    });
+</script>
 {% block js %}{% endblock %}
 </body>
 

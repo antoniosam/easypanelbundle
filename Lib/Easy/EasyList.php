@@ -35,6 +35,9 @@ class EasyList extends EasyView
 
     private $paths = [];
 
+    private $hasincludelayout = false;
+    private $includelayout;
+
     function __construct($seccion, $consulta, $columnas)
     {
         $this->seccion = $seccion;
@@ -169,6 +172,17 @@ class EasyList extends EasyView
     {
         $this->opciones[] = [];
     }
+
+    /**
+     * @param mixed $includelayout
+     */
+    public function setIncludeLayout($includelayout)
+    {
+        $this->hasincludelayout = true;
+        $this->includelayout = $includelayout;
+    }
+
+
 
     /**
      * @param $totalresults
@@ -307,6 +321,9 @@ class EasyList extends EasyView
             $return["order"]=['route'=>$this->orderby['route'],'parameters'=>$param,'columna'=>$columna,'orden'=>$direccion];
         }
         $return["rutas"] = $this->opciones;
+        $return["has_includelayout"] = $this->hasincludelayout;
+        $return["includelayout"] = $this->includelayout;
+
         return $return;
     }
     private function generatePagination(){

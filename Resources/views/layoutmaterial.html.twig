@@ -11,9 +11,10 @@
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
     <!-- CSS Files -->
-    <link href="{{ asset('admin/assets/material') }}/css/material-dashboard.css?v=2.1.1" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/material') }}/css/material-dashboard.min.css" rel="stylesheet" />
     <link href="{{ asset('admin/assets/material') }}/summernote/summernote.css" rel="stylesheet" />
     <link href="{{ asset('admin/assets/material') }}/summernote/summernote-bs4.css" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/material') }}/summernote/plugins/picture-upload/summernote-ext-picture-upload.css" rel="stylesheet" />
     {% block css %}{% endblock %}
     <style>
         .btn.aire{
@@ -157,10 +158,8 @@
             <div class="container-fluid">
                 <div class="copyright float-right">
                     Copyright &copy;
-                    <script>
-                        document.write(new Date().getFullYear())
-                    </script>, made with <i class="material-icons">favorite</i> by
-                    <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a> for a better web.
+                    2019 by
+                    <a href="https://twitter.com/samanot11" target="_blank" style="color: #495464;"><i class="fa fa-twitter"></i></a>.
                 </div>
             </div>
         </footer>
@@ -208,8 +207,9 @@
 <script src="{{asset('admin/assets/material') }}/js/material-dashboard.js?v=2.1.1" type="text/javascript"></script>
 
 <script src="{{asset('admin/assets/material') }}/summernote/summernote.min.js" type="text/javascript"></script>
-<script type="text/javascript">var BASE_WEB = '{{asset('admin/') }}';</script>
-<script src="{{asset('admin/assets/material') }}/summernote/plugins/picture-upload/summernote-ext-picture-upload.js" type="text/javascript"></script>
+<script type="text/javascript">var SUMMERNOTE_UPLOAD = '{{asset('admin/assets/material/summernote/plugins/picture-upload/api/index.php') }}';</script>
+<script src="{{asset('admin/assets/material') }}/summernote/plugins/picture-upload/summernote-ext-picture-upload.min.js" type="text/javascript"></script>
+
 <script>
 
 $(document).ready(function() {
@@ -223,31 +223,64 @@ $(document).ready(function() {
             $(close).fadeOut();
         }
     });
-    $('.initsummernote').each(function(obj,callback){
-        var textarea = $(this);
-        var id = textarea.attr('id');
-        textarea.hide();
-        var div = $('<div>');
-        div.attr('id',id+'summernote');
-        div.insertAfter(textarea);
-        $('#'+id+'summernote').summernote({
-            toolbar:[
-                ['style', ['style']],
-                ['font', ['bold', 'underline', 'clear']],
-                ['fontname', ['fontname']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['table', ['table']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['codeview', 'help']],
-                // This is a Custom Button in a new Toolbar Area
-                ['custom', ['picture-upload']]
-            ],
-            height: 300,
-            tabsize: 2
-        });
+    $('form').each(function (){
+        var form =  $(this);
+        var has_summernote =  form.find('.initsummernote').length > 0;
+        if(has_summernote){
+            form.find('.initsummernote').each(function(obj,callback){
+                var textarea = $(this);
+                var id = textarea.attr('id');
+                textarea.attr('style','height:1px!important; padding:0px;');
+                textarea.parent().find('label[for='+id+']').each(function(){
+                    $(this).removeClass('bmd-label-floating');
+                    $(this).removeClass('bmd-label-static');
+                    setTimeout(()=>{
+                        $(this).removeClass('bmd-label-static');
+                    },200);
+                });
+                var div = $('<div>');
+                div.attr('id',id+'summernote');
+                div.insertAfter(textarea);
+                $('#'+id+'summernote').summernote({
+                    toolbar:[
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture-upload']],
+                        ['view', ['codeview', 'help']]
+                    ],
+                    height: 200,
+                    tabsize: 2,
+                    focus: false
+                });
+            });
+            form.on('submit',function(e){
+                $(this).find('.initsummernote').each(function(obj,callback){
+                    var textarea = $(this);
+                    var id = textarea.attr('id');
+                    textarea.val($('#'+id+'summernote').summernote('code'));
+                });
+                var button = $(this).find('button[type=submit]');
+                var  icon = button.find('i.fa');
+                icon.removeClass('fa-floppy-o');
+                icon.addClass('fa-refresh fa-spin');
+                button.attr('disabled','disabled');
+                button.add('disabled');
+            });
+        }else{
+            form.on('submit',function(e){
+                var button = $(this).find('button[type=submit]');
+                var  icon = button.find('i.fa');
+                icon.removeClass('fa-floppy-o');
+                icon.addClass('fa-refresh fa-spin');
+                button.attr('disabled','disabled');
+                button.add('disabled');
+            });
+        }
     });
-
 });
 
 
