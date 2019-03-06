@@ -166,7 +166,7 @@ class {{ entity }}Controller extends Controller
 
         $em = $this->getDoctrine()->getManager();
 {% for key,campo in campos %}
-{% if campo in ["imagen","poster","foto","video","pdf","archivo",'metaimage','imagenpreview','metaimagelarge'] %}
+{% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
         if (${{ entity|lower }}->get{{ campo|capitalize }}() !== null) {
             ${{ campo }} = ${{ entity|lower }}->get{{ campo|capitalize }}();
             $new{{ campo }} = md5(microtime().'{{ key }}') .'.'.${{ campo }}->guessExtension();
