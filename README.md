@@ -40,7 +40,7 @@ Valores Basicos
 **$prefix** = Prefix del nombre de la ruta que se podrian generar ej: admin_clientes Generaria admin_clientes_show, admin_clientes_index dependiento del tipo de panel que se cree 
 **$layout** por default del prerequisito o si se quiere aplicar un layout direferente
 
-##Servicio
+## Servicio
 
 Se creo un nuevo servicio que permite configuracion la vista, incluir un menu personalizado, cambiar el layout general que extiend e la vista, incluir el nombre del proyecto, y mas configuracion.
 
@@ -57,7 +57,7 @@ easy_panel:
     rutalogout: ruta de symfony para cerrar sesion(Default '')
 ```
 
-####Clase EasyForm
+#### Clase EasyForm
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -72,7 +72,7 @@ $form->addLink($route, $parametros, $titulo, $clase = 'btn-secondary', $fa_icon 
 $form->setDeleteForm($form_delete)
 $form->cleanLinks()
 ```
-####Clase EasyList
+#### Clase EasyList
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -149,7 +149,7 @@ $list->cleanLinks()
  ```
 
 
-####Clase EasyShow
+#### Clase EasyShow
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -210,7 +210,7 @@ if($relacion!=null){
 En la version 1.2.4 Solo se permite 1 nivel de relacion
 
 
-####Clase Panel
+#### Clase Panel
 
 Metodos estaticos 
 Estos metodos solo crean una sola vista del template con configuracion basica
@@ -257,7 +257,7 @@ Los parametros no deben incluir la carpeta src, se integran por default
 ```
 easypanel:create:panel titulo_proyecto directorio_bundle entity_bundle prefix_name_route
 easypanel:create:menu titulo_proyecto  directorio_bundle entity_bundle prefix_name_route
-easypanel:export:assets
+easypanel:install:assets
 ```
 ej. Symfony 3 
 ```
@@ -278,7 +278,7 @@ security.yml
 ```
 security:
     encoders:
-        AppBundle\Entity\Administrador:
+        App\Entity\Administrador:
             id: app.custom_encoder
             ...
     providers:
