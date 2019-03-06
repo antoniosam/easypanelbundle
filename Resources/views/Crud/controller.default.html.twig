@@ -15,29 +15,17 @@ class DefaultController extends Controller
     /**
      * @Route("/", name="{{ ruta }}_home")
      */
-    public function indexAction()
+    public function indexAction(EasyPanelService $easyPanelService)
     {
-        $vista = $this->getParameter('easy_panel.viewpanel');
-        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig'){
-            $twig = '@EasyPanel/Default/index.material.html.twig';
-        }else if ($vista == '@EasyPanel/view.html.twig'){
-            $twig = '@EasyPanel/Default/index.html.twig';
-        }
-        return $this->render($twig);
+        return $easyPanelService->renderTestHome();
     }
 
     /**
      * @Route("/dashboard", name="{{ ruta }}_dashboard")
      */
-    public function dashboardAction()
+    public function dashboardAction(EasyPanelService $easyPanelService)
     {
-        $vista = $this->getParameter('easy_panel.viewpanel');
-        if(empty($vista) || $vista == '@EasyPanel/viewmaterial.html.twig'){
-            $twig = '@EasyPanel/Default/dashboard.material.html.twig';
-        }else if ($vista == '@EasyPanel/view.html.twig'){
-            $twig = '@EasyPanel/Default/dashboard.html.twig';
-        }
-        return $this->render($twig);
+        return $easyPanelService->renderTestDashboard();
     }
 
 }

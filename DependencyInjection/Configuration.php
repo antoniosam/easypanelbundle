@@ -24,6 +24,7 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('layoutpanel')->defaultNull()->end()
             ->scalarNode('viewpanel') ->defaultNull()->end()
+            ->scalarNode('layoutlogin')->defaultNull()->end()
             ->scalarNode('viewmenu') ->defaultNull()->end()
             ->scalarNode('nombreproyecto') ->defaultNull()->end()
             ->scalarNode('rutalogout') ->defaultNull()->end()

@@ -1,9 +1,9 @@
-{{ "{%"}} extends '@EasyPanel/layoutmaterial.html.twig' {{ "%}"}}
-{{ "{% block location %}" }}
-<li class="breadcrumb-item active">Dashboard</li>
-{{ "{% endblock %}" }}
+{% extends '@EasyPanel/layoutmaterial.html.twig' %}
+{% block location %}
+Test Dashboard
+{% endblock %}
 
-{{ "{% block body %}" }}
+{% block body %}
 <div class="row">
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="card card-stats">
@@ -124,9 +124,9 @@
         </div>
     </div>
 </div>
-{{ "{% endblock %}" }}
+{% endblock %}
 
-{{ "{% block js %}" }}
+{% block js %}
 <script>
     var demo = {
         initDocumentationCharts: function() {
@@ -267,6 +267,6 @@
         demo.initDashboardPageCharts();
     });
 </script>
-{{ "{% endblock %}" }}
+{% endblock %}
 
 

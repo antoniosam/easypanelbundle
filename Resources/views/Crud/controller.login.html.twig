@@ -1,0 +1,40 @@
+<?php
+
+namespace {{ namespace }};
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+{%  if prefix_controller_route is not empty %}
+/**
+ * @Route("{{ prefix_controller_route }}" )
+ */
+ {% endif %}
+class LoginController extends Controller
+{
+
+    /**
+     * @Route("/", name="{{ ruta }}_index")
+     */
+    public function indexAction()
+    {
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', [
+        'last_username' => $lastUsername,
+        'error' => $error
+        ]);
+        return $this->render($twig);
+    }
+    /**
+    * @Route("/logout", name="{{ ruta }}_logout")
+    */
+    public function logoutAction()
+    {
+        return  new Response();
+    }
+
+
+}

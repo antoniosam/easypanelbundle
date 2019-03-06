@@ -25,6 +25,7 @@ class EasyPanelController
     private $campos;
     private $columnas;
     private $rutacontroller;
+    private $rutasecurity;
     private $rutaform;
     private $rutatemplates;
 
@@ -56,14 +57,17 @@ class EasyPanelController
             $this->rutacontroller = $this->kernel_project_dir.'Controller/'.$this->panelbundle;
             $this->rutaform = $this->kernel_project_dir.'Form/'.$this->panelbundle;
             $this->rutatemplates = $this->kernel_project_dir.'../templates/'.$this->panelbundle;
+            $this->rutasecurity= $this->kernel_project_dir.'Security/'.$this->panelbundle;
         }else{
             $this->rutacontroller =  $this->kernel_project_dir . $this->panelbundle . '/Controller/';
             $this->rutaform = $this->kernel_project_dir.$this->panelbundle .'/Form/';
             $this->rutatemplates = $this->kernel_project_dir.$this->panelbundle .'/Resources/views/';
+            $this->rutasecurity= $this->kernel_project_dir.$this->panelbundle .'/Security/';
         }
         Util::createDir($this->rutacontroller);
         Util::createDir($this->rutaform);
         Util::createDir($this->rutatemplates);
+        Util::createDir($this->rutasecurity);
     }
 
     protected function createBundleEntity($entity,$panelbunle){
@@ -218,8 +222,22 @@ class EasyPanelController
 
         $html = $this->templating->render('@EasyPanel/Crud/controller.default.html.twig', $parametros);
         $name = "DefaultController.php";
-
         file_put_contents($this->rutacontroller .'/'. $name, $html);
+
+        $html = $this->templating->render('@EasyPanel/Crud/controller.login.html.twig', $parametros);
+        $name = "LoginController.php";
+        file_put_contents($this->rutacontroller .'/'. $name, $html);
+
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $parametros = [];
+            $parametros['namespaceadmin'] = $entitybundle;
+            $parametros['routelogin'] = $ruta;
+            $html = $this->templating->render('@EasyPanel/Crud/loginform.authenticator.html', $parametros);
+            $name = "EasyPanelLoginFormAuthenticator.php";
+            file_put_contents($this->rutasecurity .'/'. $name, $html);
+            file_put_contents($this->rutacontroller .'/'. $name, $html);
+        }
+
     }
 
 

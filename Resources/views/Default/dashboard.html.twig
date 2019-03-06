@@ -1,8 +1,8 @@
-{{ "{%"}} extends '@EasyPanel/layout.html.twig' {{ "%}"}}
-{{ "{% block location %}" }}
+{% extends '@EasyPanel/layout.html.twig' %}
+{% block location %}
 <li class="breadcrumb-item active">Dashboard</li>
-{{ "{% endblock %}" }}
-{{ "{% block body %}" }}
+{% endblock %}
+{% block body %}
 <div class="row">
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="card card-stats">
@@ -124,7 +124,7 @@
     </div>
 </div>
 
-{{ "{% endblock %}" }}
+{% endblock %}
 
 
 
