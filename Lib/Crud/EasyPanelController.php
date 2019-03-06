@@ -31,6 +31,7 @@ class EasyPanelController
 
     private $namespacedircontroller ;
     private $namespacedirform ;
+    private $namespacedirsecurity ;
     private $formnamespace;
     private $pathpublicuploads;
 
@@ -224,22 +225,64 @@ class EasyPanelController
         $name = "DefaultController.php";
         file_put_contents($this->rutacontroller .'/'. $name, $html);
 
+
+    }
+
+    public function createLoginController(){
+        $this->createLogin($this->campos, $this->panelbundle, $this->namespaceentity, $this->entity, $this->ruta, $this->seccion, '');
+    }
+    private function createLogin($campos,
+        $panelbundle,
+        $entitybundle,
+        $entity,
+        $ruta,
+        $seccion,
+        $type_crud){
+
+
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $this->namespacedircontroller = 'App\\Controller\\'.$this->panelbundle;
+            $this->namespacedirform = 'App\\Form\\'.$this->panelbundle;
+            $this->namespacedirsecurity = 'App\\Security\\'.$this->panelbundle;
+            $this->formnamespace = 'App\\Form\\'.$this->panelbundle.'\\'.$this->entity.'Type';
+        }else{
+            $this->namespacedircontroller = $this->panelbundle.'\\Controller';
+            $this->namespacedirform = $this->panelbundle.'\\Form';
+            $this->namespacedirsecurity = $this->panelbundle.'\\Security';
+            $this->formnamespace = $this->panelbundle.'\\Form\\'.$this->entity.'Type';
+        }
+        $parametros = array(
+            'seccion' => $seccion,
+            'ruta' => $ruta,
+            'entity' => $entity,
+            'entitybundle' => $entitybundle,
+            'form' => $entity . 'Type',
+            'bundle' => $panelbundle,
+            'indexlist' => '',
+            'showlist' => '',
+            'namespace' => $this->namespacedircontroller,
+            'formnamespace' => $this->formnamespace,
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:''
+        );
+
+        $parametros['ruta'] = str_replace('administrador','login',$parametros['ruta']);
         $html = $this->templating->render('@EasyPanel/Crud/controller.login.html.twig', $parametros);
         $name = "LoginController.php";
         file_put_contents($this->rutacontroller .'/'. $name, $html);
 
         if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
-            $parametros = [];
-            $parametros['namespaceadmin'] = $entitybundle;
-            $parametros['routelogin'] = $ruta;
-            $html = $this->templating->render('@EasyPanel/Crud/loginform.authenticator.html', $parametros);
+            $params = [];
+            $params['namespaceadmin'] = $entitybundle;
+            $params['routelogin'] = $parametros['ruta'].'_index';
+            $params['routeredirect'] = $ruta.'_index';
+            $params['namespace'] = $this->namespacedirsecurity;
+
+            $html = $this->templating->render('@EasyPanel/Crud/loginform.authenticator.html.twig', $params);
             $name = "EasyPanelLoginFormAuthenticator.php";
             file_put_contents($this->rutasecurity .'/'. $name, $html);
-            file_put_contents($this->rutacontroller .'/'. $name, $html);
         }
 
     }
-
 
     private function fieldsEntity($entitybundle, array  $excluir = [])
     {

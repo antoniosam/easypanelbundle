@@ -27,7 +27,7 @@ Y agregamos el bundle en el AppKernel
 ```
 ## Prerequisitos
 
-Template layout.html.twig (app/Resources/views/layout.html.twig)
+No se necesitan mas
 
 ## Funcionamiento
 
@@ -40,7 +40,24 @@ Valores Basicos
 **$prefix** = Prefix del nombre de la ruta que se podrian generar ej: admin_clientes Generaria admin_clientes_show, admin_clientes_index dependiento del tipo de panel que se cree 
 **$layout** por default del prerequisito o si se quiere aplicar un layout direferente
 
-###Clase EasyForm
+##Servicio
+
+Se creo un nuevo servicio que permite configuracion la vista, incluir un menu personalizado, cambiar el layout general que extiend e la vista, incluir el nombre del proyecto, y mas configuracion.
+
+Sun funcion es sustituir parcialmente a la clase Panel.
+
+Los valores de configuracion son 
+```
+easy_panel:
+    layoutpanel: Layout que extiende la vista (Default: @EasyPanel/layoutmaterial.html.twig)
+    viewpanel: es el template que se usa para generar las vistas (Default: @EasyPanel/viewmaterial.html.twig)
+    layoutlogin: Es el layout que se usa para mostrar el formulario de sesion (Default: @EasyPanel/loginlayout.html.twig)) 
+    viewmenu: Es el template que se incluira en la seccion de menu  (Default: @EasyPanel/Default/menumaterial.html.twig)
+    nombreproyecto: Nombre del proyecto (Default: '')
+    rutalogout: ruta de symfony para cerrar sesion(Default '')
+```
+
+####Clase EasyForm
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -55,7 +72,7 @@ $form->addLink($route, $parametros, $titulo, $clase = 'btn-secondary', $fa_icon 
 $form->setDeleteForm($form_delete)
 $form->cleanLinks()
 ```
-###Clase EasyList
+####Clase EasyList
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -132,7 +149,7 @@ $list->cleanLinks()
  ```
 
 
-###Clase EasyShow
+####Clase EasyShow
 
 Metodos estaticos solo crean una seccion con configuracion basica 
 ```
@@ -193,7 +210,7 @@ if($relacion!=null){
 En la version 1.2.4 Solo se permite 1 nivel de relacion
 
 
-###Clase Panel
+####Clase Panel
 
 Metodos estaticos 
 Estos metodos solo crean una sola vista del template con configuracion basica
@@ -227,21 +244,102 @@ Que crea el arreglo con la configuracion lista para el template
 ```
 
 ## Comandos
-Comandos para la creacion 
+
+Para facilitar la creacon del panel se incluyen metodos que generar automaticamente los controladores y formularios con funciones preestablecidas
+Los parametros dependen de la version de symfony 
+- titulo_proyecto: Nombre del proyecto
+- directorio_bundle: Carpeta donde se crearan los archivos, si es symfony 3 debes indicar el bundle y si es symfony 4  creara una carpeta con el nombre establecido dentro de la estructura de symfony
+- entity_bundle:  Carpeta donde se encuentran las entidades a controlar
+- prefix_name_route: Sufijo para la ruta de los controladores
+
+Los parametros no deben incluir la carpeta src, se integran por default
+ 
 ```
-easypanel:crud titulo_proyecto panel_bundle entity_bundle prefix_name_route
-easypanel:create titulo_proyecto panel_bundle entity_bundle prefix_name_route
-easypanel:create:sato titulo_proyecto panel_bundle entity_bundle prefix_name_route
-
-easypanel:create:menu titulo_proyecto panel_bundle entity_bundle prefix_name_route
-
+easypanel:create:panel titulo_proyecto directorio_bundle entity_bundle prefix_name_route
+easypanel:create:menu titulo_proyecto  directorio_bundle entity_bundle prefix_name_route
 easypanel:export:assets
-
 ```
-## Authors
+ej. Symfony 3 
+```
+easypanel:create:panel Demo AdminBundle AppBundle\Entity admin
+```
+ej. Symfony 4 
+```
+easypanel:create:panel Demo Admin Entity admin
+```
+
+## Login
+
+El bundle solo incluye las pantallas y los controladores, la confifuracion de seguridad se debe hacer en el archivo security.yml
+
+El servicio app.custom_encoder esta incluido dentro del bundle 
+
+security.yml
+```
+security:
+    encoders:
+        AppBundle\Entity\Administrador:
+            id: app.custom_encoder
+            ...
+    providers:
+        entity_admin:
+            entity:
+                class:  App\Entity\Administrador
+                property: correo
+        ...
+    firewalls:
+        admin_area:
+            pattern: /admin.*
+            provider: entity_admin
+            anonymous: ~
+            form_login:
+                login_path: /admin/login
+                check_path: /admin/login
+                default_target_path:  /admin/
+            logout:
+                path:   /admin/login/salir
+                target: /admin/
+
+        main:
+           ....
+    access_control:
+        - { path: ^/admin/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin/*,       roles: IS_AUTHENTICATED_FULLY }
+        ....
+```
+**Symfony 4**
+
+Si se usa con una version de symfony 4, los comandos de creacion generar la clase **EasyPanelLoginFormAuthenticator**
+
+Dentro de la carpeta src/Security/dir/EasyPanelLoginFormAuthenticator
+y se debe incluir en el firewall
+
+**dir** es el nombre de la carpeta que se uso en el comando
+
+ej.
+```
+    firewalls:
+        admin_area:
+            pattern: /admin.*
+            provider: entity_admin
+            anonymous: ~
+            form_login:
+                login_path: /admin/login
+                check_path: /admin/login
+                default_target_path:  /admin/
+            logout:
+                path:   /admin/login/salir
+                target: /admin/
+            guard:
+                authenticators:
+                    - App\Security\dir\EasyPanelLoginFormAuthenticator
+```
+
+
+### Authors
 
 * **Antonio Samano** - *Initial work* - [Antoniosam](https://github.com/antoniosam)
 
-## License
+### License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details

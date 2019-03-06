@@ -69,12 +69,18 @@ class EasyPanelCreate
 
                     $entity = Util::getFileNamespace($clase);
                     $ruta = $this->prefix.'_'.strtolower($entity);
+                    if(strtolower($entity) == 'administrador'){
+                        $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst(''));
+                        $crud->createLoginController();
+                    }
+
                     $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity));
                     $tmp = $crud->create($ignorar);
                     $creados[] = $tmp;
                     $instrucciones .= $tmp.PHP_EOL;
                     $listaentitys[] = $entity;
                 endforeach;
+
                 $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix,'material'))->create();
                 $instrucciones .= PHP_EOL.PHP_EOL.$menu;
             }

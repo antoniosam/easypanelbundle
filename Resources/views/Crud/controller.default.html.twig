@@ -4,6 +4,8 @@ namespace {{ namespace }};
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Ast\EasyPanelBundle\Services\EasyPanelService;
+
 {%  if prefix_controller_route is not empty %}
 /**
  * @Route("{{ prefix_controller_route }}" )

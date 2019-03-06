@@ -2,8 +2,12 @@
 
 namespace {{ namespace }};
 
+use Ast\EasyPanelBundle\Services\EasyPanelService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
 {%  if prefix_controller_route is not empty %}
 /**
  * @Route("{{ prefix_controller_route }}" )
@@ -15,18 +19,17 @@ class LoginController extends Controller
     /**
      * @Route("/", name="{{ ruta }}_index")
      */
-    public function indexAction()
+    public function indexAction(AuthenticationUtils $authenticationUtils, EasyPanelService $easypanel)
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', [
+        return $easypanel->renderLogin('security/login.html.twig', [
         'last_username' => $lastUsername,
         'error' => $error
         ]);
-        return $this->render($twig);
     }
     /**
     * @Route("/logout", name="{{ ruta }}_logout")
