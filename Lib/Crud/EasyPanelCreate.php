@@ -94,32 +94,42 @@ class EasyPanelCreate
 
     protected function createSf3($ignorar){
         if($this->findBundle()){
-            $this->initDefaultController();
+
+            $entity = 'Default';
+            $ruta = $this->prefix.'_'.strtolower($entity);
+            $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$entity,$this->prefix,$ruta,ucfirst(''));
+            $crud->createDefaultController();
+
             $listaclases = InfoEntityImport::folder($this->em,$this->kernel_project_dir.$this->entitybundle);
             $listaclases = $this->excluirEntidades($listaclases);
             $creados = [];
+
+            $instrucciones = ' Respuesta'.PHP_EOL;
             if(count($listaclases)>0){
                 $listaentitys = [];
                 foreach ($listaclases as $clase):
                     $entity = Util::getFileNamespace($clase);
                     $ruta = $this->prefix.'_'.strtolower($entity);
+                    if(strtolower($entity) == 'administrador'){
+                        $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst(''));
+                        $crud->createLoginController();
+                    }
                     $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity));
-                    $creados[] = $crud->create($ignorar);
+                    $tmp = $crud->create($ignorar);
+                    $creados[] = $tmp;
+                    $instrucciones .= $tmp.PHP_EOL;
                     $listaentitys[] = $entity;
                 endforeach;
                 $menu = (new EasyPanelMenu($this->em,$this->templating,$this->kernel_project_dir,$this->proyecto,$this->panelbundle,$listaentitys,$this->prefix,'material'))->create();
+                $instrucciones .= PHP_EOL.PHP_EOL.$menu;
             }
-            $instrucciones = PHP_EOL."Creado " . implode($creados)." ".PHP_EOL;
+            $instrucciones .= ' Controladores Creados'.PHP_EOL;
             $instrucciones .="Para concluir debes agregar bundle a la configuracion".PHP_EOL;
             $instrucciones .="En el archivo routing.yml debes agregar la nueva ruta".PHP_EOL;
             $instrucciones .=$this->prefix."_route:".PHP_EOL;
             $instrucciones .="    resource: '@".$this->panelbundle."/Controller/'".PHP_EOL;
             $instrucciones .='    type: annotation'.PHP_EOL;
             $instrucciones .='    prefix: /'.$this->prefix.PHP_EOL;
-            $instrucciones .="En el archivo config.yml busca el nodo twig y agrega un nuevo subnodo paths ".PHP_EOL;
-            $instrucciones .="dentro del subnodo paths agrega".PHP_EOL;
-            $instrucciones .=" '%kernel.project_dir%/src/".$this->panelbundle."/Resources/views/': ".$this->panelbundle.PHP_EOL;
-            $instrucciones .="Por ultimo limpia la cache => composer dump- && php bin/console cache:clear".PHP_EOL;
 
         }else{
             $instrucciones = "Interrumpido, Debes configurar el nuevo bundle antes de continuar ".PHP_EOL .PHP_EOL ;
@@ -131,21 +141,7 @@ class EasyPanelCreate
         }
         return $instrucciones;
     }
-    protected function initDefaultController(){
-        $parametros = array(
-            'proyecto' => $this->proyecto,
-            'bundle' => $this->panelbundle,
-            'ruta_prefix' => $this->prefix,
-        );
-        //$html = $this->templating->render('@EasyPanel/Create/layout.html.twig', $parametros);
-        //Util::guardar($this->panelbundledir."Resources/views","layout.html.twig",$html);
-        $html = $this->templating->render('@EasyPanel/Create/defaultController.php.twig', $parametros);
-        Util::guardar($this->panelbundledir."Controller","DefaultController.php",$html);
-        $html = $this->templating->render('@EasyPanel/Create/default.index.html.twig', $parametros);
-        Util::guardar($this->panelbundledir."Resources/views/Default","index.html.twig",$html);
-        $html = $this->templating->render('@EasyPanel/Create/default.dashboard.html.twig', $parametros);
-        Util::guardar($this->panelbundledir."Resources/views/Default","dashboard.html.twig",$html);
-    }
+
     protected function findBundle(){
         $this->panelbundledir = $this->kernel_project_dir . $this->panelbundle . '/';
         Util::createDir($this->panelbundledir);

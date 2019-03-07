@@ -7,19 +7,20 @@
 namespace Ast\EasyPanelBundle\Lib\Crud\Utils;
 
 
-use Ast\EasyPanelBundle\Lib\Crud\Utils\ClassMapGenerator;
-
 class InfoEntityImport
 {
 
     public static function folder(\Doctrine\ORM\EntityManager $em,$directory)
     {
-        $listaposibles = ClassMapGenerator::createMap($directory);
-
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4) {
+            $listaposibles = \Ast\EasyPanelBundle\Lib\Crud\Utils\ClassMapGenerator::createMap($directory);
+        }else{
+            $listaposibles = ClassMapGenerator::createMap($directory);
+        }
         $listaclases = [];
         foreach ($listaposibles as $class => $clase):
             if (!$em->getMetadataFactory()->isTransient($class)) {
-               $listaclases[] = $class;
+                $listaclases[] = $class;
             }
         endforeach;
         return $listaclases;
