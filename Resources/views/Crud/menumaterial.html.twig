@@ -1,13 +1,13 @@
 <div class="sidebar" data-color="azure" data-background-color="white" >
     <div class="logo">
-        <a href="{{ "{{ path('"}}{{ prefix }}{{ "_home') }}" }}" class="simple-text logo-normal">
+        <a href="{{ "{{ path('"}}{{ prefix }}{{ "default__home') }}" }}" class="simple-text logo-normal">
             {{ proyecto }}
         </a>
     </div>
     <div class="sidebar-wrapper">
         <ul class="nav">
             <li class="nav-item active  ">
-                <a class="nav-link" href="{{ "{{ path('"}}{{ prefix }}{{ "_dashboard') }}" }}">
+                <a class="nav-link" href="{{ "{{ path('"}}{{ prefix }}{{ "default__dashboard') }}" }}">
                     <i class="material-icons">dashboard</i>
                     <p>Dashboard</p>
                 </a>
@@ -15,7 +15,7 @@
             {% for ruta in rutas %}
                 <li class="nav-item"  title="{{ ruta[0]|capitalize }}">
                     <a class="nav-link" href="{{ "{{ path('"}}{{ ruta[1] }}{{ "_index') }}"}}">
-                        <i class="material-icons">{{ ruta[2] }}</i>
+                        <i class="fa {{ ruta[2] }}"></i>
                         <p >{{ ruta[0]|capitalize }}</p>
                     </a>
                 </li>

@@ -26,7 +26,7 @@ class LoginController extends Controller
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $easypanel->renderLogin('security/login.html.twig', [
+        return $easypanel->renderLogin([
         'last_username' => $lastUsername,
         'error' => $error
         ]);

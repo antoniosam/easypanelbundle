@@ -251,6 +251,7 @@ class EasyPanelController
             $this->namespacedirsecurity = $this->panelbundle.'\\Security';
             $this->formnamespace = $this->panelbundle.'\\Form\\'.$this->entity.'Type';
         }
+
         $parametros = array(
             'seccion' => $seccion,
             'ruta' => $ruta,
@@ -262,10 +263,10 @@ class EasyPanelController
             'showlist' => '',
             'namespace' => $this->namespacedircontroller,
             'formnamespace' => $this->formnamespace,
-            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:''
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.str_replace('administrador','login',$ruta):''
         );
 
-        $parametros['ruta'] = str_replace('administrador','login',$parametros['ruta']);
+        $parametros['ruta'] = str_replace('administrador','login',$ruta);
         $html = $this->templating->render('@EasyPanel/Crud/controller.login.html.twig', $parametros);
         $name = "LoginController.php";
         file_put_contents($this->rutacontroller .'/'. $name, $html);
