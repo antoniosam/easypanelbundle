@@ -182,8 +182,8 @@ class {{ entity }}Controller extends Controller
         * Se deberia borrar y configurar correctamente en otro controlador
         */
         if($isnew){
-            $salt = BuildPassword::randomSalt();
-            $newpass = BuildPassword::create($administrador->getPass(),$salt);
+            $salt = \Ast\CustomPassword\BuildPassword::randomSalt();
+            $newpass = \Ast\CustomPassword\BuildPassword::create($administrador->getPass(),$salt);
             $administrador->setPass($newpass);
             $administrador->setSalt($salt);
         }

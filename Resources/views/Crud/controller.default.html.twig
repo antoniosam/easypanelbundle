@@ -17,17 +17,17 @@ class DefaultController extends Controller
     /**
      * @Route("/", name="{{ ruta }}_home")
      */
-    public function indexAction(EasyPanelService $easyPanelService)
+    public function indexAction({{ serviceautowire }})
     {
-        return $easyPanelService->renderTestHome();
+        return {{ serviceincontroller|raw }}->renderTestHome();
     }
 
     /**
      * @Route("/dashboard", name="{{ ruta }}_dashboard")
      */
-    public function dashboardAction(EasyPanelService $easyPanelService)
+    public function dashboardAction({{ serviceautowire }})
     {
-        return $easyPanelService->renderTestDashboard();
+        return {{ serviceincontroller|raw }}->renderTestDashboard();
     }
 
 }
