@@ -19,14 +19,14 @@ class LoginController extends Controller
     /**
      * @Route("/", name="{{ ruta }}_index")
      */
-    public function indexAction(AuthenticationUtils $authenticationUtils, EasyPanelService $easypanel)
+    public function indexAction({{ authenticationautowire }}{{ serviceautowire }})
     {
-        // get the login error if there is one
+        {{ authenticationincontroller|raw }}
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $easypanel->renderLogin([
+        return {{ serviceincontroller|raw }}->renderLogin([
         'last_username' => $lastUsername,
         'error' => $error
         ]);

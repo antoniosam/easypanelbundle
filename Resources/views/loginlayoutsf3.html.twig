@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="{{ asset('admin/assets/material') }}/img/favicon.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <title>
-        {{ nombreproyecto }} | Login Panel Admin
+        {{ nombreproyecto }}| Login Panel Admin
     </title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no'
           name='viewport'/>
@@ -47,10 +47,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-8 ml-auto mr-auto">
-                    <form class="form" method="post" >
-                        <input type="hidden" name="_csrf_token"
-                               value="{{ csrf_token('authenticate') }}"
-                        >
+                    <form class="form" method="post" action="{{ path('admin_login_index') }}">
+
                         <div class="card card-login card-hidden">
                             <div class="card-header card-header-rose text-center">
                                 <h4 class="card-title">Login</h4>
@@ -64,7 +62,7 @@
                                           <i class="material-icons">email</i>
                                         </span>
                                       </div>
-                                      <input type="email" value="{{ last_username }}" name="correo" id="inputCorreo" class="form-control" placeholder="Correo" required autofocus >
+                                      <input type="text" value="{{ last_username }}" name="_username" id="inputCorreo" class="form-control" placeholder="Correo" required autofocus >
                                     </div>
                                   </span>
                                 <span class="bmd-form-group">
@@ -74,7 +72,7 @@
                                           <i class="material-icons">lock_outline</i>
                                         </span>
                                       </div>
-                                      <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                                      <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="Password" required>
                                     </div>
                                   </span>
                                 {% if error %}

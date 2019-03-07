@@ -270,6 +270,8 @@ easypanel:create:panel Demo Admin Entity admin
 
 ## Login
 
+**NOTA** Se recomienda primero crear el admnistrador antes de establecer la seguridad
+
 El bundle solo incluye las pantallas y los controladores, la confifuracion de seguridad se debe hacer en el archivo security.yml
 
 El servicio app.custom_encoder esta incluido dentro del bundle 
@@ -293,8 +295,8 @@ security:
             provider: entity_admin
             anonymous: ~
             form_login:
-                login_path: /admin/login
-                check_path: /admin/login
+                login_path: /admin/login/
+                check_path: /admin/login/
                 default_target_path:  /admin/
             logout:
                 path:   /admin/login/salir
@@ -324,8 +326,8 @@ ej.
             provider: entity_admin
             anonymous: ~
             form_login:
-                login_path: /admin/login
-                check_path: /admin/login
+                login_path: /admin/login/
+                check_path: /admin/login/
                 default_target_path:  /admin/
             logout:
                 path:   /admin/login/salir

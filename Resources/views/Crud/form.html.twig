@@ -29,12 +29,20 @@ class {{ entity }}Type extends AbstractType
     {
         $builder
 {%- for columna in columnas -%}
-{% if columna['fieldName'] in ['referencia'] %}
+{% if columna['fieldName'] in ['referencia','salt'] %}
     //->add('{{ columna['fieldName'] }}',TextType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['maxlength'=>{{ columna['length'] }}]])
 {% elseif columna['type'] == "string" %}
 {%  if columna['length'] < 254 %}
 {% if columna['fieldName'] in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
         ->add('{{ columna['fieldName'] }}',FileType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['maxlength'=>{{ columna['length'] }}]])
+{% elseif columna['fieldName'] in ['pass'] %}
+    ;
+    if($builder->getData() instanceof \{{ entitybundle }} ){
+    if($builder->getData()->getId() < 1){
+    $builder->add('{{ columna['fieldName'] }}',PasswordType::class,['label'=>'{{ columna['fieldName']|capitalize }}', 'required'  => true,'attr'=>['maxlength'=>{{ columna['length'] }}]]);
+    }
+    }
+    $builder
 {% else %}
         ->add('{{ columna['fieldName'] }}',TextType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['maxlength'=>{{ columna['length'] }}]])
 {% endif %}

@@ -43,7 +43,7 @@ class {{ entity }}Controller extends Controller
      * @Route("/", name="{{ ruta }}_index" )
      * @Method("GET")
      */
-    public function indexAction(Request $request, EasyPanelService $easypanel)
+    public function indexAction(Request $request{{ serviceautowire }})
     {
         {{ '$em = $this->' }}getDoctrine()->getManager();
         $buscar = $request->get('buscar', '');
@@ -69,7 +69,7 @@ class {{ entity }}Controller extends Controller
         $view->enableSearch('{{ ruta }}_index' , [] , $buscar);
         $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ ruta }}_index' , []);
 
-        return $easypanel->render($view);
+        return {{ serviceincontroller|raw }}->render($view);
     }
 
     /**
@@ -78,7 +78,7 @@ class {{ entity }}Controller extends Controller
     * @Route("/new", name="{{ ruta }}_new")
     * @Method({"GET", "POST"})
     */
-    public function nuevoAction(Request $request, EasyPanelService $easypanel)
+    public function nuevoAction(Request $request{{ serviceautowire }})
     {
         ${{ entity|lower }} = new {{ entity }}();
         $form = $this->createForm({{ form }}::class, ${{ entity|lower }});
@@ -93,7 +93,7 @@ class {{ entity }}Controller extends Controller
 
         $view = EasyForm::easy('Nuevo {{ seccion }}', $form->createView(), '{{ ruta }}');
 
-        return $easypanel->render($view);
+        return {{ serviceincontroller|raw }}->render($view);
     }
 
     private function showList(){
@@ -105,12 +105,12 @@ class {{ entity }}Controller extends Controller
     * @Route("/{id}/show", name="{{ ruta }}_show", requirements={"id"="\d+"} )
     * @Method("GET")
     */
-    public function showAction({{ entity }} ${{ entity|lower }}, EasyPanelService $easypanel)
+    public function showAction({{ entity }} ${{ entity|lower }}{{ serviceautowire }})
     {
         $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ ruta }}');
         $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
 
-        return $easypanel->render($view);
+        return {{ serviceincontroller|raw }}->render($view);
     }
 
     /**
@@ -119,7 +119,7 @@ class {{ entity }}Controller extends Controller
     * @Route("/{id}/edit", name="{{ ruta }}_edit", requirements={"id"="\d+"})
     * @Method({"GET", "POST"})
     */
-    public function editAction(Request $request, {{ entity }} ${{ entity|lower }}, EasyPanelService $easypanel)
+    public function editAction(Request $request, {{ entity }} ${{ entity|lower }}{{ serviceautowire }})
     {
         $editForm = $this->createForm({{ form }}::class, ${{ entity|lower }});
         if($request->getMethod()=='POST'){
@@ -135,7 +135,7 @@ class {{ entity }}Controller extends Controller
         $view->addLinkBack('{{ ruta }}_show',array('id'=>${{ entity|lower }}->getId()),'Regresar');
         $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
 
-        return $easypanel->render($view);
+        return {{ serviceincontroller|raw }}->render($view);
     }
 
     /**
@@ -176,6 +176,18 @@ class {{ entity }}Controller extends Controller
         }
 {% endif %}
 {% endfor %}
+{% if  entity == "Administrador" %}
+        /**
+        * Este fragmento solo se debera de usar para crear el primer administrador
+        * Se deberia borrar y configurar correctamente en otro controlador
+        */
+        if($isnew){
+            $salt = BuildPassword::randomSalt();
+            $newpass = BuildPassword::create($administrador->getPass(),$salt);
+            $administrador->setPass($newpass);
+            $administrador->setSalt($salt);
+        }
+{% endif %}
         $em->persist(${{ entity|lower }});
         $em->flush();
         if( $isnew ){

@@ -31,7 +31,7 @@ class EasyPanelService
         $this->twig = $twig;
         $this->panellayout = ($layout == null)?'@EasyPanel/layoutmaterial.html.twig':$layout;
         $this->panelvista = ($vista == null)?'@EasyPanel/viewmaterial.html.twig':$vista;
-        $this->panellogin = ($layoutlogin == null)?'@EasyPanel/loginlayout.html.twig':$layoutlogin;
+        $this->panellogin = ($layoutlogin == null)?((\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'@EasyPanel/loginlayout.html.twig':'@EasyPanel/loginlayoutsf3.html.twig'):$layoutlogin;
         $this->panelmenu = ($menu == null)?'@EasyPanel/Default/menumaterial.html.twig':$menu;
         $this->panelnompreproyecto = ($nombreproyecto == null)?'':$nombreproyecto;
         $this->panelrutalogout = ($rutalogout == null)?'':$rutalogout;

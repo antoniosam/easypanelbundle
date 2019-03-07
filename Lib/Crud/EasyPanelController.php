@@ -98,12 +98,12 @@ class EasyPanelController
                 $this->namespacedircontroller = 'App\\Controller\\'.$this->panelbundle;
                 $this->namespacedirform = 'App\\Form\\'.$this->panelbundle;
                 $this->formnamespace = 'App\\Form\\'.$this->panelbundle.'\\'.$this->entity.'Type';
-                $this->pathpublicuploads = '/../web/uploads';
+                $this->pathpublicuploads = '/../public/uploads';
             }else{
                 $this->namespacedircontroller = $this->panelbundle.'\\Controller';
                 $this->namespacedirform = $this->panelbundle.'\\Form';
                 $this->formnamespace = $this->panelbundle.'\\Form\\'.$this->entity.'Type';
-                $this->pathpublicuploads = '/../public/uploads';
+                $this->pathpublicuploads = '/../web/uploads';
             }
 
 
@@ -150,7 +150,9 @@ class EasyPanelController
             'namespace' => $this->namespacedircontroller,
             'formnamespace' => $this->formnamespace,
             'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:'',
-            'pathpublicuploads' => $this->pathpublicuploads
+            'pathpublicuploads' => $this->pathpublicuploads,
+            'serviceautowire'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?', EasyPanelService $easypanel':'',
+            'serviceincontroller'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'$easypanel':'$this->get(EasyPanelService::class)',
         );
 
         $html = $this->templating->render('@EasyPanel/Crud/controller.easy.html.twig', $parametros);
@@ -217,7 +219,9 @@ class EasyPanelController
             'showlist' => '',
             'namespace' => $this->namespacedircontroller,
             'formnamespace' => $this->formnamespace,
-            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:''
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.$this->prefix:'',
+            'serviceautowire'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'EasyPanelService $easypanel':'',
+            'serviceincontroller'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'$easypanel':'$this->get(EasyPanelService::class)',
         );
 
 
@@ -263,7 +267,11 @@ class EasyPanelController
             'showlist' => '',
             'namespace' => $this->namespacedircontroller,
             'formnamespace' => $this->formnamespace,
-            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.str_replace('administrador','login',$ruta):''
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.str_replace('administrador','login',$ruta):'/login',
+            'serviceautowire'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?', EasyPanelService $easypanel':'',
+            'serviceincontroller'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'$easypanel':'$this->get(EasyPanelService::class)',
+            'authenticationautowire'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'AuthenticationUtils $authenticationUtils':'',
+            'authenticationincontroller'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'':'$authenticationUtils = $this->get(\'security.authentication_utils\');'
         );
 
         $parametros['ruta'] = str_replace('administrador','login',$ruta);
