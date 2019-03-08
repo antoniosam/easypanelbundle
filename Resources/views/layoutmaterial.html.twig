@@ -17,13 +17,14 @@
     <link href="{{ asset('admin/assets/material') }}/summernote/summernote.css" rel="stylesheet" />
     <link href="{{ asset('admin/assets/material') }}/summernote/summernote-bs4.css" rel="stylesheet" />
     <link href="{{ asset('admin/assets/material') }}/summernote/plugins/picture-upload/summernote-ext-picture-upload.css" rel="stylesheet" />
-    {% block css %}{% endblock %}
     <style>
         .btn.aire{
             margin:5px;
         }
         .frm-search-table .bmd-label-floating{left:initial!important;}
+        .table img.easypanel-img{ max-width: 100px;}
     </style>
+    {% block css %}{% endblock %}
 </head>
 
 <body class="">
@@ -259,6 +260,7 @@ $(document).ready(function() {
                     tabsize: 2,
                     focus: false
                 });
+                $('#'+id+'summernote').summernote('code', textarea.val());
             });
             form.on('submit',function(e){
                 $(this).find('.initsummernote').each(function(obj,callback){
