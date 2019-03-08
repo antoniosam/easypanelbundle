@@ -85,7 +85,7 @@ class {{ entity }}Controller extends Controller
         if($request->getMethod()=='POST'){
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                return $this->saveForm(${{ entity|lower }},true);
+                return $this->saveForm(${{ entity|lower }});
             }else{
                 $this->addFlash('error','Debes ingresar los datos corractamente');
             }
@@ -121,11 +121,16 @@ class {{ entity }}Controller extends Controller
     */
     public function editAction(Request $request, {{ entity }} ${{ entity|lower }}{{ serviceautowire }})
     {
+        $olds = [];
+{% for key,campo in campos %}
+{% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
+        $olds['{{ campo }}'] = ${{ entity|lower }}->get{{ campo|capitalize }}();
+{% endif %}
         $editForm = $this->createForm({{ form }}::class, ${{ entity|lower }});
         if($request->getMethod()=='POST'){
             $editForm->handleRequest($request);
             if ($editForm->isSubmitted() && $editForm->isValid()) {
-                return $this->saveForm(${{ entity|lower }});
+                return $this->saveForm(${{ entity|lower }},$olds);
             }else{
                 $this->addFlash('error','Debes ingresar los datos corractamente');
             }
@@ -163,7 +168,7 @@ class {{ entity }}Controller extends Controller
     * @param {{ entity }}|null ${{ entity|lower }}
     * @return bool|string
     */
-    private function saveForm( {{ entity }} ${{ entity|lower }}, $isnew = false){
+    private function saveForm( {{ entity }} ${{ entity|lower }}, array $old = null){
 
         $em = $this->getDoctrine()->getManager();
 {% for key,campo in campos %}
@@ -173,6 +178,8 @@ class {{ entity }}Controller extends Controller
             $new{{ campo }} = md5(microtime().'{{ key }}') .'.'.${{ campo }}->guessExtension();
             ${{ campo }}->move($this->getPublicUplodas(), $new{{ campo }} );
             ${{ entity|lower }}->set{{ campo|capitalize }}($new{{ campo }});
+        }else{
+            ${{ entity|lower }}->set{{ campo|capitalize }}($old['{{ campo }}']);
         }
 {% endif %}
 {% endfor %}
@@ -190,7 +197,7 @@ class {{ entity }}Controller extends Controller
 {% endif %}
         $em->persist(${{ entity|lower }});
         $em->flush();
-        if( $isnew ){
+        if( $old == null ){
             $this->addFlash('success','{{ entity }} registrado correctamente');
             return $this->redirectToRoute('{{ ruta }}_show', array('id'=>${{ entity|lower }}->getId()));
         }else{
