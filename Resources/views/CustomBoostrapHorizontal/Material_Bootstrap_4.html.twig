@@ -54,7 +54,7 @@
 {% block file_row -%}
     <div class="row">
         <div class="col-sm-12 col-12">
-            <div class="form-group custom-file-input material-custom-input " >
+            <div class="form-group custom-file-input material-custom-input bmd-form-group is-filled" >
                 {{- form_widget(form) -}}
                 {{- form_errors(form) -}}
             </div>{#--#}
@@ -64,7 +64,7 @@
 
 {% block file_widget -%}
     {%- set type = type|default('file') -%}
-    <label for="{{ form.vars.id }}" class="col-form-label"  >
+    <label for="{{ form.vars.id }}" class="col-form-label bmd-label-floating"  >
         {{- form.vars.label -}}
     </label>
     <div class=" custom-file-label" >
@@ -83,6 +83,10 @@
     </div>
 {%- endblock checkbox_row %}
 
+{% block choice_widget_collapsed -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' selectpicker')|trim,'data-style':'select-with-transition','data-size':'7'}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed %}
 
 {% block checkbox_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}

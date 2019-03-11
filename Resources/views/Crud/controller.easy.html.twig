@@ -45,6 +45,7 @@ class {{ entity }}Controller extends Controller
      */
     public function indexAction(Request $request{{ serviceautowire }})
     {
+        {{ '$this->' }}get('session')->set('menu-active', '{{ entity|lower }}');
         {{ '$em = $this->' }}getDoctrine()->getManager();
         $buscar = $request->get('buscar', '');
         $pagina = $request->get('pagina', 1);

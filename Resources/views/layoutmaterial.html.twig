@@ -18,11 +18,11 @@
     <link href="{{ asset('admin/assets/material') }}/summernote/summernote-bs4.css" rel="stylesheet" />
     <link href="{{ asset('admin/assets/material') }}/summernote/plugins/picture-upload/summernote-ext-picture-upload.css" rel="stylesheet" />
     <style>
-        .btn.aire{
-            margin:5px;
-        }
+        .btn.aire{ margin:5px; }
         .frm-search-table .bmd-label-floating{left:initial!important;}
         .table img.easypanel-img{ max-width: 100px;}
+        .dropdown.bootstrap-select{ background: none; }
+        .custom-file-label{margin-top: -20px;}
     </style>
     {% block css %}{% endblock %}
 </head>
@@ -242,6 +242,13 @@ $(document).ready(function() {
     });
     $('form').each(function (){
         var form =  $(this);
+        form.find('select').each(function(){
+            var select = $(this);
+            var id = select.attr('id');
+            form.find('label[for='+id+']').each(function(){
+                $(this).parent().addClass('is-filled');
+            });
+        });
         var has_summernote =  form.find('.initsummernote').length > 0;
         if(has_summernote){
             form.find('.initsummernote').each(function(obj,callback){

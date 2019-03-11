@@ -90,7 +90,7 @@ class EasyPanelMenu
         }
 
 
-        file_put_contents($this->panelbundledir.'/menu.html.twig',$html);
+        file_put_contents($this->panelbundledir.'/menu_gen.html.twig',$html);
 
         return 'Menu Creado con '.count($lista).' rutas';
     }

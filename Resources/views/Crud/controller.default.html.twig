@@ -27,6 +27,7 @@ class DefaultController extends Controller
      */
     public function dashboardAction({{ serviceautowire }})
     {
+        $this->get('session')->set('menu-active', 'dashboard');
         return {{ serviceincontroller|raw }}->renderTestDashboard();
     }
 
