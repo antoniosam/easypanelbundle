@@ -84,8 +84,20 @@ class EasyView
         for ($i = 0; $i < $limite; $i++) {
             $param = [];
             foreach ($opciones[$i]["parameters"] as $key => $campo):
-                $getter = 'get' . $campo;
-                $param[$key] = $objeto->$getter();
+                if(strpos($campo,'.')!==false){
+                    list($subobjeto,$submetodo)= explode('.',$campo);
+                    $temp = 'get' . $subobjeto;
+                    $sub = $objeto->$temp();
+                    if($sub!=null){
+                        $temp = 'get' . $submetodo;
+                        $param[$key] = $sub->$temp();
+                    }else{
+                        $param[$key] = null;
+                    }
+                }else{
+                    $getter = 'get' . $campo;
+                    $param[$key] = $objeto->$getter();
+                }
             endforeach;
             $opciones[$i]["parameters"] = $param;
         }
