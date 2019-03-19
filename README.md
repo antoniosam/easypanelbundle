@@ -93,7 +93,8 @@ $list->renderAsDate($columna)
 $list->renderAsTime($columna)
 $list->renderAsDateTime($columna)
 $list->renderAsRaw($columna)
-
+$list->renderAsJson($columna)
+$list->renderAsLink($columna,$path)
 ```
 **Version1.3.0**
 
@@ -170,13 +171,15 @@ $show->renderAsDate($columna)
 $list->renderAsTime($columna)
 $list->renderAsDateTime($columna)
 $show->renderAsRaw($columna)
+$list->renderAsJson($columna)
+$list->renderAsLink($columna,$path)
 ```
 
 **Notas**
 
-***renderAsImage***
+***renderAsImage*** y **renderAsLink**
   
-El metodo renderAsImage permite agregar una ruta para la correcta visualizacion de la imagen. 
+El metodo renderAsImage y renderAsLink permite agregar una ruta para la correcta visualizacion de la imagen o el archivo. 
 Si se ignora solo se antepone '/' para marcar la raiz del sitio
 ```
 $manager = $this->get('assets.packages');
@@ -188,7 +191,16 @@ $vista->renderAsImage('fotoperfil',$manager->getUrl('uploads/perfil'))
 ```
 Tomando en cuenta que el metodo **fotoperfil** devolviera un valor **fotousuario.jpg** el resultado html seria:
 ```
-<img src="/uploads/perfil/fotousuario.jpg" alt="Image" "class"="img-responsive easypanel-img">
+<img src="/uploads/perfil/fotousuario.jpg" alt="Image" class="img-responsive easypanel-img">
+
+
+...
+$vista->renderAsLink('archivo',$this->generateUrl('home_link',['file'=>$name]))
+...
+```
+Tomando en cuenta que el metodo **archivo** devolviera un valor **registro1.pdf** y el metodo generateUrl(Symfony 3 y 4) generaria */descargaregistro/*:
+```
+<a href="/descargaregistro/registro1.pdf" target="_blank"  class="img-responsive easypanel-link">registro1.pdf</a>
 ```
 
 ***Tablas relacionadas***
