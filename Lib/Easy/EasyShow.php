@@ -48,7 +48,8 @@ class EasyShow extends EasyView
     public function renderAsTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TIME;} }
     public function renderAsDateTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_FECHATIME;} }
     public function renderAsRaw ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_RAW;} }
-
+    public function renderAsLink ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_LINK; $this->paths[$columna]=$path;} }
+    public function renderAsJson ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_JSON;} }
 
     public function addLinkEdit( $route, $parametros, $nombre)
     {

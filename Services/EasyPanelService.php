@@ -46,6 +46,16 @@ class EasyPanelService
 
     }
 
+    function paramsRenderLayout(){
+        $parameters = [];
+        $parameters['layout'] = $this->panellayout;
+        $parameters['menu'] = $this->panelmenu;
+        $parameters['nombreproyecto'] = $this->panelnompreproyecto;
+        $parameters['rutalogout'] = $this->panelrutalogout;
+
+        return $parameters;
+    }
+
     function render($vista, Response $response = null)
     {
         if($vista instanceof EasyList){

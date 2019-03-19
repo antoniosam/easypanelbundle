@@ -17,6 +17,8 @@ class EasyView
     const RENDER_TIME = "time";
     const RENDER_FECHATIME = "datetime";
     const RENDER_RAW = "raw";
+    const RENDER_LINK = "link";
+    const RENDER_JSON = 'json';
 
     /**
      * @param $tipo
@@ -30,6 +32,24 @@ class EasyView
             return '<img src="' . str_replace('//','/',$path.'/'.$valor) . '" alt="Image" class="img-responsive easypanel-img" />';
         } elseif ($tipo == self::RENDER_BOOLEAN) {
             return is_null($valor) ? '<i class="fa fa-minus"></i>':(($valor==true)?'<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
+        } elseif ($tipo == self::RENDER_LINK) {
+            return '<a href="' . str_replace('//','/',$path.'/'.$valor) . '" target="_blank"  class="easypanel-link">'.$valor.'</a>';
+        } elseif ($tipo == self::RENDER_JSON) {
+            $list = json_decode($valor,true);
+            $html = '<ul>';
+            foreach ($list as $clave=>$item){
+                if(is_array($item)){
+                    $html .= '<ol>';
+                    foreach ($list as $clav=>$ite){
+                        $html .= '<li>'.$clave.' => '.json_encode($ite).'</li>';
+                    }
+                    $html .= '</ol>';
+                }else{
+                    $html .= '<li>'.$clave.' => '.$item.'</li>';
+                }
+            }
+            $html .= '<ul>';
+            return $html;
         } elseif ($tipo == self::RENDER_FECHA) {
             return is_null($valor)?'---':$valor->format("Y-m-d");
         } elseif ($tipo == self::RENDER_TIME) {

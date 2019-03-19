@@ -89,48 +89,14 @@ class EasyList extends EasyView
         $this->tableopciones[] = [];
     }
 
-    public function renderAsImage($columna, $path='')
-    {
-        if (isset($this->columnas[$columna])) {
-            $this->columnas[$columna] = self::RENDER_IMAGE;
-            $this->paths[$columna]=$path;
-        }
-    }
-
-    public function renderAsBoolean($columna)
-    {
-        if (isset($this->columnas[$columna])) {
-            $this->columnas[$columna] = self::RENDER_BOOLEAN;
-        }
-    }
-
-    public function renderAsDate($columna)
-    {
-        if (isset($this->columnas[$columna])) {
-            $this->columnas[$columna] = self::RENDER_FECHA;
-        }
-    }
-
-    public function renderAsTime($columna)
-    {
-        if (isset($this->columnas[$columna])) {
-            $this->columnas[$columna] = self::RENDER_TIME;
-        }
-    }
-
-    public function renderAsDateTime($columna)
-    {
-        if (isset($this->columnas[$columna])) {
-            $this->columnas[$columna] = self::RENDER_FECHATIME;
-        }
-    }
-
-    public function renderAsRaw($columna)
-    {
-        if (isset($this->columnas[$columna])) {
-            $this->columnas[$columna] = self::RENDER_RAW;
-        }
-    }
+    public function renderAsImage($columna, $path='') { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_IMAGE; $this->paths[$columna]=$path; } }
+    public function renderAsBoolean($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_BOOLEAN;}}
+    public function renderAsDate($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_FECHA; } }
+    public function renderAsTime($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_TIME; } }
+    public function renderAsDateTime($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_FECHATIME; } }
+    public function renderAsRaw($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_RAW; } }
+    public function renderAsLink ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_LINK; $this->paths[$columna]=$path;} }
+    public function renderAsJson ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_JSON;} }
 
     public function enableOrder($route,$parametros,$col=1,$direccion='ASC'){
         $this->ordenar = true;
