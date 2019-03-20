@@ -24,14 +24,32 @@ use {{ formnamespace }};
  */
 class {{ entity }}Controller extends Controller
 {
+    /**
+     * Las columnas que se mostraran en la vista de tabla
+     * @return array
+     */
     private function indexColumnsTable(){
         return ['{{ indexlist|join("', '")|raw }}'];
     }
 
+    /**
+     * La primera columna de la vista debe ser la 1
+     * @param $col
+     * @return string
+     */
     private function indexColumnsSearch(){
-        return ['{{ indexlist|join("', '")|raw }}'];
+        if($col >= 1){
+            $col --;
+            $campos = $this->indexColumnsTable();
+            return isset($campos[$col])? $campos[$col] : '';
+        }
+        return '';
     }
 
+    /**
+     * Columnas donde se realizara la busqueda(deberian ser menos que el indexColumnsTable )
+     * @return array
+     */
     private function indexColumnOrder($col){
         $campos = [1 => '{{ indexlist|join("', '")|raw }}'];
         return isset($campos[$col])? $campos[$col] : '';
@@ -46,6 +64,7 @@ class {{ entity }}Controller extends Controller
     public function indexAction(Request $request{{ serviceautowire }})
     {
         {{ '$this->' }}get('session')->set('menu-active', '{{ entity|lower }}');
+
         {{ '$em = $this->' }}getDoctrine()->getManager();
         $buscar = $request->get('buscar', '');
         $pagina = $request->get('pagina', 1);
@@ -88,7 +107,7 @@ class {{ entity }}Controller extends Controller
             if ($form->isSubmitted() && $form->isValid()) {
                 return $this->saveForm(${{ entity|lower }});
             }else{
-                $this->addFlash('error','Debes ingresar los datos corractamente');
+                $this->addFlash('warning','Debes ingresar los datos correctamente');
             }
         }
 
@@ -96,7 +115,10 @@ class {{ entity }}Controller extends Controller
 
         return {{ serviceincontroller|raw }}->render($view);
     }
-
+    /**
+     * Todos los campos que se  mostraran
+     * @return array
+     */
     private function showList(){
         return array('{{ showlist|join("', '")|raw }}');
     }
@@ -133,7 +155,7 @@ class {{ entity }}Controller extends Controller
             if ($editForm->isSubmitted() && $editForm->isValid()) {
                 return $this->saveForm(${{ entity|lower }},$olds);
             }else{
-                $this->addFlash('error','Debes ingresar los datos corractamente');
+                $this->addFlash('warning','Debes ingresar los datos correctamente');
             }
         }
 
@@ -156,20 +178,24 @@ class {{ entity }}Controller extends Controller
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+{% for key,campo in campos %}
+{% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
+            $this->deleteMedia(${{ entity|lower }}->get{{ campo|capitalize }}());
+{% endif %}
+{% endfor %}
             $em->remove(${{ entity|lower }});
             $em->flush();
-            $this->addFlash('success','{{ entity }} eliminado correctamente');
+            $this->addFlash('warning','{{ entity }} eliminado correctamente');
         }
         return $this->redirectToRoute('{{ ruta }}_index');
     }
 
     /**
-    * @param Request $request
-    * @param FormInterface $form
-    * @param {{ entity }}|null ${{ entity|lower }}
-    * @return bool|string
+    * @param {{ entity }} ${{ entity|lower }}
+    * @param array|null $olds
+    * @return \Symfony\Component\HttpFoundation\RedirectResponse
     */
-    private function saveForm( {{ entity }} ${{ entity|lower }}, array $old = null){
+    private function saveForm( {{ entity }} ${{ entity|lower }}, array $olds = null){
 
         $em = $this->getDoctrine()->getManager();
 {% for key,campo in campos %}
@@ -179,8 +205,9 @@ class {{ entity }}Controller extends Controller
             $new{{ campo }} = md5(microtime().'{{ key }}') .'.'.${{ campo }}->guessExtension();
             ${{ campo }}->move($this->getPublicUplodas(), $new{{ campo }} );
             ${{ entity|lower }}->set{{ campo|capitalize }}($new{{ campo }});
+            if(isset($olds['{{ campo }}'])){ $this->deleteMedia($olds['{{ campo }}']); }
         }else{
-            ${{ entity|lower }}->set{{ campo|capitalize }}($old['{{ campo }}']);
+            if(isset($olds['{{ campo }}'])){ ${{ entity|lower }}->set{{ campo|capitalize }}($olds['{{ campo }}']); }
         }
 {% endif %}
 {% endfor %}
@@ -189,7 +216,7 @@ class {{ entity }}Controller extends Controller
         * Este fragmento solo se debera de usar para crear el primer administrador
         * Se deberia borrar y configurar correctamente en otro controlador
         */
-        if($isnew){
+        if( $olds == null ){
             $salt = \Ast\CustomPassword\BuildPassword::randomSalt();
             $newpass = \Ast\CustomPassword\BuildPassword::create($administrador->getPass(),$salt);
             $administrador->setPass($newpass);
@@ -198,11 +225,11 @@ class {{ entity }}Controller extends Controller
 {% endif %}
         $em->persist(${{ entity|lower }});
         $em->flush();
-        if( $old == null ){
+        if( $olds == null ){
             $this->addFlash('success','{{ entity }} registrado correctamente');
             return $this->redirectToRoute('{{ ruta }}_show', array('id'=>${{ entity|lower }}->getId()));
         }else{
-            $this->addFlash('success','{{ entity }} actualizado correctamente');
+            $this->addFlash('info','{{ entity }} actualizado correctamente');
             return $this->redirectToRoute('{{ ruta }}_index', []);
         }
     }
@@ -219,6 +246,9 @@ class {{ entity }}Controller extends Controller
             ->getForm();
     }
 
+    /**
+     * @return string
+     */
     protected function getPublicUplodas(){
         if($this->container->hasParameter('public_dir_uploads')){
             $publicdir = $this->getParameter('public_dir_uploads');
@@ -229,6 +259,18 @@ class {{ entity }}Controller extends Controller
             mkdir($publicdir,0777,true);
         }
         return $publicdir;
+    }
+
+    /**
+     * @param $file
+     */
+    protected function deleteMedia($file){
+        if(!empty($file)){
+            $filename = $this->getPublicUplodas().'/'.$file;
+            if(file_exists($filename)){
+                unlink($filename);
+            }
+        }
     }
 
 
