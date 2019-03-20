@@ -29,7 +29,7 @@ class EasyView
     {
 
         if ($tipo == self::RENDER_IMAGE) {
-            return '<img src="' . str_replace('//','/',$path.'/'.$valor) . '" alt="Image" class="img-responsive easypanel-img" />';
+            return '<img src="' . str_replace('//','/',$path.'/'.$valor) . '" alt="Image" class="img-responsive img-fluid easypanel-img" />';
         } elseif ($tipo == self::RENDER_BOOLEAN) {
             return is_null($valor) ? '<i class="fa fa-minus"></i>':(($valor==true)?'<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
         } elseif ($tipo == self::RENDER_LINK) {
