@@ -149,6 +149,7 @@ class {{ entity }}Controller extends Controller
 {% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
         $olds['{{ campo }}'] = ${{ entity|lower }}->get{{ campo|capitalize }}();
 {% endif %}
+{% endfor %}
         $editForm = $this->createForm({{ form }}::class, ${{ entity|lower }});
         if($request->getMethod()=='POST'){
             $editForm->handleRequest($request);
