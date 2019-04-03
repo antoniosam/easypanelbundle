@@ -171,6 +171,9 @@
                 </div>
             </div>
             {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
+        {% elseif  card['type'] == 'html' %}
+            <!-- Card {{ card['type'] }} -->
+            {{ card['data']|raw }}
         {% endif %}
     {% endfor %}
     {% if has_includelayout %}{% include includelayout %}{% endif %}

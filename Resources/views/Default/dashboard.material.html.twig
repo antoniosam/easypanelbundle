@@ -152,7 +152,12 @@ Test Dashboard
                         bottom: 0,
                         left: 0
                     },
-                }
+                    plugins: [
+                        Chartist.plugins.ctPointLabels({
+                            textAnchor: 'middle'
+                        })
+                    ]
+                };
 
                 var dailySalesChart = new Chartist.Line('#dailySalesChart', dataDailySalesChart, optionsDailySalesChart);
 
@@ -184,7 +189,12 @@ Test Dashboard
                         bottom: 0,
                         left: 0
                     },
-                }
+                    plugins: [
+                        Chartist.plugins.ctPointLabels({
+                            textAnchor: 'middle'
+                        })
+                    ]
+                };
 
                 var dailySalesChart = new Chartist.Line('#dailySalesChart', dataDailySalesChart, optionsDailySalesChart);
 
@@ -212,8 +222,13 @@ Test Dashboard
                         right: 0,
                         bottom: 0,
                         left: 0
-                    }
-                }
+                    },
+                    plugins: [
+                        Chartist.plugins.ctPointLabels({
+                            textAnchor: 'middle'
+                        })
+                    ]
+                };
 
                 var completedTasksChart = new Chartist.Line('#completedTasksChart', dataCompletedTasksChart, optionsCompletedTasksChart);
 
@@ -241,7 +256,12 @@ Test Dashboard
                         right: 5,
                         bottom: 0,
                         left: 0
-                    }
+                    },
+                    plugins: [
+                        Chartist.plugins.ctPointLabels({
+                            textAnchor: 'middle'
+                        })
+                    ]
                 };
                 var responsiveOptions = [
                     ['screen and (max-width: 640px)', {

@@ -9,14 +9,14 @@
                     <div class="card">
                         <div class="card-header card-header-info">
                             <h4 class="card-title ">{{ card['data']['seccion'] }}</h4>
-                                {% if card['data']['has_new'] %}
-                                    <div class="new-top-table">
-                                        <a href="{{ path(card['data']['new']["route"],card['data']['new']["parameters"]) }}"
-                                           data-toggle="tooltip" title="{{ card['data']['new']["texto"] }}"
-                                           class="btn btn-round {{ card['data']['new']["clase"] }}"><i
-                                                    class="fa {{ card['data']['new']["fa_icon"] }}"></i></a>
-                                    </div>
-                                {% endif %}
+                            {% if card['data']['has_new'] %}
+                                <div class="new-top-table">
+                                    <a href="{{ path(card['data']['new']["route"],card['data']['new']["parameters"]) }}"
+                                       data-toggle="tooltip" title="{{ card['data']['new']["texto"] }}"
+                                       class="btn btn-round {{ card['data']['new']["clase"] }}"><i
+                                                class="fa {{ card['data']['new']["fa_icon"] }}"></i></a>
+                                </div>
+                            {% endif %}
 
                             <!--<p class="card-category"> Here is a subtitle for this table</p>-->
                         </div>
@@ -111,7 +111,7 @@
                                     {% else %}
                                         <tr>
                                             {% if card['data']['has_tabla_rutas'] %}
-                                            {% set colspan = card['data']['headers']|length +1  %}
+                                                {% set colspan = card['data']['headers']|length +1  %}
                                             {% else %}
                                                 {% set colspan = card['data']['headers']|length   %}
                                             {% endif %}
@@ -238,6 +238,9 @@
                 </div>
             </div>
             {% if card['data']['has_includelayout'] %}{% include card['data']['includelayout'] %}{% endif %}
+        {% elseif  card['type'] == 'html' %}
+            <!-- Card {{ card['type'] }} -->
+            {{ card['data']|raw }}
         {% endif %}
     {% endfor %}
     {% if has_includelayout %}{% include includelayout %}{% endif %}

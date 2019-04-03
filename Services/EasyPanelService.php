@@ -58,7 +58,32 @@ class EasyPanelService
 
     function render($vista, Response $response = null)
     {
-        if($vista instanceof EasyList){
+        if(is_array($vista)) {
+            $panel = new Panel();
+            $seccion = '';
+            foreach ($vista as $view){
+                if($view instanceof EasyList){
+                    $panel->addList($view);
+                    if($seccion == ''){
+                        $seccion = $view->getSeccion();
+                    }
+                }else if($view instanceof EasyShow){
+                    $panel->addShow($view);
+                    if($seccion == ''){
+                        $seccion = $view->getSeccion();
+                    }
+                }else if($view instanceof EasyForm) {
+                    $panel->addForm($view);
+                    if($seccion == ''){
+                        $seccion = $view->getSeccion();
+                    }
+                }else if(is_string($view) ) {
+                    $panel->addHtml($view);
+                }
+            }
+            $panel->setLocation($seccion);
+            $parameters = $panel->createView();
+        }elseif($vista instanceof EasyList){
             $panel = new Panel();
             $panel->addList($vista);
             $panel->setLocation($vista->getSeccion());
@@ -72,6 +97,10 @@ class EasyPanelService
             $panel = new Panel();
             $panel->addForm($vista);
             $panel->setLocation($vista->getSeccion());
+            $parameters = $panel->createView();
+        }else if(is_string($vista)){
+            $panel = new Panel();
+            $panel->addHtml($vista);
             $parameters = $panel->createView();
         }else if($vista instanceof Panel){
             $parameters = $vista->createView();

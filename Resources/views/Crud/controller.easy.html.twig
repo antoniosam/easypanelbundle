@@ -28,7 +28,10 @@ class {{ entity }}Controller extends Controller
      * Las columnas que se mostraran en la vista de tabla
      * @return array
      */
-    private function indexColumnsTable(){
+    private function indexColumnsTable($getcabeceras = false){
+        if($getcabeceras){
+            return ['{{ indexlist|join("', '")|raw }}'];
+        }
         return ['{{ indexlist|join("', '")|raw }}'];
     }
 
@@ -37,7 +40,7 @@ class {{ entity }}Controller extends Controller
      * @param $col
      * @return string
      */
-    private function indexColumnsSearch(){
+    private function indexColumnOrder($col){
         if($col >= 1){
             $col --;
             $campos = $this->indexColumnsTable();
@@ -50,9 +53,8 @@ class {{ entity }}Controller extends Controller
      * Columnas donde se realizara la busqueda(deberian ser menos que el indexColumnsTable )
      * @return array
      */
-    private function indexColumnOrder($col){
-        $campos = [1 => '{{ indexlist|join("', '")|raw }}'];
-        return isset($campos[$col])? $campos[$col] : '';
+    private function indexColumnsSearch(){
+        return ['{{ indexlist|join("', '")|raw }}'];
     }
 
     /**
@@ -93,11 +95,11 @@ class {{ entity }}Controller extends Controller
     }
 
     /**
-    * Create a new {{ entity }} entity.
-    *
-    * @Route("/new", name="{{ ruta }}_new")
-    * @Method({"GET", "POST"})
-    */
+     * Create a new {{ entity }} entity.
+     *
+     * @Route("/new", name="{{ ruta }}_new")
+     * @Method({"GET", "POST"})
+     */
     public function nuevoAction(Request $request{{ serviceautowire }})
     {
         ${{ entity|lower }} = new {{ entity }}();
@@ -119,15 +121,18 @@ class {{ entity }}Controller extends Controller
      * Todos los campos que se  mostraran
      * @return array
      */
-    private function showList(){
+    private function showList($getcabeceras = false){
+        if($getcabeceras){
+            return ['{{ showlist|join("', '")|raw }}'];
+        }
         return array('{{ showlist|join("', '")|raw }}');
     }
     /**
-    * Finds and displays a {{ entity }} entity.
-    *
-    * @Route("/{id}/show", name="{{ ruta }}_show", requirements={"id"="\d+"} )
-    * @Method("GET")
-    */
+     * Finds and displays a {{ entity }} entity.
+     *
+     * @Route("/{id}", name="{{ ruta }}_show", requirements={"id"="\d+"} )
+     * @Method("GET")
+     */
     public function showAction({{ entity }} ${{ entity|lower }}{{ serviceautowire }})
     {
         $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ ruta }}');
@@ -137,11 +142,11 @@ class {{ entity }}Controller extends Controller
     }
 
     /**
-    * Displays a form to edit an existing {{ entity }} entity.
-    *
-    * @Route("/{id}/edit", name="{{ ruta }}_edit", requirements={"id"="\d+"})
-    * @Method({"GET", "POST"})
-    */
+     * Displays a form to edit an existing {{ entity }} entity.
+     *
+     * @Route("/{id}/edit", name="{{ ruta }}_edit", requirements={"id"="\d+"})
+     * @Method({"GET", "POST"})
+     */
     public function editAction(Request $request, {{ entity }} ${{ entity|lower }}{{ serviceautowire }})
     {
         $olds = [];
@@ -168,11 +173,11 @@ class {{ entity }}Controller extends Controller
     }
 
     /**
-    * Deletes a {{ entity }} entity.
-    *
-    * @Route("/{id}", name="{{ ruta }}_delete", requirements={"id"="\d+"})
-    * @Method("DELETE")
-    */
+     * Deletes a {{ entity }} entity.
+     *
+     * @Route("/{id}/delete", name="{{ ruta }}_delete", requirements={"id"="\d+"})
+     * @Method("DELETE")
+     */
     public function deleteAction(Request $request, {{ entity }} ${{ entity|lower }})
     {
         $form = $this->generateDeleteForm(${{ entity|lower }});
@@ -192,10 +197,10 @@ class {{ entity }}Controller extends Controller
     }
 
     /**
-    * @param {{ entity }} ${{ entity|lower }}
-    * @param array|null $olds
-    * @return \Symfony\Component\HttpFoundation\RedirectResponse
-    */
+     * @param {{ entity }} ${{ entity|lower }}
+     * @param array|null $olds
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     private function saveForm( {{ entity }} ${{ entity|lower }}, array $olds = null){
 
         $em = $this->getDoctrine()->getManager();
@@ -214,9 +219,9 @@ class {{ entity }}Controller extends Controller
 {% endfor %}
 {% if  entity == "Administrador" %}
         /**
-        * Este fragmento solo se debera de usar para crear el primer administrador
-        * Se deberia borrar y configurar correctamente en otro controlador
-        */
+         * Este fragmento solo se debera de usar para crear el primer administrador
+         * Se deberia borrar y configurar correctamente en otro controlador
+         */
         if( $olds == null ){
             $salt = \Ast\CustomPassword\BuildPassword::randomSalt();
             $newpass = \Ast\CustomPassword\BuildPassword::create($administrador->getPass(),$salt);
@@ -236,9 +241,9 @@ class {{ entity }}Controller extends Controller
     }
 
     /**
-    * @param {{ entity }} ${{ entity|lower }}
-    * @return \Symfony\Component\Form\FormInterface
-    */
+     * @param {{ entity }} ${{ entity|lower }}
+     * @return \Symfony\Component\Form\FormInterface
+     */
     private function generateDeleteForm({{ entity }} ${{ entity|lower }})
     {
         return $this->createFormBuilder()

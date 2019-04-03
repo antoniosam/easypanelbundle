@@ -63,6 +63,14 @@ class Panel
         $this->matrix[] = array("type" => "show", "data" => $datos->generar());
     }
 
+    /**
+     * @param EasyShow $datos
+     */
+    public function addHtml($html)
+    {
+        $this->matrix[] = array("type" => "html", "data" => $html);
+    }
+
     public function createView()
     {
         return array('cards' => $this->matrix ,'location'=>$this->location ,"directories"=>$this->directories,"layout"=>$this->layout,'has_includelayout' => $this->hasincludelayout,'includelayout' => $this->includelayout);

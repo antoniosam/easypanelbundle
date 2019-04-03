@@ -68,6 +68,10 @@ class EasyList extends EasyView
         $this->nueva = true;
         $this->new = $this->opcion($route, $parametros, $texto, $clase, $fa_icon);
     }
+    public function clearNew(){
+        $this->nueva = false;
+        $this->new = null;
+    }
 
     public function tableLinkEdit($route, $parametros, $nombre)
     {
@@ -350,8 +354,11 @@ class EasyList extends EasyView
         $this->renderAsBoolean("activa");
         $this->renderAsImage("imagen");
         $this->renderAsImage("foto");
+        $this->renderAsImage("thumb");
         $this->renderAsDate("fecha");
         $this->renderAsDate("dia");
+        $this->renderAsDate("creado");
+        $this->renderAsDate("actualizado");
     }
 
     /**

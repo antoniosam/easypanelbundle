@@ -34,6 +34,14 @@ class EasyShow extends EasyView
     }
 
     /**
+     * @param $seccion
+     */
+    public function setSeccion($seccion)
+    {
+        $this->seccion = $seccion;
+    }
+
+    /**
      * @return string
      */
     public function getSeccion()
@@ -151,9 +159,12 @@ class EasyShow extends EasyView
         $this->renderAsBoolean("completado");
         $this->renderAsBoolean("activa");
         $this->renderAsImage("imagen");
+        $this->renderAsImage("thumb");
         $this->renderAsImage("foto");
         $this->renderAsDate("fecha");
         $this->renderAsDate("dia");
+        $this->renderAsDate("creado");
+        $this->renderAsDate("actualizado");
     }
     /**
      * @param $seccion
