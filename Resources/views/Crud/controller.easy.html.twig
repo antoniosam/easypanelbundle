@@ -87,6 +87,7 @@ class {{ entity }}Controller extends Controller
         $result = $paginar->getResult();
 
         $view = EasyList::easy('{{ seccion }}', $result['data'], $this->indexColumnsTable() , '{{ ruta }}');
+        $view->setCabeceras($this->indexColumnsTable(true));
         $view->enableOrder('{{ ruta }}_index' , [] , $col , $orden);
         $view->enableSearch('{{ ruta }}_index' , [] , $buscar);
         $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ ruta }}_index' , []);
@@ -136,6 +137,7 @@ class {{ entity }}Controller extends Controller
     public function showAction({{ entity }} ${{ entity|lower }}{{ serviceautowire }})
     {
         $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ ruta }}');
+        $view->setCabeceras($this->showList(true));
         $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
 
         return {{ serviceincontroller|raw }}->render($view);
@@ -209,7 +211,7 @@ class {{ entity }}Controller extends Controller
         if (${{ entity|lower }}->get{{ campo|capitalize }}() !== null) {
             ${{ campo }} = ${{ entity|lower }}->get{{ campo|capitalize }}();
             $new{{ campo }} = md5(microtime().'{{ key }}') .'.'.${{ campo }}->guessExtension();
-            ${{ campo }}->move($this->getPublicUplodas(), $new{{ campo }} );
+            ${{ campo }}->move($this->getPublicUploads(), $new{{ campo }} );
             ${{ entity|lower }}->set{{ campo|capitalize }}($new{{ campo }});
             if(isset($olds['{{ campo }}'])){ $this->deleteMedia($olds['{{ campo }}']); }
         }else{
@@ -255,7 +257,7 @@ class {{ entity }}Controller extends Controller
     /**
      * @return string
      */
-    protected function getPublicUplodas(){
+    protected function getPublicUploads(){
         if($this->container->hasParameter('public_dir_uploads')){
             $publicdir = $this->getParameter('public_dir_uploads');
         }else{
@@ -272,7 +274,7 @@ class {{ entity }}Controller extends Controller
      */
     protected function deleteMedia($file){
         if(!empty($file)){
-            $filename = $this->getPublicUplodas().'/'.$file;
+            $filename = $this->getPublicUploads().'/'.$file;
             if(file_exists($filename)){
                 unlink($filename);
             }
