@@ -267,7 +267,7 @@ class EasyPanelController
             'showlist' => '',
             'namespace' => $this->namespacedircontroller,
             'formnamespace' => $this->formnamespace,
-            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.str_replace('administrador','login',$ruta):'/login',
+            'prefix_controller_route' => (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'/'.str_replace('administrador','login',str_replace('/','_',$ruta)):'/login',
             'serviceautowire'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?', EasyPanelService $easypanel':'',
             'serviceincontroller'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'$easypanel':'$this->get(EasyPanelService::class)',
             'authenticationautowire'=> (\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4)?'AuthenticationUtils $authenticationUtils':'',

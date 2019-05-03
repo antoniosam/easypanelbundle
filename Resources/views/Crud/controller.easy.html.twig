@@ -24,13 +24,17 @@ use {{ formnamespace }};
  */
 class {{ entity }}Controller extends Controller
 {
+{% set titulos = [] %}
+{% for campo in indexlist %}
+{% set titulos[] = campo|capitalize %}
+{% endfor %}
     /**
      * Las columnas que se mostraran en la vista de tabla
      * @return array
      */
     private function indexColumnsTable($getcabeceras = false){
         if($getcabeceras){
-            return ['{{ indexlist|join("', '")|raw }}'];
+            return ['{{ titulos|join("', '")|raw }}'];
         }
         return ['{{ indexlist|join("', '")|raw }}'];
     }
@@ -118,13 +122,17 @@ class {{ entity }}Controller extends Controller
 
         return {{ serviceincontroller|raw }}->render($view);
     }
+{% set titulos = [] %}
+{% for campo in indexlist %}
+    {% set titulos[] = campo|capitalize %}
+{% endfor %}
     /**
      * Todos los campos que se  mostraran
      * @return array
      */
     private function showList($getcabeceras = false){
         if($getcabeceras){
-            return ['{{ showlist|join("', '")|raw }}'];
+            return ['{{ titulos|join("', '")|raw }}'];
         }
         return array('{{ showlist|join("', '")|raw }}');
     }
