@@ -7,6 +7,8 @@
 namespace Ast\EasyPanelBundle\Lib\Easy\View;
 
 
+use Symfony\Component\HttpFoundation\Request;
+
 class EasyView
 {
 
@@ -19,6 +21,84 @@ class EasyView
     const RENDER_RAW = "raw";
     const RENDER_LINK = "link";
     const RENDER_JSON = 'json';
+    const RENDER_ARRAY = 'array';
+    const RENDER_TRANSLATE = 'translate';
+
+    private $request;
+
+
+    /**
+     * @return Request
+     */
+    private function getRequest(){
+        if(is_null($this->request)){
+            $this->request = Request::createFromGlobals();
+        }
+        return $this->request;
+    }
+
+    /**
+     * @param object $object
+     * @param $columna
+     * @return string
+     */
+    protected function getValueObject($object,$columna){
+        if(strpos($columna,'translate')!==false) {
+            return $this->getOneValueObject($object, $columna) ;
+        }else if(strpos($columna,'~')!==false) {
+            $cadena = '';
+            foreach (explode('~', $columna) as $item) {
+                $cadena .= $this->getOneValueObject($object, $item) . ' ';
+            }
+            return $cadena;
+        }else if(strpos($columna,'_')!==false){
+            $cadena = '';
+            foreach (explode('_',$columna) as $item){
+                $cadena .= $this->getOneValueObject($object,$item);
+            }
+            return $cadena;
+        }else{
+            return $this->getOneValueObject($object,$columna);
+        }
+    }
+
+    /**
+     * @param object $object
+     * @param $columna
+     * @return array|string
+     */
+    protected function getOneValueObject($object,$columna){
+        if(strpos($columna,'translate') !== false){
+            list($unless,$campo) = explode('.',$columna);
+            if(strpos($campo,'~')===false){
+                $getter = 'get' . $campo;
+                return $object->translate($this->getRequest()->getLocale())->$getter();
+            }else{
+                list($camp,$idiomas) = explode('~',$campo);
+                $getter = 'get' . $camp;
+                $lista = [];
+                foreach (explode('|',$idiomas) as $idioma){
+                    $lista[$idioma] = $object->translate($idioma)->$getter();
+                }
+                return $lista;
+            }
+        }else if(strpos($columna,'.')!==false){
+            $lista = explode('.',$columna);
+            if(count($lista) == 2){
+                $tmp = 'get' . $lista[0];
+                $tmp2 = 'get' . $lista[1];
+                return ( !is_null($object->$tmp()) ) ? $object->$tmp()->$tmp2():'';
+            }else if(count($lista) == 3){
+                $tmp = 'get' . $lista[0];
+                $tmp2 = 'get' . $lista[1];
+                $tmp3 = 'get' . $lista[2];
+                return ( !is_null($object->$tmp()) ) ?  ( ( !is_null($object->$tmp()->$temp2()()) )? $object->$tmp()->$tmp2()->$tmp3() :'' ) : '';
+            }
+        }else{
+            $getter = 'get' . $columna;
+            return $object->$getter();
+        }
+    }
 
     /**
      * @param $tipo
@@ -27,8 +107,15 @@ class EasyView
      */
     protected function renderColumna($tipo, $valor,$path='')
     {
+        if($tipo == self::RENDER_TEXTO && is_array($valor)){
+            $tipo = self::RENDER_ARRAY;
+        }elseif ($tipo == self::RENDER_TEXTO && $valor instanceof \DateTime){
+            $tipo = self::RENDER_FECHATIME;
+        }
 
-        if ($tipo == self::RENDER_IMAGE) {
+        if ($tipo == self::RENDER_TEXTO) {
+            return '<p>' . $valor . '</p>';
+        }elseif ($tipo == self::RENDER_IMAGE) {
             return '<img src="' . str_replace('//','/',$path.'/'.$valor) . '" alt="Image" class="img-responsive img-fluid easypanel-img" />';
         } elseif ($tipo == self::RENDER_BOOLEAN) {
             return is_null($valor) ? '<i class="fa fa-minus"></i>':(($valor==true)?'<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
@@ -50,12 +137,37 @@ class EasyView
             }
             $html .= '<ul>';
             return $html;
+        } elseif ($tipo == self::RENDER_ARRAY) {
+            $html = '<ul>';
+            foreach ($valor as $clave=>$item){
+                $html .= '<li>'.$clave.' => '.$item.'</li>';
+            }
+            $html .= '<ul>';
+            return $html;
         } elseif ($tipo == self::RENDER_FECHA) {
             return is_null($valor)?'---':$valor->format("Y-m-d");
         } elseif ($tipo == self::RENDER_TIME) {
             return is_null($valor)?'---':$valor->format("H:i:s");
         } elseif ($tipo == self::RENDER_FECHATIME) {
             return is_null($valor)?'---':$valor->format("Y-m-d H:i:s");
+        } elseif ($tipo == self::RENDER_TRANSLATE) {
+            if(!is_null($valor)){
+                if(!is_array($valor)){
+                    $tmp = $valor;
+                    $valor = [$tmp];
+                }
+                $html = '';
+                foreach ($valor as $idioma => $val):
+                    $html .= '<div class="render-translate-item row ">';
+                    $html .= '<div class="render-translate-languaje col-1 col-sm-1">'.$idioma.'</div>';
+                    $html .= '<div class="render-translate-content col-10 col-sm-10">'.$val.'</div>';
+                    $html .= '</div>';
+                endforeach;
+                $html .= '';
+            }else{
+                $html = 'NULL';
+            }
+            return $html;
         } elseif ($tipo == self::RENDER_RAW) {
             return $valor;
         } else {

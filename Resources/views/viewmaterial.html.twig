@@ -172,8 +172,8 @@
                         <div class="card-body">
                             {% for fila in   card['data']['filas'] %}
                                 <div class="row">
-                                    <p class="col-4">{{ fila['label'] }}</p>
-                                    <p class="col-8">{{ fila['valor']|raw }}</p>
+                                    <div class="col-4"><p>{{ fila['label'] }}</p></div>
+                                    <div class="col-8">{{ fila['valor']|raw }}</div>
                                 </div>
                             {% endfor %}
                         </div>

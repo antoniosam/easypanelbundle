@@ -58,6 +58,8 @@ class EasyShow extends EasyView
     public function renderAsRaw ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_RAW;} }
     public function renderAsLink ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_LINK; $this->paths[$columna]=$path;} }
     public function renderAsJson ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_JSON;} }
+    public function renderAsArray ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_ARRAY;} }
+    public function renderAsTranslate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TRANSLATE;} }
 
     public function addLinkEdit( $route, $parametros, $nombre)
     {
@@ -126,23 +128,9 @@ class EasyShow extends EasyView
             if(count($this->paths)>0){
                 $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
             }
-            if(strpos($columna,'.')!==false){
-                list($subobjeto,$submetodo)= explode('.',$columna);
-                $temp = 'get' . $subobjeto;
-                $sub = $this->consulta->$temp();
-                if($sub!=null){
-                    $temp = 'get' . $submetodo;
-                    $value = $this->renderColumna($tipo, $sub->$temp(),$path);
-                    $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $value);
-                }else{
-                    $value = '';
-                    $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $value);
-                }
-            }else{
-                $getter = 'get' . $columna;
-                $temp = $this->renderColumna($tipo, $this->consulta->$getter(),$path);
-                $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $temp);
-            }
+            $value = $this->getValueObject($this->consulta,$columna);
+            $html = $this->renderColumna($tipo, $value , $path);
+            $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $html);
             $key++;
         }
         $return["filas"] = $fila;
@@ -159,12 +147,9 @@ class EasyShow extends EasyView
         $this->renderAsBoolean("completado");
         $this->renderAsBoolean("activa");
         $this->renderAsImage("imagen");
-        $this->renderAsImage("thumb");
         $this->renderAsImage("foto");
         $this->renderAsDate("fecha");
         $this->renderAsDate("dia");
-        $this->renderAsDate("creado");
-        $this->renderAsDate("actualizado");
     }
     /**
      * @param $seccion

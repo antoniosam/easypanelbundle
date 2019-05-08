@@ -203,6 +203,32 @@ Tomando en cuenta que el metodo **archivo** devolviera un valor **registro1.pdf*
 <a href="/descargaregistro/registro1.pdf" target="_blank"  class="img-responsive easypanel-link">registro1.pdf</a>
 ```
 
+### TRANSLATE
+Para aplicar la traduccion este bundle se basa en la configuracion de **knplabs/doctrine-behaviors**
+https://github.com/KnpLabs/DoctrineBehaviors
+
+Para poder aplicarlo solo se debe configurar la columna 
+```
+[...,'translate.titulo',...]
+```
+
+Por default la traduccion sera con el parametro locale de la clase Request de Symfony
+
+Para poder ver varias traducciones al mismo tiempo se agregan los idiomas a la columna
+```
+[...,'translate.titulo~en|es',...]
+[...,'translate.titulo~en|es|it',...]
+```
+***renderAsTranslate***
+
+Y por ultimo para poder visulizar la traduccion se creo el metodo renderAsTranslate 
+```
+$view->renderAsTranslate('translate.titulo');
+$view->renderAsTranslate('translate.titulo~en|es');
+$view->renderAsTranslate('translate.titulo~en|es|it');
+```
+
+
 ***Tablas relacionadas***
 
 Si se tiene una consulta relacionado lo que generaria tener un objeto de la relacion en lugar de un valor definido. Se puede elegir el metodo que desea visualizar el objeto relacionado

@@ -49,6 +49,14 @@ class EasyList extends EasyView
     }
 
     /**
+     * @param string $seccion
+     */
+    public function setSeccion($seccion)
+    {
+        $this->seccion = $seccion;
+    }
+
+    /**
      * @return string
      */
     public function getSeccion()
@@ -101,6 +109,8 @@ class EasyList extends EasyView
     public function renderAsRaw($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_RAW; } }
     public function renderAsLink ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_LINK; $this->paths[$columna]=$path;} }
     public function renderAsJson ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_JSON;} }
+    public function renderAsArray ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_ARRAY;} }
+    public function renderAsTranslate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TRANSLATE;} }
 
     public function enableOrder($route,$parametros,$col=1,$direccion='ASC'){
         $this->ordenar = true;
@@ -198,7 +208,7 @@ class EasyList extends EasyView
             $back['columna']=$this->orderby['columna'];
             $back['orden']=$this->orderby['orden'];
         }
-        $back['pagina'] = $page;
+        $back['p'] = $page;
         return $back;
 
     }
@@ -243,25 +253,15 @@ class EasyList extends EasyView
         foreach ($this->consulta as $objet) {
             $fila = array();
             foreach ($this->columnas as $columna => $tipo) {
-                if(count($this->paths)>0){
-                    $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
+                if (count($this->paths) > 0) {
+                    $path = (isset($this->paths[$columna])) ? $this->paths[$columna] : '';
                 }
-                if($this->firstColumnCount && $firstcolum == $columna){
+                if ($this->firstColumnCount && $firstcolum == $columna) {
                     $fila[] = $this->firstColumnCountInit;
                     $this->firstColumnCountInit++;
-                }elseif(strpos($columna,'.')!==false){
-                    list($subobjeto,$submetodo)= explode('.',$columna);
-                    $temp = 'get' . $subobjeto;
-                    $sub = $objet->$temp();
-                    if($sub!=null){
-                        $temp = 'get' . $submetodo;
-                        $fila[] = $this->renderColumna($tipo, $sub->$temp(),$path);
-                    }else{
-                        $fila[] = '';
-                    }
-                }else{
-                    $temp = 'get' . $columna;
-                    $fila[] = $this->renderColumna($tipo, $objet->$temp(),$path);
+                } else {
+                    $value = $this->getValueObject($objet, $columna);
+                    $fila[] = $this->renderColumna($tipo, $value, $path);
                 }
             }
             $filas[] = array('fila' => $fila, 'rutas' => $this->generateParameters($objet, $this->tableopciones));
@@ -354,11 +354,9 @@ class EasyList extends EasyView
         $this->renderAsBoolean("activa");
         $this->renderAsImage("imagen");
         $this->renderAsImage("foto");
-        $this->renderAsImage("thumb");
         $this->renderAsDate("fecha");
         $this->renderAsDate("dia");
         $this->renderAsDate("creado");
-        $this->renderAsDate("actualizado");
     }
 
     /**
