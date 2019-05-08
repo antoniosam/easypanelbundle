@@ -92,7 +92,7 @@ class EasyView
                 $tmp = 'get' . $lista[0];
                 $tmp2 = 'get' . $lista[1];
                 $tmp3 = 'get' . $lista[2];
-                return ( !is_null($object->$tmp()) ) ?  ( ( !is_null($object->$tmp()->$temp2()()) )? $object->$tmp()->$tmp2()->$tmp3() :'' ) : '';
+                return ( !is_null($object->$tmp()) ) ?  ( ( !is_null($object->$tmp()->$tmp2()) )? $object->$tmp()->$tmp2()->$tmp3() :'' ) : '';
             }
         }else{
             $getter = 'get' . $columna;
