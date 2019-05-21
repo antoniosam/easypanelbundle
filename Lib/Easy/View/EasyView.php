@@ -69,7 +69,17 @@ class EasyView
      */
     protected function getOneValueObject($object,$columna){
         if(strpos($columna,'translate') !== false){
-            list($unless,$campo) = explode('.',$columna);
+            $campo = substr($columna,10);
+            if(strpos($campo,'.')!==false) {
+                list($subobject,$cmp) = explode('.', $campo);
+                $getter = 'get'.$subobject;
+                if($object->$getter() != null){
+                    $object = $object->$getter();
+                    $campo = $cmp;
+                }else{
+                    return '';
+                }
+            }
             if(strpos($campo,'~')===false){
                 $getter = 'get' . $campo;
                 return $object->translate($this->getRequest()->getLocale())->$getter();
