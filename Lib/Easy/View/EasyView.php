@@ -125,12 +125,14 @@ class EasyView
 
         if ($tipo == self::RENDER_TEXTO) {
             return '<p>' . $valor . '</p>';
-        }elseif ($tipo == self::RENDER_IMAGE) {
-            return '<img src="' . str_replace('//','/',$path.'/'.$valor) . '" alt="Image" class="img-responsive img-fluid easypanel-img" />';
         } elseif ($tipo == self::RENDER_BOOLEAN) {
             return is_null($valor) ? '<i class="fa fa-minus"></i>':(($valor==true)?'<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
+        }elseif ($tipo == self::RENDER_IMAGE) {
+            $url = (strpos($path,$valor)!==false)? $path :str_replace('//','/',$path.'/'.$valor);
+            return '<img src="' . $url . '" alt="Image" class="img-responsive img-fluid easypanel-img" />';
         } elseif ($tipo == self::RENDER_LINK) {
-            return '<a href="' . str_replace('//','/',$path.'/'.$valor) . '" target="_blank"  class="easypanel-link">'.$valor.'</a>';
+            $url = (strpos($path,$valor)!==false)? $path :str_replace('//','/',$path.'/'.$valor);
+            return '<a href="' . $url . '" target="_blank"  class="easypanel-link">'.$valor.'</a>';
         } elseif ($tipo == self::RENDER_JSON) {
             $list = json_decode($valor,true);
             $html = '<ul>';

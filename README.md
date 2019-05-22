@@ -179,7 +179,11 @@ $list->renderAsLink($columna,$path)
 
 ***renderAsImage*** y **renderAsLink**
   
-El metodo renderAsImage y renderAsLink permite agregar una ruta para la correcta visualizacion de la imagen o el archivo. 
+El metodo renderAsImage y renderAsLink permite agregar una ruta para la correcta visualizacion de la imagen o el archivo.
+ 
+Si en la ruta que se proporciona ya incluye el nombre del archivo se usa esa por defecto, si no lo incluye se contruye con el valor de path y el valor del archivo
+  ``$path.'/'.$valor``
+ 
 Si se ignora solo se antepone '/' para marcar la raiz del sitio
 ```
 $manager = $this->get('assets.packages');
@@ -191,17 +195,26 @@ $vista->renderAsImage('fotoperfil',$manager->getUrl('uploads/perfil'))
 ```
 Tomando en cuenta que el metodo **fotoperfil** devolviera un valor **fotousuario.jpg** el resultado html seria:
 ```
+$vista->renderAsImage('fotoperfil',$manager->getUrl('uploads/perfil'))
+...
 <img src="/uploads/perfil/fotousuario.jpg" alt="Image" class="img-responsive easypanel-img">
+```
+Para el metodo renderAslink se sugiere utilizar el metodo **generateUrl** de symfony
 
+Tomando en cuenta que el metodo **archivo** devolviera un valor **registro1.pdf** y tomando un ejemplo de de ruta ``file_preview`` con la configuracion ``/vista/{archivo}/preview`` obtendriamos
 
+```
+$vista->renderAsLink('fotoperfil',$this->generateUrl('file_preview',['archivo'=>$objeto->getArchivo()]))
 ...
-$vista->renderAsLink('archivo',$this->generateUrl('home_link',['file'=>$name]))
+<a href="/vista/registro1.pdf/preview" target="_blank"  class="img-responsive easypanel-link">registro1.pdf</a>
+```
+Si no se incluye el nombre del archivo en la ruta generada solo se incluye al final
+```
+$vista->renderAsLink('fotoperfil','/vista-archivo/preview')
 ...
+<a href="/vista-archivo/preview/registro1.pdf" target="_blank"  class="img-responsive easypanel-link">registro1.pdf</a>
 ```
-Tomando en cuenta que el metodo **archivo** devolviera un valor **registro1.pdf** y el metodo generateUrl(Symfony 3 y 4) generaria */descargaregistro/*:
-```
-<a href="/descargaregistro/registro1.pdf" target="_blank"  class="img-responsive easypanel-link">registro1.pdf</a>
-```
+
 
 ### TRANSLATE
 Para aplicar la traduccion este bundle se basa en la configuracion de **knplabs/doctrine-behaviors**
