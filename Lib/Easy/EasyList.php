@@ -208,7 +208,7 @@ class EasyList extends EasyView
             $back['columna']=$this->orderby['columna'];
             $back['orden']=$this->orderby['orden'];
         }
-        $back['p'] = $page;
+        $back['pagina'] = $page;
         return $back;
 
     }
