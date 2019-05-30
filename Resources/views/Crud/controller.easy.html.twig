@@ -25,8 +25,10 @@ use {{ formnamespace }};
 class {{ entity }}Controller extends Controller
 {
 {% set titulos = [] %}
+{% set tmp = "" %}
 {% for campo in indexlist %}
-{% set titulos[] = campo|capitalize %}
+{% set tmp = campo|capitalize %}
+{% set titulos = titulos|merge([tmp]) %}
 {% endfor %}
     /**
      * Las columnas que se mostraran en la vista de tabla
@@ -123,8 +125,10 @@ class {{ entity }}Controller extends Controller
         return {{ serviceincontroller|raw }}->render($view);
     }
 {% set titulos = [] %}
+{% set tmp = "" %}
 {% for campo in indexlist %}
-    {% set titulos[] = campo|capitalize %}
+    {% set tmp = campo|capitalize %}
+    {% set titulos = titulos|merge([tmp]) %}
 {% endfor %}
     /**
      * Todos los campos que se  mostraran
