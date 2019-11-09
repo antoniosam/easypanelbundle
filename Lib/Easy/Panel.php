@@ -11,6 +11,9 @@ use Ast\EasyPanelBundle\Lib\Easy\EasyShow;
 
 class Panel
 {
+    
+    public const PANEL_HTML = 1;
+    public  const PANEL_API = 2;
     private $matrix = [];
     private $location = "My Dashboard";
     private $directories = [];
@@ -19,9 +22,11 @@ class Panel
 
     private $hasincludelayout = false;
     private $includelayout;
+    private $typePanel = 0;
 
-    function __construct($layout=null)
+    function __construct($typePanel = self::PANEL_HTML, $layout = null)
     {
+        $this->typePanel =  $typePanel;
         $this->layout = (is_null($layout))?'layout.html.twig':$layout;
     }
 
@@ -52,7 +57,13 @@ class Panel
      */
     public function addList(EasyList $datos)
     {
-        $this->matrix[] = array("type" => "list", "data" => $datos->generar());
+        if($this->typePanel == self::PANEL_HTML){
+            $this->matrix[] = array("type" => "list", "data" => $datos->generar());
+        }else if($this->typePanel == self::PANEL_API){
+            $api = $datos->generatetoApi();
+            $this->matrix[$api['seccion']] = $api['data'];
+        }
+
     }
 
     /**
@@ -60,7 +71,12 @@ class Panel
      */
     public function addShow(EasyShow $datos)
     {
-        $this->matrix[] = array("type" => "show", "data" => $datos->generar());
+        if($this->typePanel == self::PANEL_HTML){
+            $this->matrix[] = array("type" => "show", "data" => $datos->generatetoHtml());
+        }else if($this->typePanel == self::PANEL_API){
+            $api = $datos->generatetoApi();
+            $this->matrix[$api['seccion']] = $api['data'];
+        }
     }
 
     /**
@@ -71,6 +87,18 @@ class Panel
         $this->matrix[] = array("type" => "html", "data" => $html);
     }
 
+    public function create()
+    {
+        if($this->typePanel == self::PANEL_HTML){
+            return array('cards' => $this->matrix ,'location'=>$this->location ,"directories"=>$this->directories,"layout"=>$this->layout,'has_includelayout' => $this->hasincludelayout,'includelayout' => $this->includelayout);
+        }else if($this->typePanel == self::PANEL_API){
+            return $this->matrix;
+        }
+        
+    }
+    /**
+     * @deprecated deprecated since version 2.5
+     */
     public function createView()
     {
         return array('cards' => $this->matrix ,'location'=>$this->location ,"directories"=>$this->directories,"layout"=>$this->layout,'has_includelayout' => $this->hasincludelayout,'includelayout' => $this->includelayout);

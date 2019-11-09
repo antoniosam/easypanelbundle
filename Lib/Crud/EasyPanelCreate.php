@@ -9,6 +9,7 @@ namespace Ast\EasyPanelBundle\Lib\Crud;
 
 use Ast\EasyPanelBundle\Lib\Crud\Utils\InfoEntityImport;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
+use namespace Ast\EasyPanelBundle\Lib\Easy\Panel;
 
 class EasyPanelCreate
 {
@@ -21,6 +22,7 @@ class EasyPanelCreate
     protected $em;
     protected $templating;
     protected $kernel_project_dir;
+    protected $panelType;
     protected $proyecto;
     protected $panelbundledir;
     protected $panelbundle;
@@ -32,6 +34,7 @@ class EasyPanelCreate
         \Doctrine\ORM\EntityManager $entityManager,
         \Twig_Environment $templating,
         $kernel_project_dir,
+        $panelType,
         $proyecto,
         $panelbundle,
         $entitybundle,
@@ -41,7 +44,8 @@ class EasyPanelCreate
     {
         $this->em = $entityManager;
         $this->templating = $templating;
-        $this->kernel_project_dir = $kernel_project_dir ;
+        $this->kernel_project_dir = $kernel_project_dir;
+        $this->panelType = $panelType;
         $this->proyecto = $proyecto;
         $this->panelbundle = $panelbundle;
         $this->entitybundle = $entitybundle;
@@ -56,9 +60,11 @@ class EasyPanelCreate
         if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
             $entity = 'Default';
             $ruta = $this->prefix.'_'.strtolower($entity);
-            $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$entity,$this->prefix,$ruta,ucfirst(''));
-            $crud->createDefaultController();
-
+            if($this->panelType == Panel::PANEL_HTML){
+                $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelType,$this->panelbundle,$entity,$this->prefix,$ruta,ucfirst(''));
+                $crud->createDefaultController();    
+            }
+            
             $listaclases = InfoEntityImport::folder($this->em,$this->kernel_project_dir.$this->entitybundle);
             $listaclases = $this->excluirEntidades($listaclases);
             $creados = [];
@@ -70,12 +76,12 @@ class EasyPanelCreate
                     $entity = Util::getFileNamespace($clase);
                     $ruta = $this->prefix.'_'.strtolower($entity);
                     if(strtolower($entity) == 'administrador'){
-                        $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst(''));
+                        $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelType,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst(''));
                         $crud->createLoginController();
                     }
 
-                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity));
-                    $tmp = $crud->create($ignorar);
+                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelType,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity),$ignorar);
+                    $tmp = $crud->createController();
                     $creados[] = $tmp;
                     $instrucciones .= $tmp.PHP_EOL;
                     $listaentitys[] = $entity;
@@ -97,8 +103,10 @@ class EasyPanelCreate
 
             $entity = 'Default';
             $ruta = $this->prefix.'_'.strtolower($entity);
-            $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$entity,$this->prefix,$ruta,ucfirst(''));
-            $crud->createDefaultController();
+            if($this->panelType == Panel::PANEL_HTML){
+                $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$entity,$this->prefix,$ruta,ucfirst(''));
+                $crud->createDefaultController();
+            }
 
             $listaclases = InfoEntityImport::folder($this->em,$this->kernel_project_dir.$this->entitybundle);
             $listaclases = $this->excluirEntidades($listaclases);
@@ -114,8 +122,8 @@ class EasyPanelCreate
                         $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst(''));
                         $crud->createLoginController();
                     }
-                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity));
-                    $tmp = $crud->create($ignorar);
+                    $crud = new EasyPanelController($this->em,$this->templating,$this->kernel_project_dir,$this->panelbundle,$clase,$this->prefix,$ruta,ucfirst($entity),$ignorar);
+                    $tmp = $crud->createController();
                     $creados[] = $tmp;
                     $instrucciones .= $tmp.PHP_EOL;
                     $listaentitys[] = $entity;

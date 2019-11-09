@@ -64,8 +64,13 @@ class EasyList extends EasyView
         return $this->seccion;
     }
 
+    public function setLabelsTable(array $labels){
+        $this->cabeceras = $labels;
+    }
 
-
+    /**
+     * @deprecated deprecated since version 2.5
+     */
     public function setCabeceras(array $cabceras)
     {
         $this->cabeceras = $cabceras;
@@ -162,8 +167,6 @@ class EasyList extends EasyView
         $this->includelayout = $includelayout;
     }
 
-
-
     /**
      * @param $totalresults
      * @param $pagina
@@ -212,6 +215,7 @@ class EasyList extends EasyView
         return $back;
 
     }
+
     public function addPages(array $array){
         foreach ($array as $item){
             if(count($item)==3){
@@ -220,7 +224,6 @@ class EasyList extends EasyView
                 $this->addPage($item[0],$item[1],$item[2],$item[3]);
             }
         }
-
     }
 
     public function setPageInfo($pageinfo){
@@ -236,7 +239,103 @@ class EasyList extends EasyView
         $this->paginacion[] = array('route'=>$route,'parameters'=>$parameters,'texto'=>$pagina,'class'=>$class);
     }
 
+    public function fetchData($consulta){
+        $this->cabeceras = $this->defineHeaders($this->columnas,$this->cabeceras);
+        $key = 0;
+        $object = [];
+        foreach ($this->columnas as $columna=>$type) {
+            $path = '';
+            if(count($this->paths)>0){
+                $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
+            }
+            $value = $this->getValueObject($consulta,$columna);
+            $dataObject = $this->formatValue($type, $value , $path);
+            $object[] = array('label' => $this->cabeceras[$key], 'value' => $dataObject, 'type' => $type);
+            $key++;
+        }
+        return $object;
+    }
+
     /**
+     * @return array
+     */
+    public function generatetoHtml()
+    {
+        $return = array();
+        $return["seccion"] = $this->seccion;
+
+        $return["headers"] = $this->defineHeaders($this->columnas, $this->cabeceras);
+        $filas = [];
+        $path ='';
+        reset($this->columnas);
+        $firstcolum = key($this->columnas);
+        //echo $firstcolum;
+        foreach ($this->consulta as $objet) {
+            $fila = array();
+            foreach ($this->fetchData($objet) as $item) {
+                if (count($this->paths) > 0) {
+                    $path = (isset($this->paths[$columna])) ? $this->paths[$columna] : '';
+                }
+                $fila[] = ['label' => $item['label'], 'valor' =>  $this->renderColumna( $item['type'] , $item['value'] )];
+                if ($this->firstColumnCount && $firstcolum == $columna) {
+                    $fila[] = $this->firstColumnCountInit;
+                    $this->firstColumnCountInit++;
+                } else {
+                    $fila[] = $this->renderColumna( $item['type'] , $item['value'] );
+                }
+            }
+            $filas[] = array('fila' => $fila, 'rutas' => $this->generateParameters($objet, $this->tableopciones));
+        }
+        $return["tabla"] = $filas;
+        $return["has_tabla_rutas"] = count($this->tableopciones);
+        $return["has_new"] = $this->nueva;
+        $return["new"] = $this->new;
+        $return["has_search"] = $this->buscar;
+        $return["search"] = $this->busqueda;
+        if($this->paginar && count($this->autopaginate)>0){
+            $this->generatePagination();
+        }
+        $return["has_paginate"] = $this->paginar;
+        $return["pages"] = $this->paginacion;
+        $return['page_info'] = $this->paginainfo;
+        $return["has_order"] = $this->ordenar;
+        if($this->ordenar){
+            $param = $this->orderby['parameters'];
+            $columna = $this->orderby['columna']==null ? 1 : $this->orderby['columna'];
+            $direccion = $this->orderby['columna']==null ? 'ASC' : $this->orderby['orden'];
+            if($this->buscar){
+                if(trim($this->busqueda['value'])!=''){
+                    $param['buscar']= $this->busqueda['value'];
+                }
+            }
+            $return["order"]=['route'=>$this->orderby['route'],'parameters'=>$param,'columna'=>$columna,'orden'=>$direccion];
+        }
+        $return["rutas"] = $this->opciones;
+        $return["has_includelayout"] = $this->hasincludelayout;
+        $return["includelayout"] = $this->includelayout;
+
+        return $return;
+    }
+
+    /**
+     * @return array
+     */
+    public function generatetoApi()
+    {
+        $filas = [];
+        $path ='';
+        foreach ($this->consulta as $objet) {
+            $fila = [];
+            foreach ($this->fetchData($objet) as $item) {
+                $fila[$item['label']] = $item['value'];
+            }
+            $filas[] = $fila;
+        }
+        return ['seccion'=>$this->seccion,'data'=> $filas];
+    }
+
+    /**
+     * @deprecated deprecated since version 2.5
      * @return array
      */
     public function generar()
@@ -368,7 +467,7 @@ class EasyList extends EasyView
      */
     public static function easy($seccion, $consulta, $columnas, $prefix = null)
     {
-        $list = new EasyList("Lista de " . $seccion, $consulta, $columnas);
+        $list = new EasyList( $seccion, $consulta, $columnas);
         $list->fixRenders();
         if(!empty($prefix)){
             $list->tableLinkShow($prefix . '_show', array("id" => "id"), "Ver " . $seccion);

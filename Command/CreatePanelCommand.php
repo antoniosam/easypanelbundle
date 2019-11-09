@@ -29,9 +29,8 @@ class CreatePanelCommand extends  ContainerAwareCommand
             ->addArgument('proyecto', InputArgument::REQUIRED, 'Nombre del proyecto')
             ->addArgument('directorio_bundle', InputArgument::REQUIRED, 'Carpeta o Bundle donde se creara el panel')
             ->addArgument('directorio_entitys', InputArgument::REQUIRED, 'Carpeta donde se ubican las entidades')
-            ->addArgument('prefix', InputArgument::REQUIRED, 'Prefijo para las rutas')
-            //->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min,normal)','easy')
-            //->addOption('menu_collapse',null,InputOption::VALUE_REQUIRED,'Menu collapsado (1,0)','1')
+            ->addArgument('tipo_panel',null,InputOption::VALUE_REQUIRED,'Tipo de panel (html, api)','html')
+            ->addOption('prefix',null,InputOption::VALUE_REQUIRED,'Prefijo para las rutas','admin')
             ->addOption('ignore',null,InputOption::VALUE_REQUIRED,'Campos que se ignorarn al crear los archivos','')
             ->addOption('exclude',null,InputOption::VALUE_REQUIRED,'Entidades que se ignorarn para la creacion del panel','')
         ;
@@ -40,50 +39,40 @@ class CreatePanelCommand extends  ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $tiempo_inicio = microtime(true);
-        // outputs multiple lines to the console (adding "\n" at the end of each line)
 
         $em = $this->getContainer()->get('doctrine')->getManager();
         $twig = $this->getContainer()->get('twig');
-        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
-            $dir = $this->getContainer()->getParameter("kernel.root_dir").'/';
-        }else{
-            $dir = $this->getContainer()->getParameter("kernel.root_dir").'/../src/';
-        }
+        
         $proyecto = $input->getArgument('proyecto');
         $carpetaobundle = $input->getArgument('directorio_bundle');
         $directorio_entitys = $input->getArgument('directorio_entitys');
-        $prefix = $input->getArgument('prefix');
-        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
-            $carpetaobundle = ucfirst($carpetaobundle);
-        }else{
-            Util::createDir($dir.$carpetaobundle);
-        }
-
-        //$type_crud = EasyPanelCreate::TYPE_EASY;
-        //$menu= EasyPanelCreate::MENU_EXPAND;
-
+        $tipo_panel = $input->getArgument('tipo_panel');
+        
+        $prefix = $input->getOption('prefix');
         $ignore = $input->getOption('ignore');
         $exclude = $input->getOption('exclude');
+
+        $dir = $this->getKernelDir();
+        $carpetaobundle = $this->fixCarpetaoBundle($carpetaobundle);
+        
         $output->writeln([
-            'Create EasyPanel  ',// A line
-            '========================================',// Another line
-            '',// Empty line
+            'Create EasyPanel',
+            '========================================',
+            '',
         ]);
 
-        // outputs a message followed by a "\n"
         $output->writeln('Proyecto: '.$proyecto);
         $output->writeln('Directorio o Bundle de destino: '.$carpetaobundle);
         $output->writeln('Directorio Entidades: '.$directorio_entitys);
+        $output->writeln('Tipo Panel : '.$tipo_panel);
         $output->writeln('Prefix: '.$prefix);
-        //$output->writeln('Tipo Crud: '.$type_crud);
-        //$output->writeln('Tipo Menu: '.$menu);
         $output->writeln('Exluir Entidades: '.$exclude);
         $output->writeln('Ignorar Campos: '.$ignore);
         $output->writeln('');
 
 
 
-        $panel = new EasyPanelCreate($em,$twig,$dir,$proyecto,$carpetaobundle,$directorio_entitys,$prefix,$exclude);
+        $panel = new EasyPanelCreate($em, $twig, $dir, $tipo_panel, $proyecto, $carpetaobundle, $directorio_entitys, $prefix , $exclude);
         $resultado = $panel->create($ignore);
         $output->writeln('Resultado:');
         $output->writeln($resultado);
@@ -104,4 +93,24 @@ class CreatePanelCommand extends  ContainerAwareCommand
 
         return ($hours>0? $hours.'h ':'').($mins>0? $mins.'m ':''). $secs.'s';
     }
+
+
+    private function getKernelDir(){
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $dir = $this->getContainer()->getParameter("kernel.root_dir").'/';
+        }else{
+            $dir = $this->getContainer()->getParameter("kernel.root_dir").'/../src/';
+        }
+        return $dir;
+    }
+
+    private function fixCarpetaoBundle($carpetaobundle){
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $carpetaobundle = ucfirst($carpetaobundle);
+        }else{
+            Util::createDir($dir.$carpetaobundle);
+        }
+        return $carpetaobundle;
+    }
+
 }

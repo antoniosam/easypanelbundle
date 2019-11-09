@@ -1,10 +1,9 @@
 <?php
 
-namespace {{ namespace }};
+namespace {{ controllerNamespace }};
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,28 +14,23 @@ use Ast\EasyPanelBundle\Lib\Easy\Panel;
 use Ast\EasyPanelBundle\Services\EasyPanelService;
 use Ast\EasyDoctrinePagination\EasyPagination;
 
-use {{ entitybundle }};
-use {{ formnamespace }};
+use {{ entityNamespace }};
+use {{ formNamespace }};
 
 
 /**
- * @Route("{{ prefix_controller_route }}/{{ entity|lower }}" )
+ * @Route("{{ prefixRouteController }}/{{ entityLower }}" )
  */
-class {{ entity }}Controller extends Controller
+class {{ entity }}Controller extends AbstractController
 {
-{% set titulos = [] %}
-{% set tmp = "" %}
-{% for campo in indexlist %}
-{% set tmp = campo|capitalize %}
-{% set titulos = titulos|merge([tmp]) %}
-{% endfor %}
+
     /**
      * Las columnas que se mostraran en la vista de tabla
      * @return array
      */
-    private function indexColumnsTable($getcabeceras = false){
-        if($getcabeceras){
-            return ['{{ titulos|join("', '")|raw }}'];
+    private function tableFields($getLabelFields = false){
+        if($getLabelFields){
+            return ['{{ indexlistLabel|join("', '")|raw }}'];
         }
         return ['{{ indexlist|join("', '")|raw }}'];
     }
@@ -46,27 +40,27 @@ class {{ entity }}Controller extends Controller
      * @param $col
      * @return string
      */
-    private function indexColumnOrder($col){
+    private function tableFieldsOrder($col){
         if($col >= 1){
             $col --;
-            $campos = $this->indexColumnsTable();
+            $campos = $this->tableFields();
             return isset($campos[$col])? $campos[$col] : '';
         }
         return '';
     }
 
     /**
-     * Columnas donde se realizara la busqueda(deberian ser menos que el indexColumnsTable )
+     * Columnas donde se realizara la busqueda(deberian ser menos que el tableFields )
      * @return array
      */
-    private function indexColumnsSearch(){
+    private function tableFieldsSearch(){
         return ['{{ indexlist|join("', '")|raw }}'];
     }
 
     /**
      *List All {{ entity }} entity
      *
-     * @Route("/", name="{{ ruta }}_index" )
+     * @Route("/", name="{{ prefixRoute }}_index" )
      * @Method("GET")
      */
     public function indexAction(Request $request{{ serviceautowire }})
@@ -83,34 +77,43 @@ class {{ entity }}Controller extends Controller
         $paginar->setPage($pagina);
         //$paginar->where('activo','=',true);// opcional
         if(!empty($buscar)){
-            $paginar->search($buscar,$this->indexColumnsSearch());
+            $paginar->search($buscar,$this->tableFieldsSearch());
         }
         if($col > 0) {
-            $paginar->order($this->indexColumnOrder($col), $orden);
+            $paginar->order($this->tableFieldsOrder($col), $orden);
         }
-
         $paginar->execute();
         $result = $paginar->getResult();
 
-        $view = EasyList::easy('{{ seccion }}', $result['data'], $this->indexColumnsTable() , '{{ ruta }}');
-        $view->setCabeceras($this->indexColumnsTable(true));
-        $view->enableOrder('{{ ruta }}_index' , [] , $col , $orden);
-        $view->enableSearch('{{ ruta }}_index' , [] , $buscar);
-        $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ ruta }}_index' , []);
-
+{% if panelTypeHtml == panelType %}
+        $view = EasyList::easy('{{ seccion }}', $result['data'], $this->tableFields() , '{{ prefixRoute }}');
+        $view->setLabelsTable($this->tableFields(true));
+        $view->enableOrder('{{ prefixRoute }}_index' , [] , $col , $orden);
+        $view->enableSearch('{{ prefixRoute }}_index' , [] , $buscar);
+        $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ prefixRoute }}_index' , []);
         return {{ serviceincontroller|raw }}->render($view);
+{% elseif (panelTypeApi == panelType) %}
+        $view = EasyList::easy('{{ seccion }}', $result['data'], $this->tableFields() );
+        $view->setLabelsTable($this->tableFields());
+        return {{ serviceincontroller|raw }}->json($view);
+{% endif %}
+        
     }
 
     /**
      * Create a new {{ entity }} entity.
      *
-     * @Route("/new", name="{{ ruta }}_new")
-     * @Method({"GET", "POST"})
+{% if panelTypeHtml == panelType %}
+     * @Route("/new", methods={"GET","HEAD","POST"}, name="{{ prefixRoute }}_new")
+{% elseif panelTypeApi == panelType %}
+     * @Route("/new", methods={"HEAD","POST"}, name="{{ prefixRoute }}_new")
+{% endif %}
      */
     public function nuevoAction(Request $request{{ serviceautowire }})
     {
+{% if panelTypeHtml == panelType %}
         ${{ entity|lower }} = new {{ entity }}();
-        $form = $this->createForm({{ form }}::class, ${{ entity|lower }});
+        $form = $this->createForm({{ formName }}::class, ${{ entity|lower }});
         if($request->getMethod()=='POST'){
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
@@ -119,57 +122,75 @@ class {{ entity }}Controller extends Controller
                 $this->addFlash('warning','Debes ingresar los datos correctamente');
             }
         }
-
-        $view = EasyForm::easy('Nuevo {{ seccion }}', $form->createView(), '{{ ruta }}');
-
+        $view = EasyForm::easy('Nuevo {{ seccion }}', $form->createView(), '{{ prefixRoute }}');
         return {{ serviceincontroller|raw }}->render($view);
+{% elseif panelTypeApi == panelType %}
+        $dataRequest = json_decode($request->getContent(),true);
+        ${{ entity|lower }} = new {{ entity }}();
+        $form = $this->createForm({{ formName }}::class, ${{ entity|lower }});
+        $form->submit($dataRequest);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist(${{ entityLower }});
+            $em->flush();
+            $json = ["message"=>"{{ entity }} creada correctamente","newId"=>${{ entityLower }}->getId()];
+            $status = 200;
+        }else{
+            $json = ["message"=>"Debes ingresar los datos correctamente"];
+            $status = 400;
+        }
+        return $this->json($json,$status);
+{% endif %}
     }
-{% set titulos = [] %}
-{% set tmp = "" %}
-{% for campo in indexlist %}
-    {% set tmp = campo|capitalize %}
-    {% set titulos = titulos|merge([tmp]) %}
-{% endfor %}
     /**
      * Todos los campos que se  mostraran
      * @return array
      */
     private function showList($getcabeceras = false){
         if($getcabeceras){
-            return ['{{ titulos|join("', '")|raw }}'];
+            return ['{{ showlistLabel|join("', '")|raw }}'];
         }
         return array('{{ showlist|join("', '")|raw }}');
     }
     /**
      * Finds and displays a {{ entity }} entity.
      *
-     * @Route("/{id}", name="{{ ruta }}_show", requirements={"id"="\d+"} )
-     * @Method("GET")
+     * @Route("/{id}", methods={"GET","HEAD"}, name="{{ prefixRoute }}_show", requirements={"id"="\d+"} )
      */
-    public function showAction({{ entity }} ${{ entity|lower }}{{ serviceautowire }})
+    public function showAction(int $id{{ serviceautowire }})
     {
-        $view = EasyShow::easy('{{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ ruta }}');
-        $view->setCabeceras($this->showList(true));
-        $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
-
+        $entrada = $this->getDoctrine()->getManager()->getRepository({{entity}}::class)->findOneBy(['id'=>$id]);
+{% if panelTypeHtml == panelType %}
+        $view = EasyShow::easy('Ver {{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ prefixRoute }}');
+        $view->setLabelsFields($this->showList(true));
+        $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->create());
         return {{ serviceincontroller|raw }}->render($view);
+{% elseif panelTypeApi == panelType %}
+        $view = EasyShow::easy('{{ entityLower }}', ${{ entity|lower }}, $this->showList());
+        $view->setLabelsFields($this->showList(true));
+        return {{ serviceincontroller|raw }}->json($view);
+{% endif %}
     }
 
     /**
      * Displays a form to edit an existing {{ entity }} entity.
-     *
-     * @Route("/{id}/edit", name="{{ ruta }}_edit", requirements={"id"="\d+"})
-     * @Method({"GET", "POST"})
+{% if panelTypeHtml == panelType %}
+     * @Route("/{id}/edit", methods={"GET","HEAD","POST"}, name="{{ prefixRoute }}_edit", requirements={"id"="\d+"})
+{% elseif panelTypeApi == panelType %}
+     * @Route("/{id}/edit", methods={"HEAD","POST"}, name="{{ prefixRoute }}_edit", requirements={"id"="\d+"})
+{% endif %}
      */
-    public function editAction(Request $request, {{ entity }} ${{ entity|lower }}{{ serviceautowire }})
+    public function editAction(Request $request, int $id{{ serviceautowire }})
     {
         $olds = [];
-{% for key,campo in campos %}
+{% for key,campo in propertysEntity %}
 {% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
         $olds['{{ campo }}'] = ${{ entity|lower }}->get{{ campo|capitalize }}();
 {% endif %}
 {% endfor %}
-        $editForm = $this->createForm({{ form }}::class, ${{ entity|lower }});
+        ${{ entityLower }} = $this->getDoctrine()->getManager()->getRepository({{entity}}::class)->findOneBy(['id'=>$id]);
+{% if panelTypeHtml == panelType %}
+        $editForm = $this->createForm({{ formName }}::class, ${{ entity|lower }});
         if($request->getMethod()=='POST'){
             $editForm->handleRequest($request);
             if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -178,27 +199,46 @@ class {{ entity }}Controller extends Controller
                 $this->addFlash('warning','Debes ingresar los datos correctamente');
             }
         }
-
         $view = EasyForm::easy('Editar {{ entity }}', $editForm->createView());
-        $view->addLinkBack('{{ ruta }}_show',array('id'=>${{ entity|lower }}->getId()),'Regresar');
+        $view->addLinkBack('{{ prefixRoute }}_show',array('id'=>${{ entity|lower }}->getId()),'Regresar');
         $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->createView());
-
         return {{ serviceincontroller|raw }}->render($view);
+{% elseif panelTypeApi == panelType %}
+        $editForm = $this->createForm({{ formName }}::class, ${{ entity|lower }});
+        $dataRequest = json_decode($request->getContent(),true);
+        $editForm->submit($dataRequest);
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist(${{ entityLower }});
+            $em->flush();
+            $body = ["message"=>"{{ entity }} creada correctamente","newId"=>${{ entityLower }}->getId()];
+            $status = 200;
+        }else{
+            $body = ["message"=>"Debes ingresar los datos correctamente"];
+            $status = 400;
+        }
+        return $this->json($body, $status);
+{% endif %}
     }
 
     /**
      * Deletes a {{ entity }} entity.
      *
-     * @Route("/{id}/delete", name="{{ ruta }}_delete", requirements={"id"="\d+"})
-     * @Method("DELETE")
+{% if panelTypeHtml == panelType %}
+     * @Route("/{id}/delete", methods={"HEAD","DELETE"}, name="{{ prefixRoute }}_delete", requirements={"id"="\d+"})
+{% elseif panelTypeApi == panelType %}
+    * @Route("/{id}/delete", methods={"HEAD","POST"}, name="{{ prefixRoute }}_delete", requirements={"id"="\d+"})
+{% endif %}
      */
-    public function deleteAction(Request $request, {{ entity }} ${{ entity|lower }})
+    public function deleteAction(Request $request, int $id)
     {
-        $form = $this->generateDeleteForm(${{ entity|lower }});
+        ${{ entityLower }} = $this->getDoctrine()->getManager()->getRepository({{entity}}::class)->findOneBy(['id'=>$id]);
+{% if panelTypeHtml == panelType %}
+        $form = $this->generateDeleteForm(${{ entityLower }});
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-{% for key,campo in campos %}
+{% for key,campo in propertysEntity %}
 {% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
             $this->deleteMedia(${{ entity|lower }}->get{{ campo|capitalize }}());
 {% endif %}
@@ -207,9 +247,27 @@ class {{ entity }}Controller extends Controller
             $em->flush();
             $this->addFlash('warning','{{ entity }} eliminado correctamente');
         }
-        return $this->redirectToRoute('{{ ruta }}_index');
+        return $this->redirectToRoute('{{ prefixRoute }}_index');
+{% elseif panelTypeApi == panelType %}
+        if(${{ entityLower }}){
+            $em = $this->getDoctrine()->getManager();
+{% for key,campo in propertysEntity %}
+{% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
+            $this->deleteMedia(${{ entity|lower }}->get{{ campo|capitalize }}());
+{% endif %}
+{% endfor %}
+            $em->remove(${{ entity|lower }});
+            $em->flush();
+            $body = ["message"=>"{{ entity }} eliminada correctamente"];
+            $status = 200;
+        }else{
+            $body = ["message"=>"{{ entity }} no existe"];
+            $status = 400;
+        }
+        return $this->json($body, $status);
+{% endif %}
     }
-
+    
     /**
      * @param {{ entity }} ${{ entity|lower }}
      * @param array|null $olds
@@ -218,7 +276,7 @@ class {{ entity }}Controller extends Controller
     private function saveForm( {{ entity }} ${{ entity|lower }}, array $olds = null){
 
         $em = $this->getDoctrine()->getManager();
-{% for key,campo in campos %}
+{% for key,campo in propertysEntity %}
 {% if campo in ['thumb','imagen','poster','foto','video','pdf','archivo','metaimage','imagenpreview','metaimagelarge'] %}
         if (${{ entity|lower }}->get{{ campo|capitalize }}() !== null) {
             ${{ campo }} = ${{ entity|lower }}->get{{ campo|capitalize }}();
@@ -247,10 +305,10 @@ class {{ entity }}Controller extends Controller
         $em->flush();
         if( $olds == null ){
             $this->addFlash('success','{{ entity }} registrado correctamente');
-            return $this->redirectToRoute('{{ ruta }}_show', array('id'=>${{ entity|lower }}->getId()));
+            return $this->redirectToRoute('{{ prefixRoute }}_show', array('id'=>${{ entity|lower }}->getId()));
         }else{
             $this->addFlash('info','{{ entity }} actualizado correctamente');
-            return $this->redirectToRoute('{{ ruta }}_index', []);
+            return $this->redirectToRoute('{{ prefixRoute }}_index', []);
         }
     }
 
@@ -261,7 +319,7 @@ class {{ entity }}Controller extends Controller
     private function generateDeleteForm({{ entity }} ${{ entity|lower }})
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('{{ ruta }}_delete', array('id' => ${{ entity|lower }}->getId())))
+            ->setAction($this->generateUrl('{{ prefixRoute }}_delete', array('id' => ${{ entity|lower }}->getId())))
             ->setMethod('DELETE')
             ->getForm();
     }
@@ -273,7 +331,7 @@ class {{ entity }}Controller extends Controller
         if($this->container->hasParameter('public_dir_uploads')){
             $publicdir = $this->getParameter('public_dir_uploads');
         }else{
-            $publicdir = $this->getParameter("kernel.root_dir").'{{ pathpublicuploads }}';
+            $publicdir = $this->getParameter("kernel.root_dir").'{{ pathPublicUploads }}';
         }
         if(!file_exists($publicdir)){
             mkdir($publicdir,0777,true);

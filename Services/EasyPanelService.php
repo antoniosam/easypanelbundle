@@ -56,6 +56,64 @@ class EasyPanelService
         return $parameters;
     }
 
+    function json($vista, Response $response = null)
+    {
+        if(is_array($vista)) {
+            $panel = new Panel(Panel::PANEL_API);
+            $seccion = '';
+            foreach ($vista as $view){
+                if($view instanceof EasyList){
+                    $panel->addList($view);
+                    if($seccion == ''){
+                        $seccion = $view->getSeccion();
+                    }
+                }else if($view instanceof EasyShow){
+                    $panel->addShow($view);
+                    if($seccion == ''){
+                        $seccion = $view->getSeccion();
+                    }
+                }else if($view instanceof EasyForm) {
+                    $panel->addForm($view);
+                    if($seccion == ''){
+                        $seccion = $view->getSeccion();
+                    }
+                }else if(is_string($view) ) {
+                    $panel->addHtml($view);
+                }
+            }
+            $panel->setLocation($seccion);
+            $parameters = $panel->create();
+        }elseif($vista instanceof EasyList){
+            $panel = new Panel(Panel::PANEL_API);
+            $panel->addList($vista);
+            $panel->setLocation($vista->getSeccion());
+            $parameters = $panel->create();
+        }else if($vista instanceof EasyShow){
+            $panel = new Panel(Panel::PANEL_API);
+            $panel->addShow($vista);
+            $panel->setLocation($vista->getSeccion());
+            $parameters = $panel->create();
+        }else if($vista instanceof EasyForm){
+            $panel = new Panel(Panel::PANEL_API);
+            $panel->addForm($vista);
+            $panel->setLocation($vista->getSeccion());
+            $parameters = $panel->create();
+        }else if(is_string($vista)){
+            $panel = new Panel(Panel::PANEL_API);
+            $panel->addHtml($vista);
+            $parameters = $panel->createView();
+        }else if($vista instanceof Panel){
+            $parameters = $vista->create();
+        }
+
+        if (null === $response) {
+            $response = new Response();
+        }
+        $response->setContent(json_encode($parameters));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+
     function render($vista, Response $response = null)
     {
         if(is_array($vista)) {

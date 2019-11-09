@@ -25,55 +25,54 @@ class CreateModuleCommand extends  ContainerAwareCommand
         $this
             ->setName(static::$defaultName)
             ->setDescription('Crea un controlador y un form basandose en un entidad ')
-            ->addArgument('seccion', InputArgument::REQUIRED, 'Seccion del Modulo')
-            ->addArgument('panelbundle', InputArgument::REQUIRED, 'Bundle donde estara el panel')
             ->addArgument('entity', InputArgument::REQUIRED, 'Namespace de la Entidad que se usara')
-            ->addArgument('prefix', InputArgument::REQUIRED, 'Prefijo para las rutas')
-            ->addOption('type_crud',null,InputOption::VALUE_REQUIRED,'Typo de controller(easy,min)','easy')
+            ->addArgument('proyecto', InputArgument::REQUIRED, 'Nombre del proyecto')
+            ->addArgument('directorio_bundle', InputArgument::REQUIRED, 'Carpeta o Bundle donde se creara el panel')
+            ->addArgument('directorio_entitys', InputArgument::REQUIRED, 'Carpeta donde se ubican las entidades')
+            ->addArgument('tipo_panel',null,InputOption::VALUE_REQUIRED,'Tipo de panel (html, api)','html')
+            ->addOption('prefix',null,InputOption::VALUE_REQUIRED,'Prefijo para las rutas','admin')
             ->addOption('ignore',null,InputOption::VALUE_REQUIRED,'Campos que se ignorarn al crear los archivos','')
+            ->addOption('exclude',null,InputOption::VALUE_REQUIRED,'Entidades que se ignorarn para la creacion del panel','')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $tiempo_inicio = microtime(true);
-        // outputs multiple lines to the console (adding "\n" at the end of each line)
-
         $em = $this->getContainer()->get('doctrine')->getManager();
         $twig = $this->getContainer()->get('twig');
-        $dir = $this->getContainer()->getParameter("kernel.root_dir").'/../src/';
-        $seccion = $input->getArgument('seccion');
-        $panelbundle = $input->getArgument('panelbundle');
+        
         $entity = $input->getArgument('entity');
-        $prefix = $input->getArgument('prefix');
-        if($input->getOption('type_crud') == 'easy'){
-            $type_crud = EasyPanelCreate::TYPE_EASY;
-        }elseif($input->getOption('type_crud') == 'min'){
-            $type_crud = EasyPanelCreate::TYPE_EASY_MIN;
-        }elseif($input->getOption('type_crud') == 'normal'){
-            $type_crud = EasyPanelCreate::TYPE_NORMAL;
-        }else{
-            $type_crud = EasyPanelCreate::TYPE_EASY;
-        }
+        $proyecto = $input->getArgument('proyecto');
+        $carpetaobundle = $input->getArgument('directorio_bundle');
+        $directorio_entitys = $input->getArgument('directorio_entitys');
+        $tipo_panel = $input->getArgument('tipo_panel');
+        
+        $prefix = $input->getOption('prefix');
         $ignore = $input->getOption('ignore');
+        $exclude = $input->getOption('exclude');
+
+        $dir = $this->getKernelDir();
+        $carpetaobundle = $this->fixCarpetaoBundle($carpetaobundle);
 
         $output->writeln([
-            'Create EasyPanel  ',// A line
-            '========================================',// Another line
-            '',// Empty line
+            'Create EasyPanel Module',
+            '========================================',
+            '',
         ]);
 
-        // outputs a message followed by a "\n"
-        $output->writeln('Seccion: '.$seccion);
-        $output->writeln('PanelBundle: '.$panelbundle);
-        $output->writeln('Namespace Entity: '.$entity);
+        $output->writeln('Entity: '.$entity);
+        $output->writeln('Proyecto: '.$proyecto);
+        $output->writeln('Directorio o Bundle de destino: '.$carpetaobundle);
+        $output->writeln('Directorio Entidades: '.$directorio_entitys);
+        $output->writeln('Tipo Panel : '.$tipo_panel);
         $output->writeln('Prefix: '.$prefix);
-        $output->writeln('Tipo Crud: '.$type_crud);
-        $output->writeln('Ignorar: '.$ignore);
+        $output->writeln('Exluir Entidades: '.$exclude);
+        $output->writeln('Ignorar Campos: '.$ignore);
         $output->writeln('');
 
-        $panel = new EasyPanelController($em,$twig,$dir,$panelbundle,$entity,$prefix,$seccion);
-        $resultado = $panel->create($type_crud,$ignore);
+        $crud = new EasyPanelController($em, $twig, $dir, $tipo_panel, $carpetaobundle, $directorio_entitys, $prefix, $prefix.'_'.strtolower($entity), ucfirst($entity) ,$ignore);
+        $resultado = $crud->createController();
         $output->writeln('Resultado:'.$resultado);
 
 
@@ -92,5 +91,23 @@ class CreateModuleCommand extends  ContainerAwareCommand
         }
 
         return ($hours>0? $hours.'h ':'').($mins>0? $mins.'m ':''). $secs.'s';
+    }
+
+    private function getKernelDir(){
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $dir = $this->getContainer()->getParameter("kernel.root_dir").'/';
+        }else{
+            $dir = $this->getContainer()->getParameter("kernel.root_dir").'/../src/';
+        }
+        return $dir;
+    }
+
+    private function fixCarpetaoBundle($carpetaobundle){
+        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
+            $carpetaobundle = ucfirst($carpetaobundle);
+        }else{
+            Util::createDir($dir.$carpetaobundle);
+        }
+        return $carpetaobundle;
     }
 }

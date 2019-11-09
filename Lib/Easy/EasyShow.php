@@ -88,7 +88,7 @@ class EasyShow extends EasyView
     }
 
     /**
-     * @Deprecated
+     * @deprecated deprecated since version 2.5
      *
      * @param $nombre
      * @param $route
@@ -99,9 +99,14 @@ class EasyShow extends EasyView
         $this->opciones[] = $this->opcion( $route,$parametros,$nombre, 'btn-danger', 'fa-trash');
     }
 
-
+    public function setLabelsFields(array $labels){
+        $this->cabeceras = $labels;
+    }
+    /**
+     * @deprecated deprecated since version 2.5
+     */
     public function setCabeceras(array $cabceras){
-        $this->cabeceras = $cabceras;
+        $this->setLabelsFields($cabceras);
     }
 
     /**
@@ -113,7 +118,57 @@ class EasyShow extends EasyView
         $this->includelayout = $includelayout;
     }
 
+    public function fetchData(){
+        $this->cabeceras = $this->defineHeaders($this->columnas,$this->cabeceras);
+        $key = 0;
+        $object = [];
+        foreach ($this->columnas as $columna=>$type) {
+            $path = '';
+            if(count($this->paths)>0){
+                $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
+            }
+            $value = $this->getValueObject($this->consulta,$columna);
+            $dataObject = $this->formatValue($type, $value , $path);
+            $object[] = array('label' => $this->cabeceras[$key], 'value' => $dataObject, 'type' => $type);
+            $key++;
+        }
+        return $object;
+    }
+
     /**
+     * @return array
+     */
+    public function generatetoHtml(){
+        $return = [];
+        $return["seccion"]= $this->seccion;
+        $this->cabeceras = $this->defineHeaders($this->columnas,$this->cabeceras);
+        $fila = [];
+        foreach ($this->fetchData() as $item) {
+            $fila[] = ['label' => $item['label'], 'valor' =>  $this->renderColumna( $item['type'] , $item['value'] )];
+        }
+        $return["filas"] = $fila;
+        $return["rutas"] = $this->generateParameters($this->consulta,$this->opciones);
+        $return["has_delete"] = $this->has_delete;
+        $return["delete"] = $this->deleteform;
+        $return["has_includelayout"] = $this->hasincludelayout;
+        $return["includelayout"] = $this->includelayout;
+
+        return $return;
+    }
+    /**
+     * @return array
+     */
+    public function generatetoApi(){
+        $data = [];
+        foreach ($this->fetchData() as $item){
+            $data[$item['label']]=$item['value'];
+        }
+        return ['seccion'=>$this->seccion,'data'=> $data];
+    }
+
+
+    /**
+     * @deprecated deprecated since version 2.5
      * @return array
      */
     public function generar()
@@ -133,7 +188,7 @@ class EasyShow extends EasyView
             $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $html);
             $key++;
         }
-        $return["filas"] = $fila;
+        $return["filas"] = $object;
         $return["rutas"] = $this->generateParameters($this->consulta,$this->opciones);
         $return["has_delete"] = $this->has_delete;
         $return["delete"] = $this->deleteform;
@@ -142,6 +197,7 @@ class EasyShow extends EasyView
 
         return $return;
     }
+
     public function fixRenders(){
         $this->renderAsBoolean("activo");
         $this->renderAsBoolean("completado");
@@ -159,7 +215,7 @@ class EasyShow extends EasyView
      * @return EasyShow
      */
     public static function easy($seccion , $consulta,$columnas,$prefix = null){
-        $show = new EasyShow("Ver ".$seccion,$consulta,$columnas);
+        $show = new EasyShow($seccion,$consulta,$columnas);
         $show->fixRenders();
         if(!empty($prefix)){
             $show->addLinkBack($prefix.'_index',[],"Regresar ");
