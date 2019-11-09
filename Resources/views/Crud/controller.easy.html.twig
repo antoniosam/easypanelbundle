@@ -60,8 +60,11 @@ class {{ entity }}Controller extends AbstractController
     /**
      *List All {{ entity }} entity
      *
-     * @Route("/", name="{{ prefixRoute }}_index" )
-     * @Method("GET")
+{% if panelTypeHtml == panelType %}
+     * @Route("/", methods={"GET","HEAD"}, name="{{ prefixRoute }}_index" )
+{% elseif panelTypeApi == panelType %}
+     * @Route("/", methods={"GET","HEAD"}, name="{{ prefixRoute }}_index" )
+{% endif %}
      */
     public function indexAction(Request $request{{ serviceautowire }})
     {
@@ -93,7 +96,7 @@ class {{ entity }}Controller extends AbstractController
         $view->createListPages( $result['totalpages'] , $pagina, $buscar , '{{ prefixRoute }}_index' , []);
         return {{ serviceincontroller|raw }}->render($view);
 {% elseif (panelTypeApi == panelType) %}
-        $view = EasyList::easy('{{ seccion }}', $result['data'], $this->tableFields() );
+        $view = EasyList::easy('{{ entityLower }}', $result['data'], $this->tableFields() );
         $view->setLabelsTable($this->tableFields());
         return {{ serviceincontroller|raw }}->json($view);
 {% endif %}
@@ -267,7 +270,7 @@ class {{ entity }}Controller extends AbstractController
         return $this->json($body, $status);
 {% endif %}
     }
-    
+
     /**
      * @param {{ entity }} ${{ entity|lower }}
      * @param array|null $olds
