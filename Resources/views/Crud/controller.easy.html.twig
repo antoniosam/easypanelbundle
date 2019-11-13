@@ -162,9 +162,9 @@ class {{ entity }}Controller extends AbstractController
      */
     public function showAction(int $id{{ serviceautowire }})
     {
-        $entrada = $this->getDoctrine()->getManager()->getRepository({{entity}}::class)->findOneBy(['id'=>$id]);
+        ${{ entityLower }} = $this->getDoctrine()->getManager()->getRepository({{entity}}::class)->findOneBy(['id'=>$id]);
 {% if panelTypeHtml == panelType %}
-        $view = EasyShow::easy('Ver {{ seccion }}', ${{ entity|lower }}, $this->showList(), '{{ prefixRoute }}');
+        $view = EasyShow::easy('Ver {{ seccion }}', ${{ entityLower }}, $this->showList(), '{{ prefixRoute }}');
         $view->setLabelsFields($this->showList(true));
         $view->setDeleteForm($this->generateDeleteForm(${{ entity|lower }})->create());
         return {{ serviceincontroller|raw }}->render($view);

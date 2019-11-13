@@ -23,6 +23,9 @@ class EasyShow extends EasyView
     private $hasincludelayout = false;
     private $includelayout;
 
+    private $groupField = [];
+    private $includeGroup = false;
+
     function __construct($seccion,$objeto,$columnas)
     {
         $this->seccion = $seccion;
@@ -52,9 +55,10 @@ class EasyShow extends EasyView
 
     public function renderAsImage ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_IMAGE; $this->paths[$columna]=$path;} }
     public function renderAsBoolean($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_BOOLEAN;}}
-    public function renderAsDate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_FECHA;} }
+    public function renderAsDate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_DATE;} }
     public function renderAsTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TIME;} }
-    public function renderAsDateTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_FECHATIME;} }
+    public function renderAsDateTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_DATETIME;} }
+    public function renderAsTimestamp($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_TIMESTAMP; } }
     public function renderAsRaw ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_RAW;} }
     public function renderAsLink ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_LINK; $this->paths[$columna]=$path;} }
     public function renderAsJson ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_JSON;} }
@@ -155,15 +159,35 @@ class EasyShow extends EasyView
 
         return $return;
     }
+
+    public function apiGroupField($field){
+        $this->includeGroup = true;
+        $this->groupField[] = $field;
+    }
+
     /**
      * @return array
      */
     public function generatetoApi(){
-        $data = [];
+        $fila = [];
         foreach ($this->fetchData() as $item){
-            $data[$item['label']]=$item['value'];
+            $fila[$item['label']]=$item['value'];
         }
-        return ['seccion'=>$this->seccion,'data'=> $data];
+        if($this->includeGroup){
+            foreach ($this->groupField as $field){
+                if(in_array($field,$fila)){
+                    throw new \Error('El Campo que deseas agrupar ya existe en la lista de campos');
+                }else{
+                    foreach ($fila as $label=>$value ){
+                        if(strpos($label,$field.'.')!==false){
+                            $fila[$field][str_replace($field.'.','',$label)] = $value;
+                            unset($fila[$label]);
+                        }
+                    }
+                }
+            }
+        }
+        return ['seccion'=>$this->seccion,'data'=> $fila];
     }
 
 

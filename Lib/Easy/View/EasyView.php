@@ -13,21 +13,22 @@ class EasyView
 {
     const RENDER_TEXT = "text";
     /**
-    * @deprecated deprecated since version 2.5
-    */
+     * @deprecated deprecated since version 2.5
+     */
     const RENDER_TEXTO = "text";
     const RENDER_IMAGE = "image";
     const RENDER_BOOLEAN = "bool";
     const RENDER_DATE = "date";
     /**
-    * @deprecated deprecated since version 2.5
-    */
+     * @deprecated deprecated since version 2.5
+     */
     const RENDER_FECHA = "date";
     const RENDER_TIME = "time";
     const RENDER_DATETIME = "datetime";
+    const RENDER_TIMESTAMP = 'timestamp';
     /**
-    * @deprecated deprecated since version 2.5
-    */
+     * @deprecated deprecated since version 2.5
+     */
     const RENDER_FECHATIME = "datetime";
     const RENDER_RAW = "raw";
     const RENDER_LINK = "link";
@@ -151,8 +152,10 @@ class EasyView
             return is_null($valor)?'---':$valor->format("Y-m-d");
         } elseif ($tipo == self::RENDER_TIME) {
             return is_null($valor)?'---':$valor->format("H:i:s");
-        } elseif ($tipo == self::RENDER_DATE || $tipo == self::RENDER_FECHATIME) {
+        } elseif ($tipo == self::RENDER_DATETIME || $tipo == self::RENDER_FECHATIME) {
             return is_null($valor)?'---':$valor->format("Y-m-d H:i:s");
+        } elseif ($tipo == self::RENDER_TIMESTAMP) {
+            return is_null($valor)?0:$valor->getTimestamp();
         } elseif ($tipo == self::RENDER_TRANSLATE) {
             if(!is_null($valor)){
                 if(!is_array($valor)){

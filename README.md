@@ -25,9 +25,7 @@ Y agregamos el bundle en el AppKernel
       new Ast\EasyPanelBundle\EasyPanelBundle(),
       ]
 ```
-## Prerequisitos
 
-No se necesitan mas
 
 ## Funcionamiento
 
@@ -40,6 +38,14 @@ Valores Basicos
 **$prefix** = Prefix del nombre de la ruta que se podrian generar ej: admin_clientes Generaria admin_clientes_show, admin_clientes_index dependiento del tipo de panel que se cree 
 **$layout** por default del prerequisito o si se quiere aplicar un layout direferente
 
+## Modo Api
+
+Ahora se puede utilizar la libreria para generar respuesta de tipo json de las consultas que se generan.
+El funcionamiento se basa en las versiones anteriores solo se debe hacer uso del metodo json en lugar del metodo render
+```
+return $easypanel->json($view);
+```
+ 
 ## Servicio
 
 Se creo un nuevo servicio que permite configuracion la vista, incluir un menu personalizado, cambiar el layout general que extiend e la vista, incluir el nombre del proyecto, y mas configuracion.
@@ -301,13 +307,19 @@ Los parametros dependen de la version de symfony
 - titulo_proyecto: Nombre del proyecto
 - directorio_bundle: Carpeta donde se crearan los archivos, si es symfony 3 debes indicar el bundle y si es symfony 4  creara una carpeta con el nombre establecido dentro de la estructura de symfony
 - entity_bundle:  Carpeta donde se encuentran las entidades a controlar
-- prefix_name_route: Sufijo para la ruta de los controladores
+- entity_bundle:  Carpeta donde se encuentran las entidades a controlar
+- tipo_panel: 1 Panel Tradicional 2 Panel tipo Api
+- prefix: Sufijo opcional para la ruta de los controladores (default:admin)
 
 Los parametros no deben incluir la carpeta src, se integran por default
- 
+
+Se agrega un nuevo metodo para generar 1 controlador y 1 formulario por entidad
 ```
-easypanel:create:panel titulo_proyecto directorio_bundle entity_bundle prefix_name_route
-easypanel:create:menu titulo_proyecto  directorio_bundle entity_bundle prefix_name_route
+ easypanel:create:modulo entity titulo_proyecto directorio_bundle entity_bundle tipo_panel --prefix=admin
+```
+```
+easypanel:create:panel titulo_proyecto directorio_bundle entity_bundle tipo_panel --prefix=admin
+easypanel:create:menu titulo_proyecto  directorio_bundle entity_bundle tipo_panel --prefix=admin
 easypanel:install:assets
 ```
 ej. Symfony 3 
@@ -316,7 +328,8 @@ easypanel:create:panel Demo AdminBundle AppBundle\Entity admin
 ```
 ej. Symfony 4 
 ```
-easypanel:create:panel Demo Admin Entity admin
+easypanel:create:panel Demo Admin Entity 1 --prefix=admin
+easypanel:create:modulo Producto Demo Admin App\Entity\Produto 1 --prefix=admin
 ```
 
 ## Login
