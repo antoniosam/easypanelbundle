@@ -305,8 +305,8 @@ class EasyList extends EasyView
         $return["has_order"] = $this->ordenar;
         if($this->ordenar){
             $param = $this->orderby['parameters'];
-            $columna = $this->orderby['columna']==null ? 1 : $this->orderby['columna'];
-            $direccion = $this->orderby['columna']==null ? 'ASC' : $this->orderby['orden'];
+            $columna = $this->orderby['columna'] == null ? 1 : $this->orderby['columna'];
+            $direccion = $this->orderby['columna'] == null ? 'ASC' : $this->orderby['orden'];
             if($this->buscar){
                 if(trim($this->busqueda['value'])!=''){
                     $param['buscar']= $this->busqueda['value'];
@@ -340,8 +340,8 @@ class EasyList extends EasyView
             }
             if($this->includeGroup){
                 foreach ($this->groupField as $field){
-                    if(in_array($field,$fila)){
-                        throw new \Error('El Campo que deseas agrupar ya existe en la lista de campos');
+                    if(isset($fila[$field])){
+                        throw new \Error('El campo '.$field.' que deseas agrupar ya existe en la lista de campos');
                     }else{
                         foreach ($fila as $label=>$value ){
                             if(strpos($label,$field.'.')!==false){

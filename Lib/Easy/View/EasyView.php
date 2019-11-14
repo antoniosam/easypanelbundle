@@ -132,8 +132,8 @@ class EasyView
     {
         if($tipo == self::RENDER_TEXTO && is_array($valor)){
             $tipo = self::RENDER_ARRAY;
-        }elseif ($tipo == self::RENDER_TEXTO && $valor instanceof \DateTime){
-            $tipo = self::RENDER_FECHATIME;
+        }elseif (($tipo == self::RENDER_TEXTO || $tipo == self::RENDER_TEXT) && $valor instanceof \DateTime){
+            $tipo = self::RENDER_DATETIME;
         }
 
         if ($tipo == self::RENDER_TEXT || $tipo == self::RENDER_TEXTO) {
@@ -155,7 +155,7 @@ class EasyView
         } elseif ($tipo == self::RENDER_DATETIME || $tipo == self::RENDER_FECHATIME) {
             return is_null($valor)?'---':$valor->format("Y-m-d H:i:s");
         } elseif ($tipo == self::RENDER_TIMESTAMP) {
-            return is_null($valor)?0:$valor->getTimestamp();
+            return is_null($valor)?0:$valor->getTimestamp()*1000;
         } elseif ($tipo == self::RENDER_TRANSLATE) {
             if(!is_null($valor)){
                 if(!is_array($valor)){
@@ -182,8 +182,8 @@ class EasyView
     {
         if($type == self::RENDER_TEXTO && is_array($value)){
             $type = self::RENDER_ARRAY;
-        }elseif ($type == self::RENDER_TEXTO && $value instanceof \DateTime){
-            $type = self::RENDER_FECHATIME;
+        }elseif (($type == self::RENDER_TEXTO || $type == self::RENDER_TEXT) && $value instanceof \DateTime){
+            $type = self::RENDER_DATETIME;
         }
 
         if ($type == self::RENDER_TEXTO) {

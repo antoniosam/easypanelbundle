@@ -212,7 +212,7 @@ class EasyShow extends EasyView
             $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $html);
             $key++;
         }
-        $return["filas"] = $object;
+        $return["filas"] = $fila;
         $return["rutas"] = $this->generateParameters($this->consulta,$this->opciones);
         $return["has_delete"] = $this->has_delete;
         $return["delete"] = $this->deleteform;
