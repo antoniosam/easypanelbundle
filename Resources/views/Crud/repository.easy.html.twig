@@ -1,0 +1,91 @@
+<?php
+
+namespace {{ repoNamespaceDir }};
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Ast\EasyPanelBundle\Lib\Easy\EasyList;
+use Ast\EasyPanelBundle\Lib\Easy\EasyShow;
+use Ast\EasyPanelBundle\Lib\Easy\EasyForm;
+use Ast\EasyPanelBundle\Lib\Easy\Panel;
+use Ast\EasyPanelBundle\Services\EasyPanelService;
+use Ast\EasyDoctrine\EasyDoctrine;
+use Ast\EasyDoctrine\EasyData;
+use Doctrine\ORM\EntityRepository;
+use {{ entityNamespace }};
+
+
+
+
+class {{ entity }}Repository extends EntityRepository
+{
+
+    /**
+     *List All {{ entity }} entity
+     */
+    public function listEasy($buscar, $pagina, $columna, $orden,  $orderFields, $searchFields): EasyData
+    {
+        $em = $this->getEntityManager();
+
+        $easyDoctrine = new EasyDoctrine($em,{{ entity }}::class);
+        $easyDoctrine->setPage($pagina);
+        //$easyDoctrine->where('activo','=',true);// opcional
+        $easyDoctrine->search($buscar,$searchFields);
+        if($columna > 0) {
+            $orderField = EasyDoctrine::findFieldOrder($orderFields,$columna);
+            $easyDoctrine->order($orderField, $orden);
+        }
+        $easyDoctrine->execute();
+        return $easyDoctrine->getResult();
+    }
+
+    /**
+    * Save or update {{ entity }} entity.
+    *
+    */
+    public function save({{ entity }} ${{ entityLower }})
+    {
+        $em = $this->getEntityManager();
+        $em->persist(${{ entityLower }});
+        $em->flush();
+        return ${{ entityLower }};
+    }
+
+    /**
+    * Find {{ entity }} entity.
+    *
+    */
+    public function getById(int $id)
+    {
+        $em = $this->getEntityManager();
+        ${{ entityLower }} = $em->getRepository({{ entity }}::class)->findOneBy(['id'=>$id]);
+        return ${{ entityLower }};
+    }
+
+    /**
+    * Delete {{ entity }} entity by Id.
+    *
+    */
+    public function deleteById( int $id)
+    {
+        ${{ entityLower }} = $this->getById($id);
+        if(${{ entityLower }}){
+            $this->deleteByObject(${{ entityLower }});
+        }
+    }
+
+    /**
+    * Delete {{ entity }} entity.
+    *
+    */
+    public function deleteByObject({{ entity }} ${{ entityLower }}){
+        $em = $this->getEntityManager();
+        $em->remove(${{ entityLower }});
+        $em->flush();
+    }
+
+
+}

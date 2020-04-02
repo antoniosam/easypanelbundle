@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 namespace Ast\EasyPanelBundle\Lib\Crud\Utils;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * ClassMapGenerator.
@@ -43,7 +45,7 @@ class ClassMapGenerator
     public static function createMap($dir)
     {
         if (is_string($dir)) {
-            $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
+            $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
         }
         $map = array();
         foreach ($dir as $file) {

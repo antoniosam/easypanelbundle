@@ -8,15 +8,25 @@
 
         <service id="easypanel.command.createmenu" class="Ast\EasyPanelBundle\Command\CreateMenuCommand">
             <tag name="console.command" command="easypanel:create:menu" />
+            <argument type="service" id="twig"/>
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument type="service" id="parameter_bag"/>
         </service>
-        <service id="easypanel.command.createmodule" class="Ast\EasyPanelBundle\Command\CreateModuleCommand">
-            <tag name="console.command" command="easypanel:create:module" />
+        <service id="easypanel.command.createmodule" class="Ast\EasyPanelBundle\Command\CreateModuloCommand">
+            <tag name="console.command" command="easypanel:create:modulo" />
+            <argument type="service" id="twig"/>
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument type="service" id="parameter_bag"/>
         </service>
         <service id="easypanel.command.createpanel" class="Ast\EasyPanelBundle\Command\CreatePanelCommand">
             <tag name="console.command" command="easypanel:create:panel" />
+            <argument type="service" id="twig"/>
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument type="service" id="parameter_bag"/>
         </service>
         <service id="easypanel.command.installassets" class="Ast\EasyPanelBundle\Command\InstallAssetsCommand">
             <tag name="console.command" command="easypanel:install:assets" />
+            <argument type="service" id="parameter_bag"/>
         </service>
 
     </services>

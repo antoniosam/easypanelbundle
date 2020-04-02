@@ -1,7 +1,6 @@
 <?php
 /**
- * Created by marcosamano.
- * Date: 24/03/18
+ * Created by antoniosam.
  */
 namespace Ast\EasyPanelBundle\Lib\Easy;
 
@@ -12,8 +11,8 @@ use Ast\EasyPanelBundle\Lib\Easy\EasyShow;
 class Panel
 {
     
-    public const PANEL_HTML = 1;
-    public  const PANEL_API = 2;
+    public const PANEL_HTML = 'html';
+    public  const PANEL_API = 'api';
     private $matrix = [];
     private $location = "My Dashboard";
     private $directories = [];
@@ -43,13 +42,12 @@ class Panel
         $this->directories[] =  array("route"=>$route,"parameters"=>$parametros,"texto"=>$texto );
     }
 
-
     /**
      * @param EasyList $datos
      */
     public function addForm(EasyForm $datos)
     {
-        $this->matrix[] = array("type" => "form", "data" => $datos->generar());
+        $this->matrix[] = array('type' => "form", 'data' => $datos->generar());
     }
 
     /**
@@ -58,12 +56,10 @@ class Panel
     public function addList(EasyList $datos)
     {
         if($this->typePanel == self::PANEL_HTML){
-            $this->matrix[] = array("type" => "list", "data" => $datos->generar());
+            $this->matrix[] = ['type' => 'list', 'data' => $datos->generatetoHtml()];
         }else if($this->typePanel == self::PANEL_API){
-            $api = $datos->generatetoApi();
-            $this->matrix[$api['seccion']] = $api['data'];
+            $this->matrix = $datos->generatetoApi();
         }
-
     }
 
     /**
@@ -72,10 +68,9 @@ class Panel
     public function addShow(EasyShow $datos)
     {
         if($this->typePanel == self::PANEL_HTML){
-            $this->matrix[] = array("type" => "show", "data" => $datos->generatetoHtml());
+            $this->matrix[] = ['type' => "show", 'data' => $datos->generatetoHtml()];
         }else if($this->typePanel == self::PANEL_API){
-            $api = $datos->generatetoApi();
-            $this->matrix[$api['seccion']] = $api['data'];
+            $this->matrix = $datos->generatetoApi();
         }
     }
 
@@ -94,14 +89,6 @@ class Panel
         }else if($this->typePanel == self::PANEL_API){
             return $this->matrix;
         }
-        
-    }
-    /**
-     * @deprecated deprecated since version 2.5
-     */
-    public function createView()
-    {
-        return array('cards' => $this->matrix ,'location'=>$this->location ,"directories"=>$this->directories,"layout"=>$this->layout,'has_includelayout' => $this->hasincludelayout,'includelayout' => $this->includelayout);
     }
 
     /**
@@ -113,53 +100,6 @@ class Panel
         $this->includelayout = $includelayout;
     }
 
-    /**
-     * @param EasyList $datos
-     * @return array
-     */
-    public static function createList(EasyList $datos,$layout=null){
-        $panel = new Panel($layout);
-        $panel->addList($datos);
-        $panel->setLocation($datos->getSeccion());
-        return $panel->createView();
-    }
-
-    /**
-     * @param EasyShow $datos
-     * @return array
-     */
-    public static function createShow(EasyShow $datos,$layout=null){
-        $panel = new Panel($layout);
-        $panel->addShow($datos);
-        $panel->setLocation($datos->getSeccion());
-        return $panel->createView();
-    }
-
-    /**
-     * @param EasyForm $datos
-     * @return array
-     */
-    public static function createForm(EasyForm $datos,$layout=null){
-        $panel = new Panel($layout);
-        $panel->addForm($datos);
-        $panel->setLocation($datos->getSeccion());
-        return $panel->createView();
-    }
-
-    /**
-     * @param $seccion
-     * @param array $consulta
-     * @param array $columnas
-     * @param $prefix
-     * @return array
-     */
-    public static function easyList($seccion, array $consulta, array $columnas, $prefix)
-    {
-        $panel = new Panel();
-        $panel->addList(EasyList::easy($seccion, $consulta, $columnas, $prefix));
-        $panel->setLocation($seccion);
-        return $panel->createView();
-    }
 
     /**
      * @param $seccion
@@ -169,27 +109,13 @@ class Panel
      * @param null $deleteform
      * @return array
      */
-    public static function easyShow($seccion, $consulta, array $columnas, $prefix,$deleteform = null)
+    public static function easyShowApi($seccion, $consulta, array $columnas)
     {
-        $panel = new Panel();
-        $panel->addShow(EasyShow::easy($seccion, $consulta, $columnas, $prefix,$deleteform));
-        $panel->setLocation($seccion);
-        return $panel->createView();
+        $panel = new Panel(Panel::PANEL_API);
+        $panel->addShow(EasyShow::easy($seccion,$consulta,$columnas));
+        return $panel->create();
     }
 
-    /**
-     * @param $seccion
-     * @param $form
-     * @param $prefix
-     * @param null $deleteform
-     * @return array
-     */
-    public static function easyForm($seccion, $form, $prefix,$deleteform = null)
-    {
-        $panel = new Panel();
-        $panel->addForm(EasyForm::easy($seccion, $form, $prefix,$deleteform));
-        $panel->setLocation($seccion);
-        return $panel->createView();
-    }
+
 
 }

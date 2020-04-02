@@ -16,13 +16,13 @@ use Doctrine\ORM\EntityManager;
 use Twig\Environment;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-use Ast\EasyPanelBundle\Lib\Crud\EasyPanelMenu;
-use Ast\EasyPanelBundle\Lib\Crud\Utils\InfoEntityImport;
-use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreateInit;
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelController;
 
-class CreateMenuCommand extends Command
+class CreateModuloCommand extends  Command
 {
-    protected static $defaultName = 'easypanel:create:menu';
+    protected static $defaultName = 'easypanel:create:modulo';
 
     private $twigExtension;
     private $em;
@@ -41,57 +41,47 @@ class CreateMenuCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
-            ->setDescription('Crea un twig de menu usando entidades.')
-            ->addArgument('proyecto', InputArgument::REQUIRED, 'Nombre del proyecto')
-            ->addArgument('directorio_entitys', InputArgument::REQUIRED, 'Carpeta donde se ubican las entidades des src')
+            ->setDescription('Crea un controlador y un form basandose en un entidad ')
+            ->addArgument('entity', InputArgument::REQUIRED, 'Namespace de la Entidad que se usara')
+            ->addArgument('tipo_panel',InputOption::VALUE_REQUIRED,'Tipo de panel (html, api)','html')
             ->addOption('prefix',null,InputOption::VALUE_REQUIRED,'Prefijo para las rutas')
             ->addOption('folder', null,InputOption::VALUE_REQUIRED, 'Carpeta donde se generan los archivos dentro de la estructura de Symfony')
-            ->addOption('tema',null,InputOption::VALUE_REQUIRED,'Tipo de assets (material, sb-admin)','material')
+            ->addOption('ignorar_campos',null,InputOption::VALUE_REQUIRED,'Campos que se ignorarn al crear los archivos','')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $tiempo_inicio = microtime(true);
+        
+        $entity = $input->getArgument('entity');
+        $tipo_panel = $input->getArgument('tipo_panel');
 
-        $proyecto = $input->getArgument('proyecto');
-        $directorio_entitys = $input->getArgument('directorio_entitys');
-
-        $tema = $input->getOption('tema');
         $folder = $input->getOption('folder');
         $prefix = $input->getOption('prefix');
+        $exclude = $input->getOption('ignorar_campos');
 
         $rootDir = $this->params->get('kernel.project_dir').DIRECTORY_SEPARATOR.'src';
-        $folder = strtolower($folder);
+        $folder = ucfirst($folder);
 
         $output->writeln([
-            'Create EasyPanel Menu  ',// A line
-            '========================================',// Another line
-            '',// Empty line
+            'Create EasyPanel Module',
+            '========================================',
+            '',
         ]);
 
-        // outputs a message followed by a "\n"
-        $output->writeln('Proyecto: '.$proyecto);
-
-        $output->writeln('Directorio Entidades: '.$directorio_entitys);
+        $output->writeln('Entity: '.$entity);
+        $output->writeln('Tipo Panel : '.$tipo_panel);
+        $output->writeln('SubFolder: '.$folder);
         $output->writeln('Prefix: '.$prefix);
-        //$output->writeln('Tipo Menu: '.$menu);
+        $output->writeln('Ignorar Campos: '.$exclude);
         $output->writeln('');
-        $output->writeln('Directorio de busqueda:'.$rootDir.DIRECTORY_SEPARATOR.$directorio_entitys);
 
-        $listaclases = InfoEntityImport::folder($this->em,$rootDir.DIRECTORY_SEPARATOR.$directorio_entitys);
-        if(count($listaclases) > 0) {
-            $listaentitys = [];
-            foreach ($listaclases as $clase):
-                $entity = Util::getFileNamespace($clase);
-                $listaentitys[] = $entity;
-            endforeach;
-            $panel = new EasyPanelMenu($this->em,$this->twigExtension,$rootDir,$proyecto,$listaentitys,$prefix,$folder,$tema);
-            $resultado = $panel->create();
-            $output->writeln('Resultado:'.$resultado);
-        }else{
-            $output->writeln('No se encontraron entidades');
-        }
+        $crud = new EasyPanelController($this->em, $this->twigExtension, $rootDir, $tipo_panel, $prefix, $folder);
+        $resultado = $crud->createController($entity);
+        $output->writeln('Resultado:'.$resultado);
+
+
         // outputs a message without adding a "\n" at the end of the line
         $output->writeln(['','Comando Terminado, '.$this->timecommand($tiempo_inicio).' :)']);
         return 0;
@@ -109,4 +99,5 @@ class CreateMenuCommand extends Command
 
         return ($hours>0? $hours.'h ':'').($mins>0? $mins.'m ':''). $secs.'s';
     }
+
 }

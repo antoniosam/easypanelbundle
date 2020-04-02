@@ -1,6 +1,6 @@
 <?php
 
-namespace {{ formDirNamespace }};
+namespace {{ formNamespaceDir }};
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,7 +28,9 @@ class {{ entity }}Type extends AbstractType
     {
         $builder
 {%- for columna in infoPropertysEntity -%}
-{% if columna['fieldName'] starts with 'id' %}
+{% if columna['fieldName'] == 'id' %}
+    //->add('{{ columna['fieldName'] }}')
+{% elseif columna['fieldName'] starts with 'id' %}
     ->add('{{ columna['fieldName'] }}')
 {% elseif columna['fieldName'] in ['referencia','salt'] %}
     //->add('{{ columna['fieldName'] }}',TextType::class,['label'=>'{{ columna['fieldName']|capitalize }}','required'  => false,'attr'=>['maxlength'=>{{ columna['length'] }}]])
@@ -80,9 +82,13 @@ class {{ entity }}Type extends AbstractType
     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => '{{ entityNamespace }}'
-         ));
+            {% if panelType == panelTypeApi %}
+                ,'csrf_protection' => false,
+                'allow_extra_fields' => true
+            {% endif %}
+         ]);
     }
 
     /**

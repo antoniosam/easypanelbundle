@@ -1,6 +1,6 @@
 <?php
 
-namespace {{ namespace }};
+namespace {{ namespaceAuthenticatorDir }};
 
 use {{ namespaceadmin }};
 use Ast\CustomPassword\CustomEnconder;
@@ -61,7 +61,7 @@ class EasyPanelLoginFormAuthenticator extends AbstractFormLoginAuthenticator
         throw new InvalidCsrfTokenException();
         }
 
-        $user = $this->entityManager->getRepository(Administrador::class)->findOneBy(['correo' => $credentials['correo']]);
+        $user = $this->entityManager->getRepository({{ entity }}::class)->findOneBy(['correo' => $credentials['correo']]);
 
         if (!$user) {
         // fail authentication with a custom error

@@ -1,7 +1,6 @@
 <?php
 /**
- * Created by marcosamano.
- * Date: 24/03/18
+ * Created by antoniosam
  */
 
 namespace Ast\EasyPanelBundle\Lib\Easy;
@@ -11,8 +10,6 @@ use Ast\EasyPanelBundle\Lib\Easy\View\EasyView;
 class EasyForm extends EasyView
 {
 
-    private $seccion = "";
-    private $opciones = array();
     private $has_delete = false;
     private $deleteform;
 
@@ -26,34 +23,6 @@ class EasyForm extends EasyView
         $this->seccion = $seccion;
         $this->form = $form;
 
-    }
-
-    /**
-     * @return string
-     */
-    public function getSeccion()
-    {
-        return $this->seccion;
-    }
-
-    public function addLinkBack( $route, $parametros,$nombre )
-    {
-        $this->addLink( $route,$parametros,$nombre, 'btn-secondary', 'fa-arrow-left');
-    }
-
-    public function addLinkShow($route, $parametros, $nombre)
-    {
-        $this->addLink( $route, $parametros, $nombre, 'btn-success', 'fa-list-ul');
-    }
-
-    public function addLink($route, $parametros, $texto, $clase = 'btn-secondary', $fa_icon = null)
-    {
-        $this->opciones[] = $this->opcion($route, $parametros, $texto, $clase, $fa_icon);
-    }
-
-    public function cleanLinks()
-    {
-        $this->opciones[] = [];
     }
 
     public function setDeleteForm( $form)
@@ -88,6 +57,13 @@ class EasyForm extends EasyView
         return $return;
     }
 
+    public function defaultConfigForm($routeBack,$paramsRoute,$formDelete = null){
+        $this->addLinkBack($routeBack,$paramsRoute,'Regresar');
+        if($formDelete){
+            $this->setDeleteForm($formDelete);
+        }
+    }
+
     /**
      * @param $seccion
      * @param $form
@@ -95,12 +71,9 @@ class EasyForm extends EasyView
      * @param null $deleteform
      * @return EasyForm
      */
-    public static function easy($seccion, $form, $prefix = null)
+    public static function easy($seccion, $form)
     {
         $form = new EasyForm("Formulario de " . $seccion, $form);
-        if(!empty($prefix)){
-            $form->addLinkBack($prefix . '_index', [], "Regresar " );
-        }
         return $form;
     }
 

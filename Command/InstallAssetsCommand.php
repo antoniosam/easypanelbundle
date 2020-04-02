@@ -16,10 +16,20 @@ use Symfony\Component\Console\Input\InputOption;
 // Add the Container
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use ZipArchive;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class InstallAssetsCommand extends  ContainerAwareCommand
+class InstallAssetsCommand extends  Command
 {
     protected static $defaultName = 'easypanel:install:assets';
+
+    private $params;
+
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->params = $params;
+
+        parent::__construct();
+    }
 
     protected function configure()
     {
@@ -37,11 +47,9 @@ class InstallAssetsCommand extends  ContainerAwareCommand
         // outputs multiple lines to the console (adding "\n" at the end of each line)
         $dir = $input->getOption('dir');
         $tipo = $input->getOption('tipo');
-        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
-            $destino = $this->getContainer()->getParameter("kernel.root_dir").'/../public/'.$dir.'/assets';
-        }else{
-            $destino = $this->getContainer()->getParameter("kernel.root_dir").'/../web/'.$dir.'/assets';
-        }
+        $destino = $this->params->get('kernel.project_dir').DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR.'assets';
+
+
 
 
         $output->writeln([
@@ -56,8 +64,8 @@ class InstallAssetsCommand extends  ContainerAwareCommand
         $assetinternal = $tipo;
 
 
-        $path = Util::createDir($destino.'/'.$assetinternal);
-        $filezip = $path.'/'.$zipname;
+        $path = Util::createDir($destino.DIRECTORY_SEPARATOR.$assetinternal);
+        $filezip = $path.DIRECTORY_SEPARATOR.$zipname;
 
         $output->writeln('Tipo Assets: '.$tipo);
         $output->writeln('Destino: '.$path);
@@ -80,6 +88,7 @@ class InstallAssetsCommand extends  ContainerAwareCommand
 
         // outputs a message without adding a "\n" at the end of the line
         $output->writeln(['','Comando Terminado, '.$this->timecommand($tiempo_inicio).' :)']);
+        return 0;
     }
 
     private function timecommand($tiempo_inicio){

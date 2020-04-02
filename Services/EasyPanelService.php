@@ -10,7 +10,7 @@ use Ast\EasyPanelBundle\Lib\Easy\EasyList;
 use Ast\EasyPanelBundle\Lib\Easy\EasyShow;
 use Ast\EasyPanelBundle\Lib\Easy\Panel;
 use Symfony\Component\HttpFoundation\Response;
-use Twig_Environment;
+use Twig\Environment;
 use Doctrine\ORM\EntityManager;
 
 class EasyPanelService
@@ -26,7 +26,7 @@ class EasyPanelService
     private $paneldefaultindex;
     private $paneldefaultdashboard;
 
-    function __construct(Twig_Environment $twig,  $layout, $vista, $layoutlogin, $menu, $nombreproyecto, $rutalogout)
+    function __construct(Environment $twig,  $layout, $vista, $layoutlogin, $menu, $nombreproyecto, $rutalogout)
     {
         $this->twig = $twig;
         $this->panellayout = ($layout == null)?'@EasyPanel/layoutmaterial.html.twig':$layout;
@@ -101,7 +101,7 @@ class EasyPanelService
         }else if(is_string($vista)){
             $panel = new Panel(Panel::PANEL_API);
             $panel->addHtml($vista);
-            $parameters = $panel->createView();
+            $parameters = $panel->create();
         }else if($vista instanceof Panel){
             $parameters = $vista->create();
         }
@@ -140,28 +140,28 @@ class EasyPanelService
                 }
             }
             $panel->setLocation($seccion);
-            $parameters = $panel->createView();
+            $parameters = $panel->create();
         }elseif($vista instanceof EasyList){
             $panel = new Panel();
             $panel->addList($vista);
             $panel->setLocation($vista->getSeccion());
-            $parameters = $panel->createView();
+            $parameters = $panel->create();
         }else if($vista instanceof EasyShow){
             $panel = new Panel();
             $panel->addShow($vista);
             $panel->setLocation($vista->getSeccion());
-            $parameters = $panel->createView();
+            $parameters = $panel->create();
         }else if($vista instanceof EasyForm){
             $panel = new Panel();
             $panel->addForm($vista);
             $panel->setLocation($vista->getSeccion());
-            $parameters = $panel->createView();
+            $parameters = $panel->create();
         }else if(is_string($vista)){
             $panel = new Panel();
             $panel->addHtml($vista);
-            $parameters = $panel->createView();
+            $parameters = $panel->create();
         }else if($vista instanceof Panel){
-            $parameters = $vista->createView();
+            $parameters = $vista->create();
         }
 
         $parameters['layout'] = $this->panellayout;

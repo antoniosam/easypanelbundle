@@ -11,33 +11,65 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EasyView
 {
-    const RENDER_TEXT = "text";
-    /**
-     * @deprecated deprecated since version 2.5
-     */
-    const RENDER_TEXTO = "text";
-    const RENDER_IMAGE = "image";
-    const RENDER_BOOLEAN = "bool";
-    const RENDER_DATE = "date";
-    /**
-     * @deprecated deprecated since version 2.5
-     */
-    const RENDER_FECHA = "date";
-    const RENDER_TIME = "time";
-    const RENDER_DATETIME = "datetime";
+    const RENDER_TEXT = 'text';
+    const RENDER_IMAGE = 'image';
+    const RENDER_BOOLEAN = 'bool';
+    const RENDER_DATE = 'date';
+    const RENDER_TIME = 'time';
+    const RENDER_DATETIME = 'datetime';
     const RENDER_TIMESTAMP = 'timestamp';
-    /**
-     * @deprecated deprecated since version 2.5
-     */
-    const RENDER_FECHATIME = "datetime";
-    const RENDER_RAW = "raw";
-    const RENDER_LINK = "link";
+    const RENDER_RAW = 'raw';
+    const RENDER_LINK = 'link';
     const RENDER_JSON = 'json';
     const RENDER_ARRAY = 'array';
     const RENDER_TRANSLATE = 'translate';
 
-    private $request;
+    protected $opciones = [];
+    protected  $seccion = '';
 
+    private $request;
+    protected $columnas;
+    protected $paths = [];
+    protected $headers;
+
+    protected $groupField = [];
+    protected $includeGroup = false;
+
+    /**
+     * @param $seccion
+     */
+    public function setSeccion($seccion)
+    {
+        $this->seccion = $seccion;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSeccion()
+    {
+        return $this->seccion;
+    }
+
+    public function addLinkEdit( $route, $parametros, $nombre)
+    {
+        $this->opciones[]= $this->opcion( $route,$parametros,$nombre, 'btn-info', 'fa-edit');
+    }
+
+    public function addLinkBack( $route, $parametros,$nombre )
+    {
+        $this->opciones[] = $this->opcion( $route,$parametros,$nombre, 'btn-secondary', 'fa-arrow-left');
+    }
+
+    public function addLink($route, $parametros, $texto,$clase = 'btn-secondary',$fa_icon = null)
+    {
+        $this->opciones[] = $this->opcion( $route,$parametros,$texto, $clase, $fa_icon);
+    }
+
+    public function cleanLinks()
+    {
+        $this->opciones[] = [];
+    }
 
     /**
      * @return Request
@@ -130,13 +162,13 @@ class EasyView
      */
     protected function formatValue($tipo, $valor,$path='')
     {
-        if($tipo == self::RENDER_TEXTO && is_array($valor)){
+        if($tipo == self::RENDER_TEXT && is_array($valor)){
             $tipo = self::RENDER_ARRAY;
-        }elseif (($tipo == self::RENDER_TEXTO || $tipo == self::RENDER_TEXT) && $valor instanceof \DateTime){
+        }elseif (($tipo == self::RENDER_TEXT ) && $valor instanceof \DateTime){
             $tipo = self::RENDER_DATETIME;
         }
 
-        if ($tipo == self::RENDER_TEXT || $tipo == self::RENDER_TEXTO) {
+        if ($tipo == self::RENDER_TEXT) {
             return $valor;
         } elseif ($tipo == self::RENDER_BOOLEAN) {
             return is_null($valor) ? null : ( $valor == true );
@@ -148,11 +180,11 @@ class EasyView
             return json_decode($valor,true);
         } elseif ($tipo == self::RENDER_ARRAY) {
             return $valor;
-        } elseif ($tipo == self::RENDER_DATE || $tipo == self::RENDER_FECHA) {
+        } elseif ($tipo == self::RENDER_DATE) {
             return is_null($valor)?'---':$valor->format("Y-m-d");
         } elseif ($tipo == self::RENDER_TIME) {
             return is_null($valor)?'---':$valor->format("H:i:s");
-        } elseif ($tipo == self::RENDER_DATETIME || $tipo == self::RENDER_FECHATIME) {
+        } elseif ($tipo == self::RENDER_DATETIME) {
             return is_null($valor)?'---':$valor->format("Y-m-d H:i:s");
         } elseif ($tipo == self::RENDER_TIMESTAMP) {
             return is_null($valor)?0:$valor->getTimestamp()*1000;
@@ -174,96 +206,22 @@ class EasyView
     }
 
     /**
-     * @param $type
-     * @param $valor
-     * @return string
-     */
-    protected function renderValue($type, $value)
-    {
-        if($type == self::RENDER_TEXTO && is_array($value)){
-            $type = self::RENDER_ARRAY;
-        }elseif (($type == self::RENDER_TEXTO || $type == self::RENDER_TEXT) && $value instanceof \DateTime){
-            $type = self::RENDER_DATETIME;
-        }
-
-        if ($type == self::RENDER_TEXTO) {
-            return '<p>' . $value . '</p>';
-        } elseif ($type == self::RENDER_BOOLEAN) {
-            return is_null($value) ? '<i class="fa fa-minus"></i>':(($value==true)?'<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
-        }elseif ($type == self::RENDER_IMAGE) {
-            return '<img src="' . $value . '" alt="Image" class="img-responsive img-fluid easypanel-img" />';
-        } elseif ($type == self::RENDER_LINK) {
-            return '<a href="' . $value . '" target="_blank"  class="easypanel-link">'.$value.'</a>';
-        } elseif ($type == self::RENDER_JSON) {
-            $html = '<ul>';
-            foreach ($value as $clave=>$item){
-                if(is_array($item)){
-                    $html .= '<ol>';
-                    foreach ($list as $clav=>$ite){
-                        $html .= '<li>'.$clave.' => '.json_encode($ite).'</li>';
-                    }
-                    $html .= '</ol>';
-                }else{
-                    $html .= '<li>'.$clave.' => '.$item.'</li>';
-                }
-            }
-            $html .= '<ul>';
-            return $html;
-        } elseif ($type == self::RENDER_ARRAY) {
-            $html = '<ul>';
-            foreach ($value as $clave=>$item){
-                $html .= '<li>'.$clave.' => '.$item.'</li>';
-            }
-            $html .= '<ul>';
-            return $html;
-        } elseif ($type == self::RENDER_FECHA) {
-            return $value;
-        } elseif ($type == self::RENDER_TIME) {
-            return $value;
-        } elseif ($type == self::RENDER_FECHATIME) {
-            return $value;
-        } elseif ($type == self::RENDER_TRANSLATE) {
-            $html = '';
-            foreach ($value as $idioma => $val):
-                $html .= '<div class="render-translate-item row ">';
-                $html .= '<div class="render-translate-languaje col-1 col-sm-1">'.$idioma.'</div>';
-                $html .= '<div class="render-translate-content col-10 col-sm-10">'.$val.'</div>';
-                $html .= '</div>';
-            endforeach;
-            return $html;
-        } elseif ($type == self::RENDER_RAW) {
-            return $value;
-        } else {
-            return $value;
-        }
-    }
-
-
-    /**
      * @param $tipo
      * @param $valor
      * @return string
      */
-    protected function renderColumna($tipo, $valor,$path='')
+    protected function  renderColumna($tipo, $valor)
     {
-        if($tipo == self::RENDER_TEXTO && is_array($valor)){
-            $tipo = self::RENDER_ARRAY;
-        }elseif ($tipo == self::RENDER_TEXTO && $valor instanceof \DateTime){
-            $tipo = self::RENDER_FECHATIME;
-        }
-
-        if ($tipo == self::RENDER_TEXTO) {
+        if ($tipo == self::RENDER_TEXT) {
             return '<p>' . $valor . '</p>';
         } elseif ($tipo == self::RENDER_BOOLEAN) {
             return is_null($valor) ? '<i class="fa fa-minus"></i>':(($valor==true)?'<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
         }elseif ($tipo == self::RENDER_IMAGE) {
-            $url = (strpos($path,$valor)!==false)? $path :str_replace('//','/',$path.'/'.$valor);
-            return '<img src="' . $url . '" alt="Image" class="img-responsive img-fluid easypanel-img" />';
+            return '<img src="' . $valor . '" alt="Image" class="img-responsive img-fluid easypanel-img" />';
         } elseif ($tipo == self::RENDER_LINK) {
-            $url = (strpos($path,$valor)!==false)? $path :str_replace('//','/',$path.'/'.$valor);
-            return '<a href="' . $url . '" target="_blank"  class="easypanel-link">'.$valor.'</a>';
+            return '<a href="' . $valor . '" target="_blank"  class="easypanel-link">'.$valor.'</a>';
         } elseif ($tipo == self::RENDER_JSON) {
-            $list = json_decode($valor,true);
+            $list = $valor;
             $html = '<ul>';
             foreach ($list as $clave=>$item){
                 if(is_array($item)){
@@ -285,12 +243,14 @@ class EasyView
             }
             $html .= '<ul>';
             return $html;
-        } elseif ($tipo == self::RENDER_FECHA) {
-            return is_null($valor)?'---':$valor->format("Y-m-d");
+        } elseif ($tipo == self::RENDER_DATE) {
+            return '<p>' . $valor . '</p>';
         } elseif ($tipo == self::RENDER_TIME) {
-            return is_null($valor)?'---':$valor->format("H:i:s");
-        } elseif ($tipo == self::RENDER_FECHATIME) {
-            return is_null($valor)?'---':$valor->format("Y-m-d H:i:s");
+            return '<p>' . $valor . '</p>';
+        } elseif ($tipo == self::RENDER_DATETIME) {
+            return '<p>' . $valor . '</p>';
+        } elseif ($tipo == self::RENDER_TIMESTAMP) {
+            return '<p>' . $valor . '</p>';
         } elseif ($tipo == self::RENDER_TRANSLATE) {
             if(!is_null($valor)){
                 if(!is_array($valor)){
@@ -304,11 +264,10 @@ class EasyView
                     $html .= '<div class="render-translate-content col-10 col-sm-10">'.$val.'</div>';
                     $html .= '</div>';
                 endforeach;
-                $html .= '';
+                return $html;
             }else{
-                $html = 'NULL';
+                return '';
             }
-            return $html;
         } elseif ($tipo == self::RENDER_RAW) {
             return $valor;
         } else {
@@ -333,10 +292,13 @@ class EasyView
         );
     }
 
-    protected function defineHeaders($columnas, $cabeceras)
+    protected function defineHeaders($columnas, $cabeceras,$firstColumnCount = false)
     {
         if (count($cabeceras) == 0) {
-            $cabeceras = array();
+            $cabeceras = [];
+            if($firstColumnCount){
+                $cabeceras[]='#';
+            }
             foreach ($columnas as $columna => $render) {
                 if(strpos($columna,'.')!==false){
                     list($titulo,$submetodo)= explode('.',$columna);
@@ -351,30 +313,52 @@ class EasyView
         return $cabeceras;
     }
 
-    protected function generateParameters($objeto, $opciones)
+    protected function generateParameters($arrayObject, $opciones)
     {
         $limite = count($opciones);
         for ($i = 0; $i < $limite; $i++) {
             $param = [];
             foreach ($opciones[$i]["parameters"] as $key => $campo):
-                if(strpos($campo,'.')!==false){
-                    list($subobjeto,$submetodo)= explode('.',$campo);
-                    $temp = 'get' . $subobjeto;
-                    $sub = $objeto->$temp();
-                    if($sub!=null){
-                        $temp = 'get' . $submetodo;
-                        $param[$key] = $sub->$temp();
-                    }else{
-                        $param[$key] = null;
-                    }
-                }else{
-                    $getter = 'get' . $campo;
-                    $param[$key] = $objeto->$getter();
-                }
+                $param[$key] = $arrayObject[$key];
             endforeach;
             $opciones[$i]["parameters"] = $param;
         }
         return $opciones;
     }
+
+
+    public function renderAsImage ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_IMAGE; $this->paths[$columna]=$path;} }
+    public function renderAsBoolean($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_BOOLEAN;}}
+    public function renderAsDate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_DATE;} }
+    public function renderAsTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TIME;} }
+    public function renderAsDateTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_DATETIME;} }
+    public function renderAsTimestamp($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_TIMESTAMP; } }
+    public function renderAsRaw ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_RAW;} }
+    public function renderAsLink ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_LINK; $this->paths[$columna]=$path;} }
+    public function renderAsJson ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_JSON;} }
+    public function renderAsArray ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_ARRAY;} }
+    public function renderAsTranslate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TRANSLATE;} }
+
+    public function apiGroupField($field){
+        $this->includeGroup = true;
+        $this->groupField[] = $field;
+    }
+
+    protected function groupFieldsApi($arrayObject){
+        foreach ($this->groupField as $field){
+            if(isset($arrayObject[$field])){
+                throw new \Error('No puedes agrupar valores en el campo '.$field.' por que es un valor que ya existe');
+            }else{
+                foreach ($arrayObject as $label=>$value ){
+                    if(strpos($label,$field.'.')!==false){
+                        $arrayObject[$field][str_replace($field.'.','',$label)] = $value;
+                        unset($arrayObject[$label]);
+                    }
+                }
+            }
+        }
+        return $arrayObject;
+    }
+
 
 }

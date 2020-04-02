@@ -7,8 +7,12 @@
 
 namespace Ast\EasyPanelBundle\Lib\Crud;
 
+
+use Ast\EasyPanelBundle\Lib\Crud\EasyPanelCreate;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\InfoEntityImport;
 use Ast\EasyPanelBundle\Lib\Crud\Utils\Util;
+use \Doctrine\ORM\EntityManager;
+use \Twig\Environment;
 
 class EasyPanelMenu
 {
@@ -18,20 +22,20 @@ class EasyPanelMenu
     protected $templating;
     protected $kernel_project_dir;
     protected $proyecto;
-    protected $panelbundledir;
-    protected $panelbundle;
+    protected $folderdir;
+    protected $folder;
     protected $entitybundle;
     protected $prefix;
     protected $tema;
 
     public function __construct(
-        \Doctrine\ORM\EntityManager $entityManager,
-        \Twig_Environment $templating,
+        EntityManager $entityManager,
+        Environment $templating,
         $kernel_project_dir,
         $proyecto,
-        $panelbundle,
-        $entitybundle,
+        $listaentitys,
         $prefix,
+        $folder,
         $tema
     )
     {
@@ -39,16 +43,13 @@ class EasyPanelMenu
         $this->templating = $templating;
         $this->kernel_project_dir = $kernel_project_dir ;
         $this->proyecto = $proyecto;
-        $this->panelbundle = $panelbundle;
-        $this->entitybundle = $entitybundle;
+        $this->folder = $folder;
+        $this->entitybundle = $listaentitys;
         $this->prefix = $prefix;
         $this->tema = $tema;
-        if(\Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION == 4){
-            $this->panelbundledir = $this->kernel_project_dir.'../templates/'.$this->panelbundle;
-        }else{
-            $this->panelbundledir = $this->kernel_project_dir . $this->panelbundle . '/Resources/views';
-        }
-        Util::createDir($this->panelbundledir);
+
+        $this->folderdir = $this->kernel_project_dir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$this->folder;
+
     }
 
     public function create()
@@ -90,7 +91,7 @@ class EasyPanelMenu
         }
 
 
-        file_put_contents($this->panelbundledir.'/menu_gen.html.twig',$html);
+        file_put_contents($this->folderdir.'/menu_gen.html.twig',$html);
 
         return 'Menu Creado con '.count($lista).' rutas';
     }

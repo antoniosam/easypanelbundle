@@ -10,7 +10,7 @@ namespace Ast\EasyPanelBundle\Lib\Crud\Utils;
 class Util
 {
     public static function createDir($dir){
-        $filename = str_replace('//','/',$dir.'/');
+        $filename = str_replace('//','/',$dir.DIRECTORY_SEPARATOR);
         if (!file_exists($filename)) {
             mkdir($filename, 0777, true);
         }

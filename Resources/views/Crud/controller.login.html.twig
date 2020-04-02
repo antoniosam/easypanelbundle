@@ -1,27 +1,25 @@
 <?php
 
-namespace {{ namespace }};
+namespace {{ controllerNamespaceDir }};
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 use Ast\EasyPanelBundle\Services\EasyPanelService;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-{%  if prefix_controller_route is not empty %}
 /**
- * @Route("{{ prefix_controller_route }}" )
+ * @Route("{{ prefix_route_controller }}" )
  */
- {% endif %}
-class LoginController extends Controller
+class LoginController extends AbstractController
 {
 
     /**
-     * @Route("/", name="{{ ruta }}_index")
+     * @Route("/", name="{{ prefix_route_name }}_index")
      */
-    public function indexAction({{ authenticationautowire }}{{ serviceautowire }})
+    public function indexAction(AuthenticationUtils $authenticationUtils {{ serviceautowire }})
     {
-        {{ authenticationincontroller|raw }}
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
@@ -32,7 +30,7 @@ class LoginController extends Controller
         ]);
     }
     /**
-    * @Route("/logout", name="{{ ruta }}_logout")
+    * @Route("/logout", name="{{ prefix_route_name }}_logout")
     */
     public function logoutAction()
     {

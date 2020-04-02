@@ -1,7 +1,6 @@
 <?php
 /**
- * Created by marcosamano.
- * Date: 24/03/18
+ * Created by antonisam.
  */
 
 namespace Ast\EasyPanelBundle\Lib\Easy;
@@ -11,78 +10,23 @@ use Ast\EasyPanelBundle\Lib\Easy\View\EasyView;
 class EasyShow extends EasyView
 {
 
-    private $opciones = array();
-    private $seccion = "";
-    private $cabeceras = [];
-    private $columnas;
-    private $consulta;
+    private $objeto;
+    private $arrayObject;
     private $has_delete = false;
     private $deleteform;
-    private $paths = [];
 
     private $hasincludelayout = false;
     private $includelayout;
 
-    private $groupField = [];
-    private $includeGroup = false;
 
     function __construct($seccion,$objeto,$columnas)
     {
         $this->seccion = $seccion;
-        $this->consulta = $objeto;
+        $this->objeto = $objeto;
         $this->columnas = [];
         foreach ($columnas as $columna){
-            $this->columnas[$columna] = self::RENDER_TEXTO;
+            $this->columnas[$columna] = self::RENDER_TEXT;
         }
-    }
-
-    /**
-     * @param $seccion
-     */
-    public function setSeccion($seccion)
-    {
-        $this->seccion = $seccion;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSeccion()
-    {
-        return $this->seccion;
-    }
-
-
-    public function renderAsImage ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_IMAGE; $this->paths[$columna]=$path;} }
-    public function renderAsBoolean($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_BOOLEAN;}}
-    public function renderAsDate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_DATE;} }
-    public function renderAsTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TIME;} }
-    public function renderAsDateTime ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_DATETIME;} }
-    public function renderAsTimestamp($columna) { if (isset($this->columnas[$columna])) { $this->columnas[$columna] = self::RENDER_TIMESTAMP; } }
-    public function renderAsRaw ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_RAW;} }
-    public function renderAsLink ($columna, $path=''){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_LINK; $this->paths[$columna]=$path;} }
-    public function renderAsJson ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_JSON;} }
-    public function renderAsArray ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_ARRAY;} }
-    public function renderAsTranslate ($columna){ if (isset($this->columnas[$columna])){ $this->columnas[$columna] = self::RENDER_TRANSLATE;} }
-
-    public function addLinkEdit( $route, $parametros, $nombre)
-    {
-        $this->opciones[]= $this->opcion( $route,$parametros,$nombre, 'btn-info', 'fa-edit');
-    }
-
-    public function addLinkBack( $route, $parametros,$nombre )
-    {
-        $this->opciones[] = $this->opcion( $route,$parametros,$nombre, 'btn-secondary', 'fa-arrow-left');
-    }
-
-    public function addLink($route, $parametros, $texto,$clase = 'btn-secondary',$fa_icon = null)
-    {
-        $this->opciones[] = $this->opcion( $route,$parametros,$texto, $clase, $fa_icon);
-    }
-
-    public function cleanLinks()
-    {
-        $this->opciones[] = [];
     }
 
     public function setDeleteForm( $form)
@@ -91,26 +35,8 @@ class EasyShow extends EasyView
         $this->deleteform = $form;
     }
 
-    /**
-     * @deprecated deprecated since version 2.5
-     *
-     * @param $nombre
-     * @param $route
-     * @param $parametros
-     */
-    public function setRemoveLink($nombre, $route, $parametros )
-    {
-        $this->opciones[] = $this->opcion( $route,$parametros,$nombre, 'btn-danger', 'fa-trash');
-    }
-
     public function setLabelsFields(array $labels){
-        $this->cabeceras = $labels;
-    }
-    /**
-     * @deprecated deprecated since version 2.5
-     */
-    public function setCabeceras(array $cabceras){
-        $this->setLabelsFields($cabceras);
+        $this->headers = $labels;
     }
 
     /**
@@ -122,105 +48,56 @@ class EasyShow extends EasyView
         $this->includelayout = $includelayout;
     }
 
-    public function fetchData(){
-        $this->cabeceras = $this->defineHeaders($this->columnas,$this->cabeceras);
-        $key = 0;
-        $object = [];
+    public function parseObject(){
+        $this->arrayObject = [];
+        $paths = count($this->paths) > 0;
+        $item = [];
         foreach ($this->columnas as $columna=>$type) {
-            $path = '';
-            if(count($this->paths)>0){
-                $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
-            }
-            $value = $this->getValueObject($this->consulta,$columna);
-            $dataObject = $this->formatValue($type, $value , $path);
-            $object[] = array('label' => $this->cabeceras[$key], 'value' => $dataObject, 'type' => $type);
-            $key++;
+            $path = ($paths && isset($this->paths[$columna]))?$this->paths[$columna]:'';
+            $value = $this->getValueObject($this->objeto,$columna);
+            $item[$columna] = $this->formatValue($type, $value , $path);
         }
-        return $object;
-    }
+        $this->arrayObject = $item;
 
+    }
     /**
      * @return array
      */
     public function generatetoHtml(){
+
         $return = [];
         $return["seccion"]= $this->seccion;
-        $this->cabeceras = $this->defineHeaders($this->columnas,$this->cabeceras);
+        $headers = $this->defineHeaders($this->columnas,$this->headers);
         $fila = [];
-        foreach ($this->fetchData() as $item) {
-            $fila[] = ['label' => $item['label'], 'valor' =>  $this->renderColumna( $item['type'] , $item['value'] )];
+        $this->parseObject();
+        $i=0;
+        foreach ($this->arrayObject as $columna=>$value) {
+            $fila[] = ['label' => $headers[$i], 'valor' => $this->renderColumna( $this->columnas[$columna] , $value )];
+            $i++;
         }
         $return["filas"] = $fila;
-        $return["rutas"] = $this->generateParameters($this->consulta,$this->opciones);
+        $return["rutas"] = $this->generateParameters($this->arrayObject,$this->opciones);
         $return["has_delete"] = $this->has_delete;
         $return["delete"] = $this->deleteform;
         $return["has_includelayout"] = $this->hasincludelayout;
         $return["includelayout"] = $this->includelayout;
 
         return $return;
-    }
-
-    public function apiGroupField($field){
-        $this->includeGroup = true;
-        $this->groupField[] = $field;
     }
 
     /**
      * @return array
      */
     public function generatetoApi(){
-        $fila = [];
-        foreach ($this->fetchData() as $item){
-            $fila[$item['label']]=$item['value'];
-        }
+        $this->parseObject();
         if($this->includeGroup){
-            foreach ($this->groupField as $field){
-                if(in_array($field,$fila)){
-                    throw new \Error('El Campo que deseas agrupar ya existe en la lista de campos');
-                }else{
-                    foreach ($fila as $label=>$value ){
-                        if(strpos($label,$field.'.')!==false){
-                            $fila[$field][str_replace($field.'.','',$label)] = $value;
-                            unset($fila[$label]);
-                        }
-                    }
-                }
-            }
+            $data = $this->groupFieldsApi($this->arrayObject);
+        }else{
+            $data = $this->arrayObject;
         }
-        return ['seccion'=>$this->seccion,'data'=> $fila];
+        return ['code'=> true ,'message'=>'','data'=> $data];
     }
 
-
-    /**
-     * @deprecated deprecated since version 2.5
-     * @return array
-     */
-    public function generar()
-    {
-        $return = array();
-        $return["seccion"]= $this->seccion;
-        $this->cabeceras = $this->defineHeaders($this->columnas,$this->cabeceras);
-        $fila = [];
-        $path ='';
-        $key = 0;
-        foreach ($this->columnas as $columna=>$tipo) {
-            if(count($this->paths)>0){
-                $path = (isset($this->paths[$columna]))?$this->paths[$columna]:'';
-            }
-            $value = $this->getValueObject($this->consulta,$columna);
-            $html = $this->renderColumna($tipo, $value , $path);
-            $fila[] = array('label' => $this->cabeceras[$key], 'valor' => $html);
-            $key++;
-        }
-        $return["filas"] = $fila;
-        $return["rutas"] = $this->generateParameters($this->consulta,$this->opciones);
-        $return["has_delete"] = $this->has_delete;
-        $return["delete"] = $this->deleteform;
-        $return["has_includelayout"] = $this->hasincludelayout;
-        $return["includelayout"] = $this->includelayout;
-
-        return $return;
-    }
 
     public function fixRenders(){
         $this->renderAsBoolean("activo");
@@ -231,6 +108,15 @@ class EasyShow extends EasyView
         $this->renderAsDate("fecha");
         $this->renderAsDate("dia");
     }
+
+    public function defaultConfigShow($prefix,$headers,$formDelete){
+        $this->addLinkBack($prefix.'_index',[],"Regresar ");
+        $this->addLinkEdit($prefix.'_edit',array("id"=>"id"),"Editar ".$this->getSeccion());
+        $this->setLabelsFields($headers);
+        $this->setDeleteForm($formDelete);
+    }
+
+
     /**
      * @param $seccion
      * @param $consulta
@@ -238,14 +124,9 @@ class EasyShow extends EasyView
      * @param $prefix
      * @return EasyShow
      */
-    public static function easy($seccion , $consulta,$columnas,$prefix = null){
-        $show = new EasyShow($seccion,$consulta,$columnas);
+    public static function easy($seccion , $consulta, $columnas){
+        $show = new EasyShow($seccion, $consulta, $columnas);
         $show->fixRenders();
-        if(!empty($prefix)){
-            $show->addLinkBack($prefix.'_index',[],"Regresar ");
-            $show->addLinkEdit($prefix.'_edit',array("id"=>"id"),"Editar ".$seccion);
-        }
-
         return $show;
     }
 
