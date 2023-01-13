@@ -13,8 +13,7 @@
   "require": {
     "php": ">=7.2.5",
     "antoniosam/easy-doctrine": "^1.0",
-    "antoniosam/custom-password": "^1.0",
-    "antoniosam/utilstring": "^1.2"
+    "antoniosam/php-utils": "^0.1"
   },
   "autoload": {
     "psr-4" : {
